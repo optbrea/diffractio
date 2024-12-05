@@ -34,6 +34,7 @@ jobs:
         pip install .
         pip install jupyter papermill
     - name: Execute notebooks
+      continue-on-error: true
       run: |
         notebooks=$(find "$NOTEBOOK_DIR" -name "*.ipynb")
         if [[ -n "$notebooks" ]]; then

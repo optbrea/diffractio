@@ -805,13 +805,7 @@ __________________________________________________
 
     - layer
 
-    - lens_convergent
-
-    - lens_divergent
-
-    - lens_plane_convergent
-
-    - lens_plane_divergent
+    - lens
 
     - mask_from_array
 

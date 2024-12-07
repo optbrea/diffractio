@@ -36,7 +36,7 @@ EM = Vector_source_XY(x0, y0, wavelength)
 EM.azimuthal_wave(u=1, r0=(0*um, 0*um), radius=(length / 5, length / 5))
 EM.VRS(z=30*mm, new_field=False)
 
-Ex, Ey, _ = EM.get()
+Ex, Ey, _ = EM.get(kind='E')
 
 EM.reduce_matrix = ''
 
@@ -93,6 +93,6 @@ class Test_Vector_fields_XY():
         func_name = sys._getframe().f_code.co_name
         # filename = '{}{}.npz'.format(newpath, func_name)
 
-        EM.draw(kind='param_ellipse')
+        EM.draw(kind='param_ellipses')
         save_figure_test(newpath, func_name, add_name='')
         assert True

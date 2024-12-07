@@ -119,9 +119,9 @@ class Test_Scalar_fields_XZ():
         u1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength)
         u1.incident_field(u0)
 
-        u1.lens_convergent(r0=(0, 100),
-                           aperture=300*um,
-                           radius=(1000*um, -250*um),
+        u1.lens(r0=(0, 100),
+                           size=300*um,
+                           radii=(1000*um, -250*um),
                            thickness=100*um,
                            refractive_index=2,
                            angle=0*degrees,

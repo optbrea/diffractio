@@ -58,6 +58,6 @@ class Test_Scalar_masks_XYZ():
         uxyz.sphere(r0=(0*um, 0*um, 0*um),
                     radius=(10*um, 30*um, 50*um),
                     refractive_index=2,
-                    angles=(0*degrees, 0*degrees, 45*degrees))
+                    rotation = None)
         uxyz.incident_field(t1)
         assert True

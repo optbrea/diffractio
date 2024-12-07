@@ -1,4 +1,4 @@
-Scalar_XZ
+Vector_XZ
 =============
 
 .. toctree::

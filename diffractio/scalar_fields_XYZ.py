@@ -1173,8 +1173,8 @@ class Scalar_field_XYZ():
         if has_draw[0] is True:
             plt.figure()
             plt.plot(self.z, beam_width, 'r', label='axis')
-            plt.xlabel("z ($\mu$m)")
-            plt.ylabel("widths ($\mu$m)")
+            plt.xlabel(r"z ($\mu$m)")
+            plt.ylabel(r"widths ($\mu$m)")
             plt.legend()
 
         return beam_width_x, beam_width_y, principal_axis_z
@@ -1586,8 +1586,8 @@ class Scalar_field_XYZ():
                 elif kind == 'phase':
                     image.set_clim(-np.pi, np.pi)
                 texto = "z = {:2.3f} mm".format(self.z[i_prog] / mm)
-                plt.xlabel("x (microns)")
-                plt.ylabel("y (microns)")
+                plt.xlabel(r"x (microns)")
+                plt.ylabel(r"y (microns)")
                 plt.title(texto)
                 plt.draw()
                 plt.savefig("{}_{:04.0f}.png".format(file, i_prog))
@@ -1614,8 +1614,8 @@ class Scalar_field_XYZ():
                     elif kind == 'phase':
                         image.set_clim(-np.pi, np.pi)
                     texto = "z = {:2.3f} mm".format(self.z[i_prog] / mm)
-                    plt.xlabel("x (microns)")
-                    plt.ylabel("y (microns)")
+                    plt.xlabel(r"x (microns)")
+                    plt.ylabel(r"y (microns)")
                     plt.title(texto)
                     plt.draw()
                     writer.grab_frame(facecolor='k')

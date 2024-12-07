@@ -22,6 +22,6 @@ Examples for scalar propagation
    source/examples_scalar/talbot_effect.ipynb
    source/examples_scalar/blazed_grating.ipynb
    source/examples_scalar/dammann.ipynb
-   source/examples_scalar/dobule_grating.ipynb
+   source/examples_scalar/double_grating.ipynb
    source/examples_scalar/variable_refractive_index.ipynb
    source/examples_scalar/image_formation.ipynb

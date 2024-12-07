@@ -1333,8 +1333,8 @@ class Scalar_field_XZ():
             plt.figure()
             plt.plot(self.z / mm, intensity_prof, 'k')
             plt.grid()
-            plt.xlabel("$z\,(mm)$")
-            plt.ylabel("$I(z)$")
+            plt.xlabel(r"$z\,(mm)$")
+            plt.ylabel(r"$I(z)$")
             plt.ylim(bottom=0)
 
         return intensity_prof

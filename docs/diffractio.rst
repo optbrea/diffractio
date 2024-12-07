@@ -12,6 +12,14 @@ diffractio.config module
    :undoc-members:
    :show-inheritance:
 
+diffractio.diffractio module
+----------------------------
+
+.. automodule:: diffractio.diffractio
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 diffractio.scalar\_fields\_X module
 -----------------------------------
 

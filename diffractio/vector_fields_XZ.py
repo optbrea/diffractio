@@ -762,8 +762,8 @@ class Vector_field_XZ():
                 
             plt.xlim(self.z[0], self.z[-1])
             plt.grid('on')
-            plt.xlabel("$z\,(mm)$")
-            plt.ylabel("$Check$")
+            plt.xlabel(r"$z\,(mm)$")
+            plt.ylabel(r"$Check$")
             plt.ylim(bottom=0)
             plt.legend()
 
@@ -2041,7 +2041,7 @@ def draw2D_xz(
         y,
         ax=None,
         xlabel="x $(\mu m)$",
-        ylabel="$y  (\mu m)$",
+        ylabel="r$y  (\mu m)$",
         title="",
         cmap="YlGnBu",  # YlGnBu  seismic
         interpolation='bilinear',  # 'bilinear', 'nearest'

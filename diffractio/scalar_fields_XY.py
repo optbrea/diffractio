@@ -2378,8 +2378,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(intensity,
                                        self.x,
                                        self.y,
-                                       xlabel="$x  (\mu m)$",
-                                       ylabel="$y  (\mu m)$",
+                                       xlabel="r$x  (\mu m)$",
+                                       ylabel="r$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2416,8 +2416,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(amplitude,
                                        self.x,
                                        self.y,
-                                       xlabel="$x  (\mu m)$",
-                                       ylabel="$y  (\mu m)$",
+                                       xlabel="r$x  (\mu m)$",
+                                       ylabel="r$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2453,8 +2453,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(phase,
                                        self.x,
                                        self.y,
-                                       xlabel="$x  (\mu m)$",
-                                       ylabel="$y  (\mu m)$",
+                                       xlabel="r$x  (\mu m)$",
+                                       ylabel="r$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2506,8 +2506,8 @@ class Scalar_field_XY():
                         aspect='auto',
                         origin='lower',
                         extent=extension)
-        plt.xlabel("$x  (\mu m)$")
-        plt.ylabel("$y  (\mu m)$")
+        plt.xlabel(r"$x  (\mu m)$")
+        plt.ylabel(r"$y  (\mu m)$")
         plt.colorbar(orientation='horizontal', shrink=0.66, pad=0.1)
 
         plt.axis('scaled')
@@ -2526,8 +2526,8 @@ class Scalar_field_XY():
                         aspect='auto',
                         origin='lower',
                         extent=extension)
-        plt.xlabel("$x  (\mu m)$")
-        plt.ylabel("$y  (\mu m)$")
+        plt.xlabel(r"$x  (\mu m)$")
+        plt.ylabel(r"$y  (\mu m)$")
         plt.colorbar(orientation='horizontal', shrink=0.66, pad=0.1)
 
         plt.axis('scaled')
@@ -2568,8 +2568,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(rf,
                                        self.x,
                                        self.y,
-                                       xlabel="$x  (\mu m)$",
-                                       ylabel="$y  (\mu m)$",
+                                       xlabel="r$x  (\mu m)$",
+                                       ylabel="r$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2598,8 +2598,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(np.abs(self.n),
                                        self.x,
                                        self.y,
-                                       xlabel="$x  (\mu m)$",
-                                       ylabel="$y  (\mu m)$",
+                                       xlabel="r$x  (\mu m)$",
+                                       ylabel="r$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,

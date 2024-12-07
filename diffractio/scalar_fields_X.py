@@ -724,7 +724,7 @@ class Scalar_field_X():
     def _RS_(self, z: float, n: float, matrix: bool = False,
              new_field: bool = True, fast: bool = False, kind: str = "z",
              xout: None | NDArrayFloat = None, verbose: bool = True):
-        """Fast-Fourier-Transform  method for numerical integration of diffraction Rayleigh-Sommerfeld formula. `Thin Element Approximation` is considered for determining the field just after the mask:
+        r"""Fast-Fourier-Transform  method for numerical integration of diffraction Rayleigh-Sommerfeld formula. `Thin Element Approximation` is considered for determining the field just after the mask:
 
         :math:`\mathbf{E}_{0}(\zeta,\eta)=t(\zeta,\eta)\mathbf{E}_{inc}(\zeta,\eta)`
 
@@ -993,13 +993,13 @@ class Scalar_field_X():
                 # calculating scalar diffraction below
                 
                 R = np.sqrt(xout**2 + z_now**2)
-                if z>=0:
+                if z.all()>=0:
                     F0 = (0.5j * k * z_now / R) * hankel1(1, k * R)
                 else:
                     F0 = (-0.5j * k * z_now / R) * hankel1(1, k * R).conjugate()
 
                 R = np.sqrt(self.x**2 + z_now**2)
-                if z>=0:
+                if z.all()>=0:
                     F = (0.5j * k * z_now / R) * hankel1(1, k * R)
                 else:
                     F = (-0.5j * k * z_now / R) * hankel1(1, k * R).conjugate()
@@ -1212,7 +1212,7 @@ class Scalar_field_X():
         return u_iter, u_out_gv, u_out_roi, u_axis_x, u_axis_z, u_max, z_max
 
     def to_far_field(self, angles: np.array,  z_obs: float | None = None,  has_draw: bool = True, has_logarithm=True, verbose: bool = True, **kwargs):
-        """
+        r"""
         Compute the far field of a source or mask. 
         
 
@@ -1433,34 +1433,34 @@ class Scalar_field_X():
 
         if kind == "field":
             plt.subplot(211)
-            plt.plot(self.x, y, "k", lw=0.5)
-            plt.xlabel("$x\,(\mu m)$")
-            plt.ylabel("$A\,(arb.u.)$")
+            plt.plot(self.x, y, "k")
+            plt.xlabel(r"$x\,(\mu m)$")
+            plt.ylabel(r"$A\,(arb.u.)$")
             plt.xlim(left=self.x[0], right=self.x[-1])
             plt.ylim(bottom=0)
 
             plt.subplot(212)
-            plt.plot(self.x, phase, "k", lw=0.5)
-            plt.xlabel("$x\,(\mu m)$")
-            plt.ylabel("$phase\,(radians)$")
+            plt.plot(self.x, phase, "k")
+            plt.xlabel(r"$x\,(\mu m)$")
+            plt.ylabel(r"$phase\,(radians)$")
             plt.xlim(left=self.x[0], right=self.x[-1])
 
         elif kind in ("amplitude", "intensity", "phase"):
-            plt.plot(self.x, y, "k", lw=0.5)
-            plt.xlabel("$x\,(\mu m)$")
+            plt.plot(self.x, y, "k")
+            plt.xlabel(r"$x\,(\mu m)$")
             plt.ylabel(kind)
             plt.xlim(left=self.x[0], right=self.x[-1])
 
         elif kind == "fft":
-            plt.plot(self.x/degrees, y, "k", lw=0.5)
+            plt.plot(self.x/degrees, y, "k")
             plt.xlim(left=self.x[0]/degrees, right=self.x[-1]/degrees)
-            plt.xlabel("$\phi\,(degrees)$")
+            plt.xlabel(r"$\phi\,(degrees)$")
             plt.ylabel(kind)
 
         elif kind == "fill":
             # this is for binary maks, as gratings and I0s.
             plt.fill_between(self.x, 0, amplitude)
-            plt.xlabel("$x\,(\mu m)$")
+            plt.xlabel(r"$x\,(\mu m)$")
             plt.ylabel(kind)
             plt.xlim(left=self.x[0], right=self.x[-1])
 
@@ -1478,7 +1478,7 @@ class Scalar_field_X():
 
 def kernelRS(x: NDArrayFloat, wavelength: float, z: float,
              n: float = 1., kind: str = "z", fast: bool = False):
-    """Kernel for RS propagation. It uses the hankel tansform.
+    r"""Kernel for RS propagation. It uses the hankel tansform.
 
     There is a 'fast' version based on :math:`hk_1 = \sqrt{2/(\pi \, k \, R)}  e^{i  (k \, R - 3  \pi / 4)}` which approximates the result.
 

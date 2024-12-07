@@ -2126,8 +2126,8 @@ class Vector_field_XY():
         if colorbar is True:
             plt.colorbar(orientation='horizontal', shrink=0.66, pad=0.15)
 
-        plt.xlabel("$x  (\mu m)$")
-        plt.ylabel("$y  (\mu m)$")
+        plt.xlabel(r"$x  (\mu m)$")
+        plt.ylabel(r"$y  (\mu m)$")
         h.set_clim(0, image.max())
         plt.subplots_adjust(0.01, 0.01, 0.99, 0.95, 0.05, 0.05)
 
@@ -2170,8 +2170,8 @@ def draw2D_XY(
         x,
         y,
         ax=None,
-        xlabel="$x  (\mu m)$",
-        ylabel="$y  (\mu m)$",
+        xlabel="r$x  (\mu m)$",
+        ylabel="r$y  (\mu m)$",
         title="",
         color="YlGnBu",  # YlGnBu  seismic
         interpolation='bilinear',  # 'bilinear', 'nearest'

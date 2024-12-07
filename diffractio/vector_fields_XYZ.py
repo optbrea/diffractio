@@ -609,12 +609,12 @@ class Vector_field_XYZ():
         if has_draw is True:
             if z_scale == 'mm':
                 plt.plot(self.z / mm, field_x, 'k', lw=2)
-                plt.xlabel('$z\,(mm)$')
+                plt.xlabel(r'$z\,(mm)$')
                 plt.xlim(left=self.z[0] / mm, right=self.z[-1] / mm)
 
             elif z_scale == 'um':
                 plt.plot(self.z, field_x, 'k', lw=2)
-                plt.xlabel('$z\,(\mu m)$')
+                plt.xlabel(r'$z\,(\mu m)$')
                 plt.xlim(left=self.z[0], right=self.z[-1])
 
             plt.ylabel(kind)

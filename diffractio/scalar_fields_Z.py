@@ -433,11 +433,11 @@ class Scalar_field_Z():
             return
         if z_scale == 'mm':
             z_drawing = self.z / mm
-            zlabel = '$z\,(mm)$'
+            zlabel = r'$z\,(mm)$'
 
         else:
             z_drawing = self.z
-            zlabel = '$z\,(\mu m)$'
+            zlabel = r'$z\,(\mu m)$'
 
         amplitude, intensity, phase = field_parameters(self.u)
 
@@ -460,14 +460,14 @@ class Scalar_field_Z():
             plt.subplot(211)
             plt.plot(z_drawing, y, 'k', lw=2)
             plt.xlabel(zlabel)
-            plt.ylabel('$A\,(arb.u.)$')
+            plt.ylabel(r'$A\,(arb.u.)$')
             plt.xlim(left=z_drawing[0], right=z_drawing[-1])
             plt.ylim(bottom=0)
 
             plt.subplot(212)
             plt.plot(z_drawing, phase, 'k', lw=2)
             plt.xlabel(zlabel)
-            plt.ylabel('$phase\,(radians)$')
+            plt.ylabel(r'$phase\,(radians)$')
             plt.xlim(left=z_drawing[0], right=z_drawing[-1])
 
         elif kind in ('amplitude', 'intensity', 'phase'):

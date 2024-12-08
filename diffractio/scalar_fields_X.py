@@ -79,8 +79,8 @@ from .__init__ import degrees, mm, np, plt
 
 from .config import bool_raise_exception, Draw_X_Options, get_scalar_options, empty_types
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
-from .utils_common import (get_date, load_data_common, save_data_common, check_none, add,
-                           oversampling, get_scalar)
+from .utils_common import (get_date, load_data_common, save_data_common, check_none, add, rmul,
+                           oversampling, get_scalar, get_instance_size_MB)
 from .utils_drawing import normalize_draw
 from .utils_math import (fft_filter, get_edges, nearest, reduce_to_1, Bluestein_dft_x, get_k, nearest2)
 from .utils_multiprocessing import (_pickle_method, _unpickle_method,
@@ -232,6 +232,72 @@ class Scalar_field_X():
         new_field = Scalar_field_X(self.x, self.wavelength)
         new_field.u = self.u * other.u
         return new_field
+
+
+    @check_none('x','u',raise_exception=bool_raise_exception)
+    def __rmul__(self, number: float | complex | int):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            Scalar_field_X:
+        """
+
+        if self.type == 'Scalar_mask_X':
+            t = rmul(self, number, kind='intensity')
+        elif self.type == 'Scalar_source_X' or 'Scalar_field_X':
+            t = rmul(self, number, kind='amplitude')
+            
+        return t
+
+
+    @check_none('x','u',raise_exception=bool_raise_exception)
+    def rmul(self, number, kind):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        This function is general for all the SCALAR modules of the package. After, this function is called by the rmul method of each class. 
+        When module is for sources, any value for the number is valid. When module is for masks, the modulus is <=1.
+
+        The kind parameter is used to specify how to multiply the field. The options are:
+        - 'intensity': Multiply the intensity of the field by the number.
+        - 'amplitude': Multiply the amplitude of the field by the number.
+        - 'phase': Multiply the phase of the field by the number.
+        
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            The field multiplied by the number.
+        """
+
+        t = rmul(self, number, kind)
+           
+        return t
+
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
+        
 
     @check_none('u')
     def conjugate(self, new_field: bool = True):

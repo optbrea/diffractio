@@ -20,6 +20,7 @@ import pyvista as pv
 from pyvista.core.utilities.helpers import wrap
 
 from .config import CONF_DRAWING, Draw_XYZ_Options, Draw_pyvista_Options, video_isovalue_Options
+from .utils_drawing import normalize_draw
 
 
 def load_stl(filename: str, has_draw: bool = False, verbose: bool = False):  # -> tuple[MultiBlock | UnstructuredGrid | DataSet | pyvista_n...:
@@ -126,6 +127,7 @@ def draw(
     drawing: Draw_pyvista_Options = "volume",
     has_grid: bool = False,
     filename: str = "",
+    logarithm: float = 0.,
     **kwargs
 ):
     """_summary_
@@ -196,6 +198,8 @@ def draw(
     if kind == "intensity":
         intensity = self.intensity()
         intensity = intensity/intensity.max()
+        intensity = normalize_draw(intensity, logarithm)
+
         data = intensity
 
     elif kind == "refractive_index":

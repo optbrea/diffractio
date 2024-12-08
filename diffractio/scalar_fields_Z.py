@@ -53,7 +53,7 @@ from scipy.interpolate import interp1d
 from .__init__ import degrees, mm, np, plt
 from .config import bool_raise_exception, Draw_Z_Options, get_scalar_options
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
-from .utils_common import add, get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar
+from .utils_common import add, get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar, rmul
 from .utils_drawing import normalize_draw
 from .utils_math import nearest
 
@@ -96,7 +96,7 @@ class Scalar_field_Z():
         self.date = get_date()
 
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def __str__(self):
         """Represents main data of the atributes."""
 
@@ -121,7 +121,7 @@ class Scalar_field_Z():
         return ("")
 
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def __add__(self, other):
         """Adds two Scalar_field_Z.
 
@@ -137,7 +137,7 @@ class Scalar_field_Z():
         return u
 
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def __sub__(self, other):
         """Substract two Scalar_field_x. For example two light sources or two masks.
 
@@ -154,7 +154,71 @@ class Scalar_field_Z():
         return u3
 
 
-    @check_none('z','u')
+
+
+    @check_none('z','u',raise_exception=bool_raise_exception)
+    def __rmul__(self, number: float | complex | int):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            Scalar_field_XYZ:
+        """
+
+
+        t = rmul(self, number, kind='amplitude')
+            
+        return t
+
+
+    @check_none('z','u',raise_exception=bool_raise_exception)
+    def rmul(self, number, kind):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        This function is general for all the SCALAR modules of the package. After, this function is called by the rmul method of each class. 
+        When module is for sources, any value for the number is valid. When module is for masks, the modulus is <=1.
+
+        The kind parameter is used to specify how to multiply the field. The options are:
+        - 'intensity': Multiply the intensity of the field by the number.
+        - 'amplitude': Multiply the amplitude of the field by the number.
+        - 'phase': Multiply the phase of the field by the number.
+        
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            The field multiplied by the number.
+        """
+
+        t = rmul(self, number, kind)
+           
+        return t
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
+        
+
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def duplicate(self, clear: bool = False):
         """Duplicates the instance"""
         new_field = copy.deepcopy(self)
@@ -163,7 +227,7 @@ class Scalar_field_Z():
         return new_field
 
 
-    @check_none('u')
+    @check_none('u',raise_exception=bool_raise_exception)
     def conjugate(self, new_field: bool = True):
         """Conjugates the field
         """
@@ -176,7 +240,7 @@ class Scalar_field_Z():
             self.u = np.conj(self.u)
 
 
-    @check_none('u')
+    @check_none('u',raise_exception=bool_raise_exception)
     def clear_field(self):
         """Removes the field so that self.u = 0. """
         self.u = np.zeros_like(self.u, dtype=complex)
@@ -224,7 +288,7 @@ class Scalar_field_Z():
             print(dict0.keys())
 
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def oversampling(self, factor_rate: int | tuple):
         """Overfample function has been implemented in scalar X, XY, XZ, and XYZ frames reduce the pixel size of the masks and fields. 
         This is also performed with the cut_resample function. However, this function oversamples with integer factors.
@@ -250,7 +314,7 @@ class Scalar_field_Z():
         data = get_scalar(self, kind)
         return data
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def cut_resample(self,
                      z_limits: NDArrayFloat | None = None,
                      num_points: int | None = None,
@@ -316,7 +380,7 @@ class Scalar_field_Z():
             return field
 
 
-    @check_none('u')
+    @check_none('u',raise_exception=bool_raise_exception)
     def normalize(self, kind='amplitude', new_field: bool = False):
         """Normalizes the field so that intensity.max()=1.
 
@@ -330,7 +394,7 @@ class Scalar_field_Z():
         return normalize_field(self, kind, new_field)
 
 
-    @check_none('u')
+    @check_none('u',raise_exception=bool_raise_exception)
     def intensity(self):
         """Intensity.
 
@@ -342,7 +406,7 @@ class Scalar_field_Z():
         return intensity
 
 
-    @check_none('u')
+    @check_none('u',raise_exception=bool_raise_exception)
     def average_intensity(self, verbose: bool = False):
         """Returns the average intensity as: (np.abs(self.u)**2).sum() / num_data
 
@@ -359,7 +423,7 @@ class Scalar_field_Z():
         return average_intensity
 
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def FWHM1D(self, percentage: float = 0.5, remove_background: bool = None,
                has_draw: bool = False):
         """
@@ -383,7 +447,7 @@ class Scalar_field_Z():
         return np.squeeze(width)
 
 
-    @check_none('z','u')
+    @check_none('z','u',raise_exception=bool_raise_exception)
     def DOF(self, percentage: float = 0.5, remove_background: str | None = None,
             has_draw: bool = False):
         """Determines Depth-of_focus (DOF) in terms of the width at different distances

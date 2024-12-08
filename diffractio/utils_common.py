@@ -17,12 +17,13 @@
 import datetime
 import multiprocessing
 
+import sys
 import numpy as np
 import psutil
 from scipy.io import loadmat, savemat
 from scipy.ndimage import center_of_mass
 
-from .config import (bool_raise_exception, Options_add, Options_sub,
+from .config import (bool_raise_exception, Options_add, Options_sub, Options_rmul,
                      get_scalar_options, get_vector_options)
 
 
@@ -542,6 +543,75 @@ def sub(self, other, kind: Options_sub  = 'source'):
     return t
 
 
+
+def rmul(cls, number: float | complex | int, kind: Options_rmul  = 'intensity'):
+    """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+    This function is general for all the SCALAR modules of the package. After, this function is called by the rmul method of each class. 
+    When module is for sources, any value for the number is valid. When module is for masks, the modulus is <=1.
+
+    The kind parameter is used to specify how to multiply the field. The options are:
+    - 'intensity': Multiply the intensity of the field by the number.
+    - 'amplitude': Multiply the amplitude of the field by the number.
+    - 'phase': Multiply the phase of the field by the number.
+    
+    Args:
+        number (float | complex | int): number to multiply the field.
+        kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+            - 'intensity': Multiply the intensity of the field by the number.
+            - 'amplitude': Multiply the amplitude of the field by the number.
+            - 'phase': Multiply the phase of the field by the number.
+
+    Returns:
+        The field multiplied by the number.
+    """
+    
+    from diffractio.scalar_sources_X import Scalar_source_X
+    from diffractio.scalar_sources_XY import Scalar_source_XY
+    from diffractio.scalar_masks_X import Scalar_mask_X
+    from diffractio.scalar_masks_XY import Scalar_mask_XY
+    from diffractio.scalar_fields_XZ import Scalar_field_XZ
+    from diffractio.scalar_fields_XY import Scalar_field_XY
+    from diffractio.scalar_masks_XZ import Scalar_mask_XZ
+    from diffractio.scalar_fields_Z import Scalar_field_Z
+    from diffractio.scalar_fields_XYZ import Scalar_field_XYZ
+    from diffractio.scalar_masks_XYZ import Scalar_mask_XYZ
+
+    if isinstance(cls, Scalar_mask_XY):
+        t = Scalar_mask_XY(cls.x, cls.y, cls.wavelength)
+    elif isinstance(cls, Scalar_source_XY):
+        t = Scalar_source_XY(cls.x, cls.y, cls.wavelength)
+    elif isinstance(cls, Scalar_mask_X):
+        t = Scalar_mask_X(cls.x, cls.wavelength)
+    elif isinstance(cls, Scalar_source_X):
+        t = Scalar_source_X(cls.x,  cls.wavelength)
+    elif isinstance(cls, Scalar_mask_XZ):
+        t = Scalar_mask_XZ(cls.x, cls.z, cls.wavelength)
+    elif isinstance(cls, Scalar_field_XZ):
+        t = Scalar_field_XZ(cls.x, cls.z, cls.wavelength)
+    elif isinstance(cls, Scalar_field_Z):
+        t = Scalar_field_Z(cls.z, cls.wavelength)
+    elif isinstance(cls, Scalar_field_XYZ):
+        t = Scalar_field_XYZ(cls.x, cls.y, cls.z, cls.wavelength)
+    elif isinstance(cls, Scalar_mask_XYZ):
+        t = Scalar_mask_XYZ(cls.x, cls.y, cls.z, cls.wavelength)
+    elif isinstance(cls, Scalar_field_XY):
+        t = Scalar_field_XY(cls.x, cls.y, cls.wavelength)
+
+    if kind == 'intensity':
+        t.u = cls.u * np.sqrt(number)
+    
+    elif kind == 'amplitude':
+        t.u = cls.u * number
+
+    elif kind == 'phase':
+        ampltiude = np.abs(cls.u)
+        phase = np.angle(cls.u)
+        t.u = ampltiude * np.exp(1j * number * phase)
+        
+    return t
+
+
 def computer_parameters(verbose: bool = False) -> tuple[int, float, float, float]:
     """Determine several computer Args:
         - number of processors
@@ -740,3 +810,25 @@ def date_in_name(filename: str) -> str:
     date = now.strftime("%Y-%m-%d_%H_%M_%S_%f")
     filename_2 = "{}_{}.{}".format(initial_name, date, extension)
     return filename_2
+
+
+
+def get_instance_size_MB(cls, verbose: bool = False) -> float:
+    size = 0
+    for key, value in cls.__dict__.items():
+        size += sys.getsizeof(key)
+        if isinstance(value, np.ndarray):
+            size += value.nbytes
+        else:
+            size += sys.getsizeof(value)
+        
+    if verbose:
+        if size < 1024:
+            print("size = {} bytes".format(size))
+        elif size < 1024**2:
+            print("size = {:2.2f} Kbytes".format(size/1024))
+        elif size < 1024**3:
+            print("size = {:2.2f} Mbytes".format(size/1024**2))
+        elif size < 1024**4:
+            print("size = {:2.2f} Gbytes".format(size/1024**3))
+    return size/1024**2

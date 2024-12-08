@@ -54,6 +54,7 @@ from .__init__ import degrees, eps, mm, np, plt
 from .config import bool_raise_exception, CONF_DRAWING, Draw_Z_Options, get_vector_options
 from .scalar_fields_Z import Scalar_field_Z
 from .utils_common import get_date, load_data_common, save_data_common, get_vector_options, check_none
+from .utils_common import get_instance_size_MB
 from .utils_drawing import normalize_draw
 from .utils_math import nearest
 from .utils_optics import normalize_field
@@ -187,6 +188,20 @@ class Vector_field_Z():
         if clear is True:
             new_field.clear_field()
         return new_field
+
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
 
     @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
     def get(self, kind: get_vector_options, mode: str = 'modulus', **kwargs):

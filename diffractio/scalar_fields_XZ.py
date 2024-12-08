@@ -84,7 +84,8 @@ from .__init__ import num_max_processors, degrees, mm, seconds, um
 from .config import (bool_raise_exception, Draw_X_Options, Draw_XZ_Options, Draw_interactive_Options, 
                      Draw_refractive_index_Options, CONF_DRAWING, get_scalar_options)
 from .utils_typing import NDArrayFloat
-from .utils_common import add, get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar
+from .utils_common import add, get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar, rmul
+from .utils_common import get_instance_size_MB
 from .utils_drawing import normalize_draw, prepare_drawing
 from .utils_math import get_k, nearest, reduce_to_1, rotate_image
 from .utils_multiprocessing import _pickle_method, _unpickle_method
@@ -203,7 +204,7 @@ class Scalar_field_XZ():
 
 
         u = add(self, other, kind='source')
-        u.n = self.n + other.n # TODO: check
+        u.n = self.n + other.n
 
         return u
 
@@ -228,6 +229,58 @@ class Scalar_field_XZ():
         return u3
 
 
+
+    @check_none('x','z','u',raise_exception=bool_raise_exception)
+    def __rmul__(self, number: float | complex | int):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            Scalar_field_XYZ:
+        """
+
+        if self.type == 'Scalar_mask_XZ':
+            t = rmul(self, number, kind='intensity')
+        elif self.type == 'Scalar_field_XZ':
+            t = rmul(self, number, kind='amplitude')
+            
+        return t
+
+
+    @check_none('x','z','u',raise_exception=bool_raise_exception)
+    def rmul(self, number, kind):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        This function is general for all the SCALAR modules of the package. After, this function is called by the rmul method of each class. 
+        When module is for sources, any value for the number is valid. When module is for masks, the modulus is <=1.
+
+        The kind parameter is used to specify how to multiply the field. The options are:
+        - 'intensity': Multiply the intensity of the field by the number.
+        - 'amplitude': Multiply the amplitude of the field by the number.
+        - 'phase': Multiply the phase of the field by the number.
+        
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            The field multiplied by the number.
+        """
+
+        t = rmul(self, number, kind)
+           
+        return t
+
+
     @check_none('x','z',raise_exception=bool_raise_exception)
     def __rotate__(self, angle: float, position=None):
         """Rotation of X,Z with respect to position
@@ -250,6 +303,20 @@ class Scalar_field_XZ():
                                                      z0) * np.cos(angle)
         return Xrot, Zrot
 
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
+        
 
     def reduce_to_1(self):
         """All the values greater than 1 pass to 1. This is used for Scalar_masks when we add two masks.
@@ -453,7 +520,7 @@ class Scalar_field_XZ():
         if draw_check is True:
             plt.figure()
             plt.plot(self.z, lineas_filtradas)
-            plt.xlabel('z ($\mu m$)')
+            plt.xlabel(r'z ($\mu m$)')
             plt.ylabel('filtered zone)')
             plt.title("detection of edges", fontsize=24)
 
@@ -468,8 +535,8 @@ class Scalar_field_XZ():
                             aspect='auto',
                             origin='lower',
                             extent=extension)
-            plt.xlabel('z ($\mu m$)')
-            plt.ylabel('x ($\mu m$)')
+            plt.xlabel(r'z ($\mu m$)')
+            plt.ylabel(r'x ($\mu m$)')
 
             plt.axis(extension)
             h1.set_cmap(cm.gray_r)
@@ -1116,6 +1183,7 @@ class Scalar_field_XZ():
         if verbose is True:
             print("Time = {:2.2f} s, time/loop = {:2.4} ms".format(
                 t2 - t1, (t2 - t1) / len(self.z) * 1000))
+            get_instance_size_MB(self, verbose)
 
         if matrix is True:
             return self.u
@@ -1563,11 +1631,11 @@ class Scalar_field_XZ():
                         **kwargs)
 
         if z_scale == 'um':
-            plt.xlabel('z ($\mu m$)')
+            plt.xlabel(r'z ($\mu m$)')
         elif z_scale == 'mm':
-            plt.xlabel('z (mm)')
+            plt.xlabel(r'z (mm)')
 
-        plt.ylabel('x ($\mu m$)')
+        plt.ylabel(r'x ($\mu m$)')
 
         if colormap_kind in ('', [], None, True):
             if kind == 'intensity':
@@ -1607,7 +1675,7 @@ class Scalar_field_XZ():
             else:
                 border0, border1 = edge_matrix
 
-            plt.plot(border1, border0, 'w.', ms=.25)
+            plt.plot(border1, border0, 'w.', ms=.5)
 
         if filename != '':
             plt.savefig(filename, dpi=300, bbox_inches='tight', pad_inches=0.1)
@@ -1694,8 +1762,8 @@ class Scalar_field_XZ():
                             origin='lower',
                             extent=extension)
 
-        plt.xlabel('z ($\mu m$)')
-        plt.ylabel('x ($\mu m$)')
+        plt.xlabel(r'z ($\mu m$)')
+        plt.ylabel(r'x ($\mu m$)')
         plt.title(title)
 
         plt.axis(extension)
@@ -1856,7 +1924,7 @@ class Scalar_field_XZ():
             plt.plot(self.x, I_drawing, 'k', linewidth=2)  # 'k-o'
             plt.axis([self.x[0], self.x[-1], I_drawing.min(), I_drawing.max()])
             texto = 'I(z=%d um, x)' % (z0)
-            plt.xlabel('x (um)')
+            plt.xlabel(r'x ($\mu$m)')
             plt.ylabel(texto)
 
             if filename != '':

@@ -12,4 +12,6 @@ ipywidgets
 ipympl>=0.9.3
 ezdxf 
 pyvista
-# opencv-python
+python-ffmpeg
+pyqt5
+opencv-python

@@ -70,6 +70,7 @@ Beta state
 
   - vector XY mask: q_plate, SLM, radial_polarizer, azimuthal_polarizer, RCP, LCP, RCP2LCP, LCP2 RCP.
 
+  - new function: get_instance_size_MB to get the size of the instance in MBytes, and .size(verbose) method in all classes.
 
 * Documentation:
 

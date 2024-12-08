@@ -63,6 +63,8 @@ from .__init__ import degrees, eps, mm, np, plt, um
 from .config import bool_raise_exception, CONF_DRAWING, Draw_Vector_XY_Options, get_vector_options
 from .utils_typing import NDArrayFloat
 from .utils_common import load_data_common, save_data_common, get_date, check_none, get_vector, check_none
+from .utils_common import get_instance_size_MB
+
 from .utils_drawing import normalize_draw, reduce_matrix_size, draw_edges
 from .utils_math import nearest
 from .scalar_fields_XY import Scalar_field_XY
@@ -226,6 +228,19 @@ class Vector_field_XY():
         self.Ex = np.zeros_like(self.Ex, dtype=complex)
         self.Ey = np.zeros_like(self.Ex, dtype=complex)
         self.Ez = np.zeros_like(self.Ex, dtype=complex)
+
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
 
 
     def to_py_pol(self):

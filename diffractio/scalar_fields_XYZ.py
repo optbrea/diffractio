@@ -72,7 +72,7 @@ from scipy.interpolate import RegularGridInterpolator
 from .__init__ import degrees, mm, np, plt, num_max_processors
 from .config import bool_raise_exception, CONF_DRAWING, Draw_pyvista_Options, video_isovalue_Options, get_scalar_options
 from .config import  Draw_XZ_Options, Draw_XY_Options, Draw_XYZ_Options
-from .utils_common import get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar, add, sub
+from .utils_common import get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar, add, sub, rmul
 from .utils_drawing import normalize_draw
 from .utils_math import get_k, nearest, reduce_to_1
 from .utils_multiprocessing import _pickle_method, _unpickle_method
@@ -252,6 +252,58 @@ class Scalar_field_XYZ():
         return t
 
 
+
+    @check_none('x','y','z','u',raise_exception=bool_raise_exception)
+    def __rmul__(self, number: float | complex | int):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            Scalar_field_XYZ:
+        """
+
+        if self.type == 'Scalar_mask_XYZ':
+            t = rmul(self, number, kind='intensity')
+        elif self.type == 'Scalar_field_XYZ':
+            t = rmul(self, number, kind='amplitude')
+            
+        return t
+
+
+    @check_none('x','y','z','u',raise_exception=bool_raise_exception)
+    def rmul(self, number, kind):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        This function is general for all the SCALAR modules of the package. After, this function is called by the rmul method of each class. 
+        When module is for sources, any value for the number is valid. When module is for masks, the modulus is <=1.
+
+        The kind parameter is used to specify how to multiply the field. The options are:
+        - 'intensity': Multiply the intensity of the field by the number.
+        - 'amplitude': Multiply the amplitude of the field by the number.
+        - 'phase': Multiply the phase of the field by the number.
+        
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            The field multiplied by the number.
+        """
+
+        t = rmul(self, number, kind)
+           
+        return t
+
+
     @check_none('X','Y','Z','u',raise_exception=bool_raise_exception)
     def __XYZ_rotate_point__(self, angles: tuple[float,float,float], point: tuple[float,float,float]):
         """Function to rotate around any of the 3 axis of rigid solid.
@@ -347,7 +399,19 @@ class Scalar_field_XYZ():
             
         return Xrot, Yrot, Zrot
             
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
 
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
+        
     @check_none('u',raise_exception=bool_raise_exception)
     def conjugate(self, new_field: bool = True):
         """Congugates the field.
@@ -938,6 +1002,8 @@ class Scalar_field_XYZ():
             print("Time = {:2.2f} s, time/loop = {:2.4} ms".format(
                 t2 - t1, (t2 - t1) / len(self.z) * 1000))
 
+        return (t2 - t1) / len(self.z) * 1000
+
     @check_none('x','y','z','u',raise_exception=bool_raise_exception)
     def to_Scalar_field_XY(self,
                            iz0: int | None = None,
@@ -1287,9 +1353,9 @@ class Scalar_field_XYZ():
                         aspect='auto',
                         origin='lower',
                         extent=extension)
-        plt.xlabel('y ($\mu m$)')
-        plt.ylabel('x ($\mu m$)')
-        plt.zlabel('z ($\mu m$)')
+        plt.xlabel(r'y ($\mu m$)')
+        plt.ylabel(r'x ($\mu m$)')
+        plt.zlabel(r'z ($\mu m$)')
 
         plt.axis(extension)
         if colorbar_kind not in (False, '', None):
@@ -1372,7 +1438,7 @@ class Scalar_field_XYZ():
 
         plt.figure()
         ufield = self.to_Scalar_field_XZ(y0=y0)
-        ufield.u = ufield.u.transpose()
+        # ufield.u = ufield.u.transpose()  # TODO: check if it is necessary
         h1 = ufield.draw(kind, logarithm, normalize, draw_borders, filename,
                          **kwargs)
 
@@ -1444,8 +1510,8 @@ class Scalar_field_XYZ():
                             self.z[0] , self.z[-1] , self.y[0],
                             self.y[-1]
                         ])
-        plt.xlabel('z ($\mu$m)')
-        plt.ylabel('y ($\mu$m)')
+        plt.xlabel(r'z ($\mu$m)')
+        plt.ylabel(r'y ($\mu$m)')
         h1.set_cmap(cmap)  # OrRd # Reds_r gist_heat
         plt.colorbar()
         

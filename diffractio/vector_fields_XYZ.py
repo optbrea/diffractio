@@ -60,6 +60,8 @@ from .__init__ import degrees, eps, mm, np, plt
 from .config import bool_raise_exception, CONF_DRAWING, Draw_Vector_XY_Options, Draw_Vector_XZ_Options, get_vector_options
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
 from .utils_common import get_date, load_data_common, save_data_common, check_none, get_vector
+from .utils_common import get_instance_size_MB
+
 from .utils_drawing import normalize_draw, reduce_matrix_size
 from .utils_math import get_k, nearest
 from .utils_optics import normalize_field, fresnel_equations_kx
@@ -242,12 +244,26 @@ class Vector_field_XYZ():
 
 
 
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
+
     def duplicate(self, clear: bool = False):
         """Duplicates the instance"""
         new_field = copy.deepcopy(self)
         if clear is True:
             new_field.clear_field()
         return new_field
+
 
 
     @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)

@@ -12,41 +12,11 @@
 
 
 """
-This module 
+Init module to control the rest of the modules. 
     
 
 """
 # flake8: noqa
-
-
-# import copy
-# import copyreg
-# import multiprocessing
-# import time
-# import types
-
-
-
-# from numpy import angle, array, concatenate, exp, linspace, pi, shape, sqrt, zeros
-# from numpy.lib.scimath import sqrt as csqrt
-# from scipy.fftpack import fft, fftshift, ifft
-# from scipy.interpolate import interp1d
-# from scipy.special import hankel1
-
-# from .__init__ import degrees, mm, np, plt
-
-# from .config import bool_raise_exception, Draw_X_Options, get_scalar_options, empty_types
-# from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
-# from .utils_common import get_date, load_data_common, save_data_common, check_none, add, oversampling
-# from .utils_drawing import normalize_draw
-# from .utils_math import (fft_filter, get_edges, nearest, reduce_to_1, Bluestein_dft_x, get_k, nearest2)
-# from .utils_multiprocessing import (_pickle_method, _unpickle_method,
-#                                     execute_multiprocessing)
-# from .utils_optics import field_parameters, normalize_field
-
-# copyreg.pickle(types.MethodType, _pickle_method, _unpickle_method)
-
-# num_max_processors = multiprocessing.cpu_count()
 
 
 from .config import Options_Diffractio_kind, Options_Diffractio_frame

@@ -80,7 +80,7 @@ from .__init__ import degrees, mm, seconds, um
 
 from .config import bool_raise_exception, CONF_DRAWING, Draw_XY_Options, Save_mask_Options, get_scalar_options
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
-from .utils_common import get_date, load_data_common, save_data_common, add, check_none, oversampling, get_scalar
+from .utils_common import get_date, load_data_common, save_data_common, add, check_none, oversampling, get_scalar, rmul
 from .utils_drawing import (draw2D, normalize_draw, prepare_drawing,
                             reduce_matrix_size)
 from .utils_math import get_edges, get_k, nearest, nearest2, reduce_to_1, rotate_image, Bluestein_dft_xy
@@ -88,6 +88,7 @@ from .utils_optics import beam_width_2D, field_parameters, normalize_field
 from .scalar_fields_X import Scalar_field_X
 from .scalar_fields_XZ import Scalar_field_XZ
 from .scalar_fields_Z import Scalar_field_Z
+from .utils_common import get_instance_size_MB
 
 try:
     import screeninfo
@@ -242,6 +243,56 @@ class Scalar_field_XY():
         return new_field
 
 
+    @check_none('x','y','u',raise_exception=bool_raise_exception)
+    def __rmul__(self, number: float | complex | int):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            Scalar_field_X:
+        """
+
+        if self.type == 'Scalar_mask_XY':
+            t = rmul(self, number, kind='intensity')
+        elif self.type == 'Scalar_source_XY' or 'Scalar_field_XY':
+            t = rmul(self, number, kind='amplitude')
+            
+        return t
+
+
+    @check_none('x','y','u',raise_exception=bool_raise_exception)
+    def rmul(self, number, kind):
+        """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
+
+        This function is general for all the SCALAR modules of the package. After, this function is called by the rmul method of each class. 
+        When module is for sources, any value for the number is valid. When module is for masks, the modulus is <=1.
+
+        The kind parameter is used to specify how to multiply the field. The options are:
+        - 'intensity': Multiply the intensity of the field by the number.
+        - 'amplitude': Multiply the amplitude of the field by the number.
+        - 'phase': Multiply the phase of the field by the number.
+        
+        Args:
+            number (float | complex | int): number to multiply the field.
+            kind (str): instruction how to add the fields: ['intensity', 'amplitude', 'phase'].
+                - 'intensity': Multiply the intensity of the field by the number.
+                - 'amplitude': Multiply the amplitude of the field by the number.
+                - 'phase': Multiply the phase of the field by the number.
+
+        Returns:
+            The field multiplied by the number.
+        """
+
+        t = rmul(self, number, kind)
+           
+        return t
+
     @check_none('x','y', 'X', 'Y','u',raise_exception=bool_raise_exception)
     def __rotate__(self, angle: float,
                    position: tuple[float, float] | None = None):
@@ -261,6 +312,20 @@ class Scalar_field_XY():
         Xrot = (self.X - x0) * np.cos(angle) + (self.Y - y0) * np.sin(angle)
         Yrot = -(self.X - x0) * np.sin(angle) + (self.Y - y0) * np.cos(angle)
         return Xrot, Yrot
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
+
+        
 
     @check_none('u',raise_exception=bool_raise_exception)
     def conjugate(self, new_field: bool = True):
@@ -1321,6 +1386,7 @@ class Scalar_field_XY():
         if verbose is True:
             print("Time = {:2.2f} s, time/loop = {:2.4} ms".format(
                 t2 - t1, (t2 - t1) / num_steps * 1000))
+            get_instance_size_MB(self, verbose)
 
         return u_iter, u_out_gv, u_out_roi, u_axis_x, u_axis_z, u_max, z_max
 

@@ -55,6 +55,7 @@ from .config import (bool_raise_exception, CONF_DRAWING,
                      get_vector_options, Draw_Vector_XZ_Options)
 from .utils_typing import npt, Any, NDArray, NDArrayFloat, NDArrayComplex
 from .utils_common import get_date, load_data_common, save_data_common, check_none, get_vector
+from .utils_common import get_instance_size_MB
 from .utils_drawing import normalize_draw, reduce_matrix_size, draw_edges
 from .utils_math import get_k, nearest
 from .utils_optics import normalize_field, fresnel_equations_kx
@@ -230,6 +231,18 @@ class Vector_field_XZ():
             new_field.clear_field()
         return new_field
 
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
 
 
     def normalize(self, kind='amplitude', new_field: bool = False):
@@ -891,11 +904,7 @@ class Vector_field_XZ():
             return id_fig
 
 
-    def __draw_intensity__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_intensity__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         cmap=CONF_DRAWING["color_intensity"], 
@@ -927,11 +936,7 @@ class Vector_field_XZ():
 
 
     @check_none('x','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
-    def __draw_intensities__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_intensities__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         cmap=CONF_DRAWING["color_intensity"],
@@ -1006,11 +1011,7 @@ class Vector_field_XZ():
 
 
     @check_none('x','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
-    def __draw_phases__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_phases__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         percentage_intensity=None,
@@ -1034,6 +1035,11 @@ class Vector_field_XZ():
         intensity1 = np.abs(self.Ex)**2
         intensity2 = np.abs(self.Ex)**2
         intensity3 = np.abs(self.Ez)**2
+
+        intensity1 = normalize_draw(intensity1, logarithm, normalize, cut_value)
+        intensity2 = normalize_draw(intensity2, logarithm, normalize, cut_value)
+        intensity3 = normalize_draw(intensity3, logarithm, normalize, cut_value)
+
 
         intensity_max = np.max((intensity1.max(), intensity2.max(), intensity3.max()))
 
@@ -1094,11 +1100,7 @@ class Vector_field_XZ():
 
 
     @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
-    def __draw_fields__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_fields__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         percentage_intensity: float | None = None,
@@ -1166,11 +1168,7 @@ class Vector_field_XZ():
 
 
     @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
-    def __draw_EH__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_EH__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         cmap=CONF_DRAWING["color_amplitude_sign"],
@@ -1279,11 +1277,7 @@ class Vector_field_XZ():
         return self
 
     @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
-    def __draw_E2H2__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_E2H2__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         cmap=CONF_DRAWING["color_intensity"],
@@ -1410,6 +1404,9 @@ class Vector_field_XZ():
 
         
         Sx, Sy, Sz = self.get('poynting_vector_averaged', matrix=True)
+        Sx = normalize_draw(Sx, logarithm, normalize, cut_value)
+        Sy = normalize_draw(Sy, logarithm, normalize, cut_value)
+        Sz = normalize_draw(Sz, logarithm, normalize, cut_value)
 
 
         S_max = np.max((Sx, Sy, Sz))
@@ -1446,17 +1443,19 @@ class Vector_field_XZ():
 
         plt.tight_layout()   
 
-    def __draw_poynting_vector__(self,
-        logarithm,
-        normalize,
-        cut_value,
-        draw_borders=False,
-        scale = 'scaled',
-        cmap=CONF_DRAWING["color_amplitude_sign"],
-        edge=None,
-        **kwargs
-        ):
+    def __draw_poynting_vector__(self, logarithm, normalize, cut_value, draw_borders=False,
+        scale = 'scaled', cmap=CONF_DRAWING["color_amplitude_sign"], edge=None, **kwargs ):
+        """Draws the poynting vector.
 
+        Args:
+            logarithm (_type_): _description_
+            normalize (_type_): _description_
+            cut_value (_type_): _description_
+            draw_borders (bool, optional): _description_. Defaults to False.
+            scale (str, optional): _description_. Defaults to 'scaled'.
+            cmap (_type_, optional): _description_. Defaults to CONF_DRAWING["color_amplitude_sign"].
+            edge (_type_, optional): _description_. Defaults to None.
+        """
         
         z0 = self.z
         x0 = self.x
@@ -1465,6 +1464,9 @@ class Vector_field_XZ():
 
         
         Sx, Sy, Sz = self.get('poynting_vector', matrix=True)
+        Sx = normalize_draw(Sx, logarithm, normalize, cut_value)
+        Sy = normalize_draw(Sy, logarithm, normalize, cut_value)
+        Sz = normalize_draw(Sz, logarithm, normalize, cut_value)
 
 
         S_max = np.max((Sx, Sy, Sz))
@@ -1516,10 +1518,9 @@ class Vector_field_XZ():
         x0 = self.x
         
         tx, ty = rcParams["figure.figsize"]
-
         
         S = self.get('poynting_total', matrix=True)
-
+        S = normalize_draw(S, logarithm, normalize, cut_value)
 
         fig, axs = plt.subplots(nrows=1, ncols=1)
         
@@ -1552,10 +1553,10 @@ class Vector_field_XZ():
         
         tx, ty = rcParams["figure.figsize"]
 
-        
         S = self.get('energy_density', matrix=True)
-        S=np.real(S)
-
+        S = np.real(S)
+        S = normalize_draw(S, logarithm, normalize, cut_value)
+        
         fig, axs = plt.subplots(nrows=1, ncols=1)
         
         id_fig, ax, IDimage = draw2D_xz(
@@ -1590,7 +1591,9 @@ class Vector_field_XZ():
 
         
         S = self.get('irradiance', mode=mode, matrix=True)
-        S=np.real(S)
+        S = np.real(S)
+        S = normalize_draw(S, logarithm, normalize, cut_value)
+
 
         fig, axs = plt.subplots(nrows=1, ncols=1)
         
@@ -1606,11 +1609,7 @@ class Vector_field_XZ():
         plt.tight_layout() 
 
 
-    def __draw_stokes__(
-        self,
-        logarithm,
-        normalize,
-        cut_value,
+    def __draw_stokes__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
         color_intensity=CONF_DRAWING["color_intensity"],
@@ -1621,6 +1620,7 @@ class Vector_field_XZ():
         tx, ty = rcParams["figure.figsize"]
 
         S0, S1, S2, S3 = self.get('stokes')
+
         S0 = normalize_draw(S0, logarithm, normalize, cut_value)
         S1 = normalize_draw(S1, logarithm, normalize, cut_value)
         S2 = normalize_draw(S2, logarithm, normalize, cut_value)

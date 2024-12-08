@@ -49,6 +49,8 @@ from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
 from .config import bool_raise_exception, CONF_DRAWING, Draw_Vector_X_Options, get_vector_options
 from .scalar_fields_X import Scalar_field_X
 from .utils_common import get_date, load_data_common, save_data_common, check_none, get_vector
+from .utils_common import get_instance_size_MB
+
 from .utils_drawing import normalize_draw
 
 percentage_intensity = CONF_DRAWING['percentage_intensity']
@@ -131,6 +133,20 @@ class Vector_field_X():
         EM.Ez = self.Ez + other.Ez
 
         return EM
+
+
+
+    def size(self, verbose: bool = False):
+        """returns the size of the instance in MB.
+
+        Args:
+            verbose (bool, optional): prints size in Mb. Defaults to False.
+
+        Returns:
+            float: size in MB
+        """
+
+        return get_instance_size_MB(self, verbose)
 
 
     def save_data(self, filename: str, add_name: str = "",

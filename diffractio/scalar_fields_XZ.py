@@ -1864,7 +1864,7 @@ class Scalar_field_XZ():
             ])
 
             plt.xlabel(xlabel)
-            plt.ylabel('I(z, x = {:2.2f} $\mu$m)'.format(x0))
+            plt.ylabel(r'I(z, x = {:2.2f} $\mu$m)'.format(x0))
 
             if filename != '':
                 plt.savefig(filename,
@@ -2018,7 +2018,7 @@ class Scalar_field_XZ():
             plt.figure()
             plt.plot(self.z / factor, widths, 'r', label='axis')
             plt.xlabel(xlabel)
-            plt.ylabel("widths ($\mu$m)")
+            plt.ylabel(r"widths ($\mu$m)")
             plt.legend()
 
         if verbose:
@@ -2077,7 +2077,7 @@ class Scalar_field_XZ():
         def animate(i):
 
             hdl_line.set_data(self.x, I_drawing[i, :])
-            ax.set_title("$z = {:2.0f} \mu m$".format(self.z[i]))
+            ax.set_title(r"$z = {:2.0f} \mu m$".format(self.z[i]))
             return i
 
         ani = animation.FuncAnimation(fig,

@@ -1472,7 +1472,7 @@ class Scalar_mask_XY(Scalar_field_XY):
     @check_none('x','y','X','Y',raise_exception=bool_raise_exception)
     def aspheric(self, r0: tuple[float, float], c: float, k: float, a: list, n0: float, n1: float,
                  radius: float = 0.):
-        """asferic surface.
+        r"""asferic surface.
 
         $z = \frac{c r^2}{1+\np.sqrt{1-(1+k) c^2 r^2 }}+\sum{a_i r^{2i}}$
 

@@ -84,8 +84,8 @@ def draw2D(
     image: NDArrayFloat,
     x: NDArrayFloat,
     y: NDArrayFloat,
-    xlabel: str = "$x  (\mu m)$",
-    ylabel: str = "$y  (\mu m)$",
+    xlabel: str = r"$x  (\mu m)$",
+    ylabel: str = r"$y  (\mu m)$",
     title: str = "",
     color: str = "YlGnBu",  # YlGnBu  seismic
     interpolation: str = "bilinear",  # 'bilinear', 'nearest'

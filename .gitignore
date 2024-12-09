@@ -44,7 +44,7 @@ sdist/
 var/
 distLM/
 .installed.cfg
-
+aocg/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

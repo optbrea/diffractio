@@ -110,7 +110,7 @@ class Scalar_mask_X(Scalar_field_X):
                            v_globals: dict = {},
                            x0: float = 0*um,
                            radius: float = 0*um):
-        """Phase mask defined between two surfaces :math:`f_1` and :math:`f_2`: :math:`h(x,y)=f_2(x,y)-f_1(x,y)`, :math:`t(x)=mask(x)e^{i\,k\,(n-1)(f_{2}-f_{1})}`
+        r"""Phase mask defined between two surfaces :math:`f_1` and :math:`f_2`: :math:`h(x,y)=f_2(x,y)-f_1(x,y)`, :math:`t(x)=mask(x)e^{i\,k\,(n-1)(f_{2}-f_{1})}`
 
         Args:
             index (float): refractive index of the mask
@@ -410,7 +410,7 @@ class Scalar_mask_X(Scalar_field_X):
         return h
 
     def aspheric(self, x0: float, c: float, k: float, a: list, n0: float, n1: float, radius: float):
-        """Asferic surface. $z = \frac{c r^2}{1+\sqrt{1-(1+k) c^2 r^2 }}+\sum{a_i r^{2i}}$
+        r"""Asferic surface. $z = \frac{c r^2}{1+\sqrt{1-(1+k) c^2 r^2 }}+\sum{a_i r^{2i}}$
 
         Args:
             x0 (float): position of center

@@ -2707,7 +2707,7 @@ class Scalar_field_XY():
 
             I_drawing = prepare_drawing(image, kind, logarithm, normalize)
             ax.imshow(I_drawing)
-            ax.set_title("$z = {:2.0f} \mu m$".format(zs[i]))
+            ax.set_title(r"$z = {:2.0f} \mu m$".format(zs[i]))
             return i
 
         ani = animation.FuncAnimation(fig, animate, list(range(0, len(zs), frames_reduction)),

@@ -344,7 +344,7 @@ def get_phase(u: NDArrayComplex):
 
 
 def amplitude2phase(u: NDArrayComplex):
-    """Passes the amplitude of a complex field to phase. Previous phase is removed. :math:`u = A e^{i \phi}  -> e^(i abs(A))`
+    r"""Passes the amplitude of a complex field to phase. Previous phase is removed. :math:`u = A e^{i \phi}  -> e^(i abs(A))`
 
     Args:
         u (numpy.np.array, dtype=complex): complex field

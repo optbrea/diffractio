@@ -208,8 +208,29 @@ def reduce_to_1(class_diffractio):
 
     return class_diffractio
 
+def distance(p1: NDArray | float,p2: NDArray | float, verbose: bool = False):
+    """Distance between to floats or numpy arrays.
 
-def distance(x1: NDArrayFloat, x2: NDArrayFloat):
+    Args:
+        p1 (NDArray | float): Point 1
+        p2 (NDArray | float): Point 2
+        verbose (bool, optional): prints distance. Defaults to False.
+
+    Returns:
+        float: distance between the two points
+    """
+
+    if isinstance(p2, (int, float)):
+        d = np.abs((p2-p1))
+    else:
+        d = np.sqrt(np.sum((p2-p1)**2, axis=1))
+
+    if verbose:
+        print(f'distance between p1 and p2: {d}')
+
+    return d
+
+def distance_backup(x1: NDArrayFloat, x2: NDArrayFloat):
     """Compute distance between two vectors.
 
     Args:
@@ -224,8 +245,33 @@ def distance(x1: NDArrayFloat, x2: NDArrayFloat):
     else:
         return np.linalg.norm(x2 - x1)
 
+def nearest(vector: NDArray, number: float | int, verbose: bool=False):
+    """find the nearest value in a vector to a given number
 
-def nearest(vector: NDArrayFloat, number: float):
+    Args:
+        vector (NDArray): Array with values
+        number (float | int): value to compare with vector
+        verbose (bool, optional): prints something. Defaults to True.
+
+    Returns:
+        i_mins: index of the nearest value in numbers
+        values: nearest values in numbers
+        distances: distances between vector and nearest values in numbers
+    """
+    
+    ds = distance(vector, number)
+
+    index = ds.argmin()
+    value = vector[index]
+    dist_min = ds[index]
+
+    if verbose:
+        print(f'index: {index}, value: {value}, dist_min: {dist_min}')
+
+    return index, value, dist_min
+
+
+def nearest_backup(vector: NDArrayFloat, number: float):
     """Computes the nearest element in vector to number.
 
     Args:
@@ -244,8 +290,48 @@ def nearest(vector: NDArrayFloat, number: float):
 
     return indexes, values, distances
 
+def nearest2(vector: NDArray, numbers: NDArray, verbose: bool=True):
+    """find the nearest value of numbers to a given vector
 
-def nearest2(vector: NDArrayFloat, numbers: NDArrayFloat):
+    Args:
+        vector (NDArray): N dimensional vector to compare with numbers
+        numbers (NDArray): N dimensional array with values
+
+    Returns:
+        i_mins: index of the nearest value in numbers
+        values: nearest values in numbers
+        distances: distances between vector and nearest values in numbers
+    """
+
+    i_mins = np.zeros(len(numbers))
+    values = np.zeros(len(numbers))
+    distances = np.zeros(len(numbers))
+    
+    i_mins = []
+    values = []
+    distances = []
+
+    for i, number in enumerate(numbers):
+        # i_mins[i], values[i], distances[i] = nearest(vector, number, verbose=False)
+        i_min, value, dist_min = nearest(vector, number, verbose=False)
+        i_mins.append(i_min)
+        values.append(value)
+        distances.append(dist_min)
+
+    i_mins = np.array(i_mins)
+    values = np.array(values)
+    distances = np.array(distances)
+           
+
+
+    if verbose:
+        print(f'i_mins: {i_mins}')    
+        print(f'values: \n {values}')    
+        print(f'distances: {distances}')    
+
+    return i_mins, values, distances
+
+def nearest2_backup(vector: NDArrayFloat, numbers: NDArrayFloat):
     """Computes the nearest element in vector to numbers.
 
     Args:

@@ -64,7 +64,7 @@ class Test_Scalar_fields_X():
         Tests save in savez and other functions
         """
         func_name = sys._getframe().f_code.co_name
-        filename = '{}{}.'.format(newpath, func_name)
+        filename = '{}{}'.format(newpath, func_name)
 
         x = np.linspace(-500*um, 500*um, 512)
         wavelength = .5*um

@@ -520,7 +520,7 @@ class Scalar_field_XY():
         ofile.write("y0 = %f *um, y1 = %f *um, Deltay = %f *um\n" %
                     (self.y.min(), self.y[-1], self.y[1] - self.y[0]))
 
-        ofile.write("\wavelength = %f *um" % self.wavelength)
+        ofile.write("wavelength = %f *um" % self.wavelength)
         ofile.close()
 
         return mask
@@ -950,7 +950,7 @@ class Scalar_field_XY():
     def _RS_(self, z: float, n: float, new_field: bool = True, out_matrix: bool = False,
              kind: str = 'z', xout: float | None = None, yout: float | None = None,
              verbose: bool = False):
-        """Fast-Fourier-Transform  method for numerical integration of diffraction Rayleigh-Sommerfeld formula. `Thin Element Approximation` is considered for determining the field just after the mask: :math:`\mathbf{E}_{0}(\zeta,\eta)=t(\zeta,\eta)\mathbf{E}_{inc}(\zeta,\eta)` Is we have a field of size N*M, the result of propagation is also a field N*M. Nevertheless, there is a parameter `amplification` which allows us to determine the field in greater observation planes (jN)x(jM).
+        r"""Fast-Fourier-Transform  method for numerical integration of diffraction Rayleigh-Sommerfeld formula. `Thin Element Approximation` is considered for determining the field just after the mask: :math:`\mathbf{E}_{0}(\zeta,\eta)=t(\zeta,\eta)\mathbf{E}_{inc}(\zeta,\eta)` Is we have a field of size N*M, the result of propagation is also a field N*M. Nevertheless, there is a parameter `amplification` which allows us to determine the field in greater observation planes (jN)x(jM).
 
         Args:
             z (float): distance to observation plane.
@@ -1954,9 +1954,9 @@ class Scalar_field_XY():
 
             x0 = self.x[0]
             y0 = self.y[0]
-            plt.plot(x0, y0, 'yellow', label='4$\sigma$')
-            plt.plot(x0, y0, 'red', label='2$\sigma$')
-            plt.plot(x0, y0, 'black', label='1$\sigma$')
+            plt.plot(x0, y0, 'yellow', label=r'4$\sigma$')
+            plt.plot(x0, y0, 'red', label=r'2$\sigma$')
+            plt.plot(x0, y0, 'black', label=r'1$\sigma$')
             plt.legend()
 
         return dx, dy, principal_axis, (x_mean, y_mean, x2_mean, y2_mean,
@@ -2444,8 +2444,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(intensity,
                                        self.x,
                                        self.y,
-                                       xlabel="r$x  (\mu m)$",
-                                       ylabel="r$y  (\mu m)$",
+                                       xlabel=r"$x  (\mu m)$",
+                                       ylabel=r"$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2519,8 +2519,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(phase,
                                        self.x,
                                        self.y,
-                                       xlabel="r$x  (\mu m)$",
-                                       ylabel="r$y  (\mu m)$",
+                                       xlabel=r"$x  (\mu m)$",
+                                       ylabel=r"$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2634,8 +2634,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(rf,
                                        self.x,
                                        self.y,
-                                       xlabel="r$x  (\mu m)$",
-                                       ylabel="r$y  (\mu m)$",
+                                       xlabel=r"$x  (\mu m)$",
+                                       ylabel=r"$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,
@@ -2664,8 +2664,8 @@ class Scalar_field_XY():
         id_fig, IDax, IDimage = draw2D(np.abs(self.n),
                                        self.x,
                                        self.y,
-                                       xlabel="r$x  (\mu m)$",
-                                       ylabel="r$y  (\mu m)$",
+                                       xlabel=r"$x  (\mu m)$",
+                                       ylabel=r"$y  (\mu m)$",
                                        title=title,
                                        color=colormap_kind,
                                        reduce_matrix=self.reduce_matrix,

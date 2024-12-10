@@ -145,7 +145,7 @@ class Scalar_mask_X(Scalar_field_X):
                         interp_kind: str = 'quadratic',
                         radius: float = 0*um,
                         x0: float = 0*um):
-        """Phase mask defined between two surfaces defined by arrays: array1 and array2, :math:`t(x)=mask(x)e^{i\,k\,(n-1)(array2(x,z)-array1(x,z))}`
+        r"""Phase mask defined between two surfaces defined by arrays: array1 and array2, :math:`t(x)=mask(x)e^{i\,k\,(n-1)(array2(x,z)-array1(x,z))}`
 
         Args:
             index (float): refractive index of the mask

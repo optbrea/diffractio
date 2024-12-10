@@ -1621,32 +1621,24 @@ class Scalar_mask_XY(Scalar_field_XY):
 
 
     @check_none('X','Y',raise_exception=bool_raise_exception)
-    def axicon(self,
-               r0: tuple[float, float],
-               refractive_index: float,
-               angle: float,
-               radius: float = 0,
-               off_axis_angle: float = 0*degrees,
-               reflective: bool = False):
+    def axicon(self, r0: tuple[float, float], refractive_index: float, angle: float,
+               radius: float = 0, off_axis_angle: float = 0*degrees, reflective: bool = False):
         """Axicon,
 
-        Args:
+                Args:
             r0 (float, float): (x0,y0) - center of lens
             refractive_index (float): refractive index
             angle (float): angle of the axicon
             radius (float): radius of lens mask
             off_axis_angle (float) angle when it works off-axis
             reflective (bool): True if the axicon works in reflective mode.
-
         """
 
         k = 2 * np.pi / self.wavelength
         x0, y0 = r0
 
-        # distance de la generatriz al eje del cono
         r = np.sqrt((self.X - x0)**2 + (self.Y - y0)**2)
 
-        # Region de transmitancia
         u_mask = np.zeros_like(self.X)
         ipasa = r < radius
         u_mask[ipasa] = 1

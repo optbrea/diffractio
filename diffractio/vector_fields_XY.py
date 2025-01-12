@@ -81,15 +81,15 @@ class Vector_field_XY():
     Args:
         x (numpy.array): linear array with equidistant positions. The number of data is preferibly 2**n.
         y (numpy.array): linear array with equidistant positions. The number of data is preferibly 2**n.
-        wavelength (float): wavelength of the incident field
-        info (str): String with info about the simulation
+        wavelength (float): wavelength of the incident field.
+        info (str): String with info about the simulation.
 
     Attributes:
         self.x (numpy.array): linear array with equidistant positions. The number of data is preferibly 2**n.
         self.y (numpy.array): linear array with equidistant positions. The number of data is preferibly 2**n.
         self.wavelength (float): wavelength of the incident field.
-        self.Ex (numpy.array): Electric_x field
-        self.Ey (numpy.array): Electric_y field
+        self.Ex (numpy.array): Electric_x field.
+        self.Ey (numpy.array): Electric_y field.
     """
 
     def __init__(self, x: NDArrayFloat | None = None, y: NDArrayFloat | None = None,

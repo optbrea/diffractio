@@ -61,18 +61,18 @@ class Vector_field_X():
 
     Args:
         x (numpy.array): linear array with equidistant positions. The number of data is preferibly 2**n.
-        wavelength (float): wavelength of the incident field
-        info (str): String with info about the simulation
+        wavelength (float): wavelength of the incident field.
+        info (str): String with info about the simulation.
 
     Attributes:
         self.x (numpy.array): linear array with equidistant positions. The number of data is preferibly 2**n.
         self.wavelength (float): wavelength of the incident field.
-        self.Ex (numpy.array): Electric_x field
-        self.Ey (numpy.array): Electric_y field
-        self.Ez (numpy.array): Electric_z field
+        self.Ex (numpy.array): Electric_x field.
+        self.Ey (numpy.array): Electric_y field.
+        self.Ez (numpy.array): Electric_z field.
     """
 
-    def __init__(self, x: NDArrayFloat = None, wavelength: float | None = None, n_background: float = 1.0,
+    def __init__(self, x: NDArrayFloat | None = None, wavelength: float | None = None, n_background: float = 1.0,
                  info: str = ""):
         self.x = x
         self.wavelength = wavelength
@@ -672,6 +672,7 @@ class Vector_field_X():
 
         return (h1, h2, h3, h4)
 
+    @check_none('x',raise_exception=bool_raise_exception)
     def __draw1__(self, data: NDArrayFloat, ylabel: str = '', title: str = ''):
         """Draws image.
 

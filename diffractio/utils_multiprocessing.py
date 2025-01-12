@@ -85,6 +85,17 @@ class auxiliar_multiprocessing():
                                 var_iterable,
                                 dict_constants=dict(),
                                 Ncores=8):
+        """_summary_
+
+        Args:
+            function (_type_): _description_
+            var_iterable (_type_): _description_
+            dict_constants (_type_, optional): _description_. Defaults to dict().
+            Ncores (int, optional): num of cores. Defaults to 8.
+
+        Returns:
+            _type_: _description_
+        """
         # Store data in object
         self.external_function = function
         self.dict_constants = dict_constants

@@ -439,7 +439,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
         else:
             sign2 = ">"
 
-        R ='np.sqrt((Xrot-{x0})**2 + (Yrot-{y0})**2)'
+        R =f'np.sqrt((Xrot-{x0})**2 + (Yrot-{y0})**2)'
 
 
         params = dict(

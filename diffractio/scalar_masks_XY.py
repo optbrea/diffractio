@@ -1243,11 +1243,10 @@ class Scalar_mask_XY(Scalar_field_XY):
         x0, y0 = r0
 
         Xrot, Yrot = self.__rotate__(angle, (x0, y0))
-        F = np.sqrt(Xrot**2 / R1**2 + Yrot**2 / R2**2 - s**2 * Xrot**2 * Yrot**2 /
-                    (R1**2 * R2**2))
+        F = Xrot**2 / R1**2 + Yrot**2 / R2**2 - s**2 * Xrot**2 * Yrot**2 / (R1**2 * R2**2)
 
         Z1 = F < 1
-        Z = Z1 * t1.u
+        Z = np.sqrt(Z1) * t1.u
 
         self.u = Z
 

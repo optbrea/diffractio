@@ -290,7 +290,7 @@ def nearest_backup(vector: NDArrayFloat, number: float):
 
     return indexes, values, distances
 
-def nearest2(vector: NDArray, numbers: NDArray, verbose: bool=True):
+def nearest2(vector: NDArray, numbers: NDArray, verbose: bool=False):
     """find the nearest value of numbers to a given vector
 
     Args:
@@ -877,8 +877,7 @@ def cart2pol(x: NDArrayFloat, y: NDArrayFloat):
 
 
 def pol2cart(rho: NDArrayFloat, phi: NDArrayFloat):
-    """
-    polar to cartesian coordinate transformation
+    """Polar to cartesian coordinate transformation
 
     Args:
         rho (np.array): rho coordinate
@@ -916,7 +915,7 @@ def fZernike(X: NDArrayFloat, Y: NDArrayFloat, n: int, m: int, radius: float):
 
         The first polinomial is the real part and the second de imaginary part.
 
-       * n m aberration
+        * n m aberration
         * 0 0 piston
         * 1 -1 vertical tilt
         * 1 1 1 horizontal tilt

@@ -47,11 +47,7 @@ class Test_Scalar_masks_XZ():
         z0 = 10*um
         z1 = 50*um
         v_globals = dict(z0=z0, z1=z1)
-        t1.extrude_mask(t=t0,
-                        z0=z0,
-                        z1=z1,
-                        refractive_index='1+0.25*(z-z0)/(z1-z0)',
-                        v_globals=v_globals)
+        t1.extrude_mask(t=t0,   z0=z0,   z1=z1,   refractive_index='1+0.25*(z-z0)/(z1-z0)',   v_globals=v_globals)
         t1.draw_refractive_index(draw_borders=False, )
 
         t1.save_data(filename=filename + '.npz', add_name='')
@@ -74,11 +70,7 @@ class Test_Scalar_masks_XZ():
         z0 = 10*um
         z1 = 50*um
         v_globals = dict(z0=z0, z1=z1)
-        t1.extrude_mask(t=t0,
-                        z0=z0,
-                        z1=z1,
-                        refractive_index=1.5,
-                        v_globals=v_globals)
+        t1.extrude_mask(t=t0,   z0=z0,   z1=z1,  refractive_index=1.5,  v_globals=v_globals)
         t1.draw_refractive_index(draw_borders=False, )
 
         t1.save_data(filename=filename + '.npz', add_name='')
@@ -99,13 +91,7 @@ class Test_Scalar_masks_XZ():
         v_globals = {'um': 1, 'np': np}
 
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength)
-        t1.mask_from_function(r0=(0*um, 0*um),
-                              refractive_index=1.5,
-                              f1=f1,
-                              f2=f2,
-                              z_sides=z_sides,
-                              angle=0*degrees,
-                              v_globals=v_globals)
+        t1.mask_from_function(r0=(0*um, 0*um), refractive_index=1.5, f1=f1, f2=f2, z_sides=z_sides, angle=0*degrees, v_globals=v_globals)
 
         t1.draw_refractive_index()
 
@@ -163,11 +149,7 @@ class Test_Scalar_masks_XZ():
         Fs = ['Xrot<3*um', 'Xrot>-3*um', 'Zrot>25*um', 'Zrot<1750*um']
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength, n_background=1)
 
-        t1.object_by_surfaces(r0,
-                              refractive_index,
-                              Fs,
-                              angle=0*degrees,
-                              v_globals={})
+        t1.object_by_surfaces(r0, refractive_index, Fs, angle=0*degrees, v_globals={})
 
         t1.draw_refractive_index(draw_borders=True)
 
@@ -190,10 +172,7 @@ class Test_Scalar_masks_XZ():
         z0 = np.linspace(0*um, 400*um, 256)
         wavelength = 50*um
 
-        t0 = Scalar_mask_XZ(x=x0,
-                            z=z0,
-                            wavelength=wavelength,
-                            n_background=1.0)
+        t0 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength, n_background=1.0)
 
         pn = dict(n_out=1.5,
                   n_center=4,
@@ -207,10 +186,7 @@ class Test_Scalar_masks_XZ():
         ref_index = "{p[n_out]}+({p[n_center]}-{p[n_out]})*(1-((X-{p[cx]})**2+(Z-{p[cz]})**2)/{p[radius]}**2)".format(
             p=pn)
 
-        t0.cylinder(r0=center,
-                  radius=(radius, radius),
-                  refractive_index=ref_index,
-                  angle=0)
+        t0.cylinder(r0=center, radius=(radius, radius), refractive_index=ref_index, angle=0)
 
         t0.draw_refractive_index(draw_borders=False, scale='equal')
 
@@ -235,11 +211,7 @@ class Test_Scalar_masks_XZ():
         z_max = 50*um
         v_globals = dict(np=np)
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength, n_background=1)
-        t1.extrude_mask(t=t0,
-                        z0=z_min,
-                        z1=z_max,
-                        refractive_index='1+0.25*np.abs(x/200)**2',
-                        v_globals=v_globals)
+        t1.extrude_mask(t=t0, z0=z_min, z1=z_max, refractive_index='1+0.25*np.abs(x/200)**2', v_globals=v_globals)
         t1.draw_refractive_index(draw_borders=False)
 
         t1.save_data(filename=filename + '.npz', add_name='')
@@ -256,10 +228,7 @@ class Test_Scalar_masks_XZ():
         z0 = np.linspace(0*um, 400*um, 256)
         wavelength = 50*um
 
-        t0 = Scalar_mask_XZ(x=x0,
-                            z=z0,
-                            wavelength=wavelength,
-                            n_background=1.0)
+        t0 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength, n_background=1.0)
 
         pn = dict(n_out=1.5,
                   n_center=4,
@@ -340,10 +309,7 @@ class Test_Scalar_masks_XZ():
         t0.double_slit(x0=0, size=20*um, separation=50*um)
         t0.draw()
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength, n_background=1)
-        t1.extrude_mask(t=t0,
-                        z0=10*um,
-                        z1=50*um,
-                        refractive_index=1.5 - 1.5j)
+        t1.extrude_mask(t=t0,  z0=10*um,  z1=50*um,  refractive_index=1.5 + 1.5j)
         t1.draw_refractive_index(draw_borders=True)
 
         t1.save_data(filename=filename + '.npz', add_name='')
@@ -478,14 +444,9 @@ class Test_Scalar_masks_XZ():
         wavelength = .5*um
 
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength)
-        t1.semi_cylinder(r0=(0*um, 0*um),
-                       radius=(100, 100),
-                       refractive_index=2,
-                       angle=0*degrees)
+        t1.semi_cylinder(r0=(0*um, 0*um),  radius=(100, 100),  refractive_index=2,  angle=0*degrees)
 
-        t1.draw_refractive_index(draw_borders=True,
-                                 min_incr=0.01,
-                                 scale='equal')
+        t1.draw_refractive_index(draw_borders=True,   min_incr=0.01,  scale='equal')
 
         t1.save_data(filename=filename + '.npz', add_name='')
         save_figure_test(newpath, func_name, add_name='')
@@ -566,18 +527,7 @@ class Test_Scalar_masks_XZ():
         wavelength = 0.5*um
 
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength)
-
-        t1.ronchi_grating(period=50*um,
-                          fill_factor=.5,
-                          length=500*um,
-                          height=20*um,
-                          r0=(0*um, 100*um),
-                          Dx=2*um,
-                          refractive_index=1.5 + 0.5j,
-                          heigth_substrate=25*um,
-                          refractive_index_substrate=1.5,
-                          angle=0*degrees)
-
+        t1.ronchi_grating(period=50*um, fill_factor=.5, length=500*um, height=20*um, r0=(0*um, 100*um), Dx=2*um, refractive_index=1.5 + 0.5j, heigth_substrate=25*um, refractive_index_substrate=1.5, angle=0*degrees)
         t1.draw_refractive_index()
 
         t1.save_data(filename=filename + '.npz', add_name='')
@@ -605,10 +555,7 @@ class Test_Scalar_masks_XZ():
         t2 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength, n_background=1)
 
         t2.extrude_mask(t=t0, z0=10*um, z1=50*um, refractive_index=1.5)
-        t2.extrude_mask(t=t1,
-                        z0=50*um,
-                        z1=55.5*um,
-                        refractive_index=1.5 - 1.5)
+        t2.extrude_mask(t=t1,   z0=50*um,   z1=55.5*um,   refractive_index=1.5 - 1.5)
 
         t2.draw_refractive_index(draw_borders=False)
 
@@ -625,14 +572,7 @@ class Test_Scalar_masks_XZ():
 
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength)
 
-        t1.sine_grating(period=20*um,
-                        heigth_sine=10*um,
-                        heigth_substrate=100*um,
-                        r0=(0*um, 200*um),
-                        length=500*um,
-                        Dx=2*um,
-                        refractive_index=1.5,
-                        angle=0*degrees)
+        t1.sine_grating(period=20*um,   heigth_sine=10*um,   heigth_substrate=100*um,   r0=(0*um, 200*um),   length=500*um,   Dx=2*um,   refractive_index=1.5,   angle=0*degrees)
 
         t1.draw_refractive_index()
 
@@ -669,13 +609,7 @@ class Test_Scalar_masks_XZ():
         wavelength = 0.6238*um
 
         t1 = Scalar_mask_XZ(x=x0, z=z0, wavelength=wavelength)
-        t1.rough_sheet(r0=(0*um, 0*um),
-                       size=(200*um, 25*um),
-                       t=10*um,
-                       s=10*um,
-                       refractive_index=1.5,
-                       angle=0,
-                       rotation_point=None)
+        t1.rough_sheet(r0=(0*um, 0*um),  size=(200*um, 25*um),  t=10*um,  s=10*um,  refractive_index=1.5,  angle=0,  rotation_point=None)
         t1.draw_refractive_index()
 
         t1.save_data(filename=filename + '.npz', add_name='')

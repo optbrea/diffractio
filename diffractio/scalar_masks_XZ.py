@@ -97,7 +97,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
     @check_none('x','z',raise_exception=bool_raise_exception)
     def object_by_surfaces(
-        self, rotation_point: tuple[float, float], refractive_index: float | str,
+        self, rotation_point: tuple[float, float], refractive_index: complex | float | str,
         Fs: list, angle: float, v_globals: dict = {}, verbose: bool = False
     ):
         """Mask defined by n surfaces given in array Fs={f1, f2, ....}.
@@ -154,7 +154,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     @check_none('x','z',raise_exception=bool_raise_exception)
-    def extrude_mask(self, t, z0: float, z1: float, refractive_index: float,
+    def extrude_mask(self, t, z0: float, z1: float, refractive_index: complex | float | str,
                      angle: float = 0*degrees, v_globals: dict = {}):
         """
         Converts a Scalar_mask_X in volumetric between z0 and z1 by growing between these two planes
@@ -190,7 +190,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     def mask_from_function(
-            self, r0: tuple[float, float], refractive_index: float | str, f1, f2, z_sides: tuple[float],
+            self, r0: tuple[float, float], refractive_index: complex | float | str, f1, f2, z_sides: tuple[float],
             angle: float, r_rot: tuple[float, float] | None = None, v_globals: dict = {}):
         """
         Phase mask defined between two surfaces f1 and f1: h(x,z)=f2(x,z)-f1(x,z)
@@ -251,21 +251,11 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         x_c, z_c = r0
 
         f1_interp = interp1d(
-            array1[0,:] + x_c,
-            array1[1,:] + z_c,
-            kind=interp_kind,
-            bounds_error=False,
-            fill_value=1, # array1[1,0] + z_c,
-            assume_sorted=False,
+            array1[0,:] + x_c, array1[1,:] + z_c, kind=interp_kind, bounds_error=False, fill_value=1, # array1[1,0] + z_c, assume_sorted=False,
         )
 
         f2_interp = interp1d(
-            array2[0,:] + x_c,
-            array2[1,:] + z_c,
-            kind=interp_kind,
-            bounds_error=False,
-            fill_value=1, # array2[1,0] + z_c,
-            assume_sorted=False,
+            array2[0,:] + x_c, array2[1,:] + z_c, kind=interp_kind, bounds_error=False, fill_value=1, # array2[1,0] + z_c, assume_sorted=False,
         )
 
         F1 = f1_interp(self.x)
@@ -395,8 +385,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     @check_none('x','z',raise_exception=bool_raise_exception)
-    def insert_array_masks(self, txz, refractive_index: float, space: tuple[float], margin: tuple[float] | float = 0,
-                            angle: float = 0*degrees):
+    def insert_array_masks(self, txz, refractive_index: float, space: tuple[float], margin: tuple[float] | float = 0, angle: float = 0*degrees):
         """Generates a matrix of shapes given in txz.
 
         Args:
@@ -443,10 +432,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return self
 
     #@check_none('x','z','u',raise_exception=bool_raise_exception)
-    def repeat_structure(self,
-                            num_repetitions: tuple[int,int],
-                            position: str = 'center',
-                            new_field: bool = True):
+    def repeat_structure(self,                 num_repetitions: tuple[int,int],                 position: str = 'center',                 new_field: bool = True):
         """Repeat the structure (n x m) times.
 
         Args:
@@ -464,12 +450,8 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         z_min = self.z[0]
         z_max = self.z[-1]
 
-        x_new = np.linspace(num_repetitions[0] * x_min,
-                            num_repetitions[0] * x_max,
-                            num_repetitions[0] * len(self.z))
-        z_new = np.linspace(num_repetitions[1] * z_min,
-                            num_repetitions[1] * z_max,
-                            num_repetitions[1] * len(self.z))
+        x_new = np.linspace(num_repetitions[0] * x_min, num_repetitions[0] * x_max, num_repetitions[0] * len(self.z))
+        z_new = np.linspace(num_repetitions[1] * z_min, num_repetitions[1] * z_max, num_repetitions[1] * len(self.z))
 
         center_x = (x_new[-1] + x_new[0])/2
         center_z = (z_new[-1] + z_new[0])/2
@@ -491,12 +473,11 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
         return t_new
 
-
     
     @check_none('x','z',raise_exception=bool_raise_exception)
     def add_surfaces(
         self, fx, x_sides: tuple[float, float],
-        refractive_index: float | str, min_incr: float = 0.1, angle: float = 0*degrees):
+        refractive_index: complex | float | str, min_incr: float = 0.1, angle: float = 0*degrees):
         """A topography fx is added to one of the faces of object u (self.n).
 
         Args:
@@ -772,7 +753,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return self
 
 
-    def semi_plane(self, r0: tuple[float, float], refractive_index: float | str,
+    def semi_plane(self, r0: tuple[float, float], refractive_index: complex | float | str,
                    angle: float = 0*degrees, rotation_point: tuple[float, float] | None = None):
         """Inserts a semi-cylinder in background (x>x0). If something else previous, it is removed.
 
@@ -797,7 +778,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return ipasa
 
 
-    def layer(self, r0: tuple[float, float], depth: float, refractive_index: float | str,
+    def layer(self, r0: tuple[float, float], depth: float, refractive_index: complex | float | str,
               angle: float = 0*degrees, rotation_point: tuple[float, float] | None = None):
         """Insert a layer. If it is something else previous, it is removed.
 
@@ -826,7 +807,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     def square(self, r0: tuple[float, float], size: tuple[float, float],
-                  refractive_index: float | str, angle: float = 0*degrees,
+                  refractive_index: complex | float | str, angle: float = 0*degrees,
                   rotation_point: tuple[float, float] | None = None):
         """Insert a square in background. Anything previous, is removed.
 
@@ -874,7 +855,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
     @check_none('n',raise_exception=bool_raise_exception)
     def slit(self, r0: tuple[float, float], aperture: float, depth: float,
-             refractive_index: float | str, refractive_index_center: float or str = "",
+             refractive_index: complex | float | str, refractive_index_center: complex | float | str = "",
              angle: float = 0, rotation_point: tuple[float, float] | None = None):
         """Insert a slit in background.
 
@@ -917,7 +898,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return ipasa_slit != ipasa
 
     def cylinder(self, r0: tuple[float, float], radius: tuple[float, float],
-               refractive_index: float | str, angle: float = 0*degrees,
+               refractive_index: complex | float | str, angle: float = 0*degrees,
                rotation_point: tuple[float, float] | None = None):
         """Insert a cylinder in background.
 
@@ -951,7 +932,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     def semi_cylinder(self, r0: tuple[float, float], radius: tuple[float, float],
-                    refractive_index: float | str, angle: float = 0*degrees,
+                    refractive_index: complex | float | str, angle: float = 0*degrees,
                     rotation_point: tuple[float, float] | None = None):
         """Insert a semi_cylinder in background.
 
@@ -985,7 +966,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return ipasa
 
 
-    def aspheric_surface_z(self, r0: tuple[float, float], refractive_index: float | str,
+    def aspheric_surface_z(self, r0: tuple[float, float], refractive_index: complex | float | str,
                            cx: float, Qx: float, a2: float, a3: float, a4: float,
                            side: str, angle: float = 0*degrees):
         """Define an aspheric surface
@@ -1035,7 +1016,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             self,
             r0: tuple[float, float],
             angle: float,
-            refractive_index: float | str,
+            refractive_index: complex | float | str,
             cx: tuple[float, float],
             thickness: tuple[float, float],
             size: float,
@@ -1185,7 +1166,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     def wedge(
-            self, r0: tuple[float, float], length, refractive_index: float | str, angle_wedge: float,
+            self, r0: tuple[float, float], length, refractive_index: complex | float | str, angle_wedge: float,
             angle: float = 0*degrees, rotation_point: tuple[float, float] | None = None):
         """Insert a wedge pointing towards the light beam
 
@@ -1213,7 +1194,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return ipasa
 
 
-    def prism(self, r0: tuple[float, float], length: float, refractive_index: float | str,
+    def prism(self, r0: tuple[float, float], length: float, refractive_index: complex | float | str,
             angle_prism: float, angle: float = 0*degrees, rotation_point: tuple[float, float] | None = None):
         """Similar to wedge but the use is different. Also the angle is usually different. One of the sides is paralel to x=x0.
 
@@ -1231,8 +1212,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             rotation_point = r0
 
         cond1 = "Xrot>{}".format(x0)
-        cond2 = "Zrot-({})>{}*(Xrot-{})".format(z0,
-                                                np.tan(angle_prism/2), x0)
+        cond2 = "Zrot-({})>{}*(Xrot-{})".format(z0,                     np.tan(angle_prism/2), x0)
         cond3 = "Zrot-({})<{}*(Xrot-{})".format(
             z0 + length, np.tan(np.pi - angle_prism/2), x0
         )
@@ -1246,7 +1226,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     def biprism(self, r0: tuple[float, float], length: float, height: float,
-                refractive_index: float | str, angle: float = 0*degrees):
+                refractive_index: complex | float | str, angle: float = 0*degrees):
         """Fresnel biprism.
 
         Args:
@@ -1297,7 +1277,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             length: float,
             height: float,
             Dx: float,
-            refractive_index: float | str,
+            refractive_index: complex | float | str,
             heigth_substrate: float,
             refractive_index_substrate: float,
             angle: float = 0*degrees):
@@ -1350,7 +1330,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             r0: tuple[float, float],
             length: float,
             Dx: float,
-            refractive_index: float | str,
+            refractive_index: complex | float | str,
             angle: float = 0*degrees):
         """Insert a sine grating in background.
 
@@ -1381,7 +1361,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
     def probe(self, r0: tuple[float, float], base: float, length: float,
-              refractive_index: float | str, angle: float = 0*degrees):
+              refractive_index: complex | float | str, angle: float = 0*degrees):
         """Probe with a sinusoidal shape.
 
         Args:
@@ -1413,7 +1393,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
     @check_none('x','z',raise_exception=bool_raise_exception)
     def rough_sheet(self, r0: tuple[float, float], size: float, t: float, s: float,
-                    refractive_index: float | str, angle: float = 0*degrees,
+                    refractive_index: complex | float | str, angle: float = 0*degrees,
                     rotation_point: tuple[float, float] | None = None):
         """Sheet with one of the surface rough.
 
@@ -1470,6 +1450,5 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             self.n[i_z[i]: i_final, i] = n_back[i_z[i]: i_final, i]
 
         if angle != 0:
-            self.rotate_field(angle, rotation_point,
-                              n_background=self.n_background)
+            self.rotate_field(angle, rotation_point,   n_background=self.n_background)
         return ipasa

@@ -59,7 +59,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
 
     @check_none('X','Y','Z','n', raise_exception=bool_raise_exception)
     def mask_from_function(
-            self, r0: tuple[float, float, float], refractive_index: float | str, fs: tuple[str], rotation: dict | None, v_globals: dict = {}):
+            self, r0: tuple[float, float, float], refractive_index: complex | float | str, fs: tuple[str], rotation: dict | None, v_globals: dict = {}):
         """
         Phase mask defined between two surfaces f1 and f1: h(x,z)=f2(x,z)-f1(x,z)
 
@@ -365,7 +365,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
     def aspheric_lens(
             self,
             r0: tuple[float, float, float],
-            refractive_index: float | str,
+            refractive_index: complex | float | str,
             thickness: tuple[float, float],
             cx: tuple[float, float],
             diameter: float | None = None,

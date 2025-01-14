@@ -64,7 +64,7 @@ author = u"Luis Miguel Sanchez Brea"
 #
 # The short X.Y version.
 # version = diffractio.__version__
-version = '0.3.1'
+version = '1.0.0'
 # The full version, including alpha/beta/rc tags.
 # release = diffractio.__version__
 release = version

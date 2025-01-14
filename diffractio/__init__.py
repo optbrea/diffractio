@@ -28,7 +28,7 @@ import scipy as sp
 
 __author__ = """Luis Miguel Sanchez Brea"""
 __email__ = 'optbrea@ucm.es'
-__version__ = '0.3.1'
+__version__ = '1.0.0'
 name = 'diffractio'
 
 um = 1.

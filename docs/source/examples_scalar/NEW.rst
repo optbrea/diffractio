@@ -17,9 +17,7 @@ New Features
   - Improvement in documentation and examples.
 
   - Typing variables in functions.
-  
-  
-
+ 
 
 * Fix bugs:
 

@@ -139,7 +139,7 @@ class Vector_field_XY():
 
         return ""
 
-    @check_none('x','y','Ex','Ey',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', raise_exception=bool_raise_exception)
     def __add__(self, other, kind: str = 'standard'):
         """adds two Vector_field_XY. For example two light sources or two masks
 
@@ -158,7 +158,7 @@ class Vector_field_XY():
 
         return EM
 
-    @check_none('x','y','X','Y',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'X', 'Y', raise_exception=bool_raise_exception)
     def __rotate__(self, angle, position=None):
         """Rotation of X,Y with respect to position
 
@@ -221,7 +221,7 @@ class Vector_field_XY():
             print(dict0.keys())
 
 
-    @check_none('x','y','Ex','Ey',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', raise_exception=bool_raise_exception)
     def clear(self):
         """simple - removes the field:"""
 
@@ -277,7 +277,7 @@ class Vector_field_XY():
         return new_field
 
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def get(self, kind: get_vector_options, mode: str = 'modulus', **kwargs):
         """Takes the vector field and divide in Scalar_field_X.
 
@@ -292,7 +292,7 @@ class Vector_field_XY():
         return data
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def pupil(self, r0: tuple[float, float] | None = None, radius: tuple[float, float] | None = None,
               angle: float = 0*degrees):
         """place a pupil in the field. If r0 or radius are None, they are computed using the x,y parameters.
@@ -336,7 +336,7 @@ class Vector_field_XY():
         self.Ez = self.Ez * pupil0
 
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def apply_mask(self, u, new_field: bool = False):
         """Multiply field by binary scalar mask: self.Ex = self.Ex * u.u
 
@@ -375,7 +375,7 @@ class Vector_field_XY():
         return edges
     
     
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def intensity(self):
         """"Returns intensity.
         """
@@ -385,7 +385,7 @@ class Vector_field_XY():
         return intensity
 
 
-    # @check_none('x','y',raise_exception=bool_raise_exception)
+    # @check_none('x', 'y', raise_exception=bool_raise_exception)
     # def RS(self,
     #        z=10*mm,
     #        n: float = 1.,
@@ -445,7 +445,7 @@ class Vector_field_XY():
     #         self.y = Ex.y
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=False)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=False)
     def VFFT(self,
              radius: float,
              focal: float,
@@ -579,7 +579,7 @@ class Vector_field_XY():
 
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=False)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=False)
     def IVFFT(self,
               radius: float,
               focal: float,
@@ -714,7 +714,7 @@ class Vector_field_XY():
 
 
 
-    @check_none('x','y',raise_exception=False)
+    @check_none('x', 'y', raise_exception=False)
     def VRS(self, z: float, n: float = 1., new_field: bool = True, verbose: bool = False,
             amplification: tuple[int, int] = (1, 1)):
         """Fast-Fourier-Transform  method for numerical integration of diffraction Vector Rayleigh-Sommerfeld formula.
@@ -786,7 +786,7 @@ class Vector_field_XY():
             self.Ez = Ez.u
 
 
-    @check_none('x','y',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', raise_exception=bool_raise_exception)
     def VCZT(self, z, xout=None, yout=None, verbose: bool = False):
         """Vector Z Chirped Transform algorithm (VCZT)
 
@@ -954,7 +954,7 @@ class Vector_field_XY():
                 return E_out
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def normalize(self, kind:str = 'amplitude'):
         """Normalizes the field, to the maximum intensity.
         
@@ -974,7 +974,7 @@ class Vector_field_XY():
         self.Ez = self.Ez / maximum
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def cut_resample(self,
                      x_limits: tuple[float, float] | None = None,
                      y_limits: tuple[float, float] | None = None,
@@ -986,7 +986,7 @@ class Vector_field_XY():
         Args:
             x_limits (float,float): (x0,x1) starting and final points to cut. if '' - takes the current limit x[0] and x[-1]
             y_limits (float,float): (y0,y1) - starting and final points to cut. if '' - takes the current limit y[0] and y[-1]
-            num_points (int): it resamples x, y and u. [],'',0,None -> it leave the points as it is
+            num_points (int): it resamples x, y and u. [], '',0,None -> it leave the points as it is
             new_field (bool): it returns a new Scalar_field_XY
             interp_kind (int): numbers between 1 and 5
         """
@@ -1103,7 +1103,7 @@ class Vector_field_XY():
             field.Ez = Ez_new
             return field
 
-    @check_none('x','y','n')
+    @check_none('x', 'y', 'n')
     def surface_detection(self,
                           mode: int = 1,
                           min_incr: float = 0.1,
@@ -1137,7 +1137,7 @@ class Vector_field_XY():
         return self.borders
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def draw(self,
              kind: Draw_Vector_XY_Options = 'intensity',
              logarithm: float = 0,
@@ -1205,7 +1205,7 @@ class Vector_field_XY():
             return id_fig
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_intensity__(self,
                            logarithm: float,
                            normalize: bool,
@@ -1241,7 +1241,7 @@ class Vector_field_XY():
         return h1
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_phases__(self, color_phase: str = CONF_DRAWING['color_phase'], draw_borders: bool=False,
                            **kwargs):
         """internal funcion: draws intensity X,Y.
@@ -1349,7 +1349,7 @@ class Vector_field_XY():
             return h1, h2, h3
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=False)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=False)
     def __draw_intensities__(self,
                              logarithm: float,
                              normalize: bool,
@@ -1448,7 +1448,7 @@ class Vector_field_XY():
             return h1, h2, h3
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_intensities_rz__(
             self,
             logarithm: float,
@@ -1502,7 +1502,7 @@ class Vector_field_XY():
         return h1, h2
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_fields__(self,
                         logarithm: float,
                         normalize: bool,
@@ -1642,7 +1642,7 @@ class Vector_field_XY():
             return h1, h2, h3, h4, h5, h6
 
 
-    @check_none('x','y','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_EH__(
         self,
         logarithm,
@@ -1769,7 +1769,7 @@ class Vector_field_XY():
 
 
 
-    @check_none('x','y','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_E2H2__(
         self,
         logarithm,
@@ -1895,7 +1895,7 @@ class Vector_field_XY():
 
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_stokes__(self,
                         logarithm: float,
                         normalize: bool,
@@ -1944,7 +1944,7 @@ class Vector_field_XY():
         return (h1, h2, h3, h4)
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_param_ellipse__(self,
                                color_intensity: str = CONF_DRAWING['color_intensity'],
                                color_phase: str = CONF_DRAWING['color_phase'],
@@ -1981,7 +1981,7 @@ class Vector_field_XY():
 
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_ellipses__(self,
                           logarithm: float = 0.,
                           normalize: bool = False,
@@ -2087,7 +2087,7 @@ class Vector_field_XY():
                 #           percentage_intensity * intensity_max)
 
 
-    @check_none('x','y','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw1__(self,
                   image: NDArrayFloat,
                   colormap: str,

@@ -71,7 +71,7 @@ class Scalar_source_X(Scalar_field_X):
         super().__init__(x, wavelength, n_background, info)
         self.type = 'Scalar_source_X'
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def plane_wave(self, A: float = 1., theta: float = 0., z0: float = 0.):
         """Plane wave. 
 
@@ -85,7 +85,7 @@ class Scalar_source_X(Scalar_field_X):
         self.u = A * np.exp(1.j * k * (self.x * np.sin(theta) + z0 * np.cos(theta)))
 
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def gauss_beam(self, x0: float, w0: float, z0: float, A: float = 1, theta: float = 0.):
         """Gauss Beam.
 
@@ -115,7 +115,7 @@ class Scalar_source_X(Scalar_field_X):
         self.u = amplitude * phase1 * phase2
 
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def spherical_wave(self, A: float, x0: float, z0: float, normalize: bool = False):
         """Spherical wave. self.u = amplitude * A * np.exp(-1.j * np.sign(z0) * k * Rz) / Rz
 
@@ -137,7 +137,7 @@ class Scalar_source_X(Scalar_field_X):
             self.u = self.u / np.abs(self.u.max() + 1.012034e-12)
 
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def plane_waves_dict(self, params: dict):
         """Several plane waves with parameters defined in dictionary
 
@@ -157,7 +157,7 @@ class Scalar_source_X(Scalar_field_X):
                 (self.x * np.sin(p['theta']) + p['z0'] * np.cos(p['theta'])))
 
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def plane_waves_several_inclined(self, A: float, num_beams: int, max_angle: float):
         """Several paralel plane waves.
 
@@ -176,7 +176,7 @@ class Scalar_source_X(Scalar_field_X):
         self.u = t
 
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def gauss_beams_several_parallel(self, A: float, num_beams: int, w0: float, z0: float, x_central: float, x_range: float, theta: float = 0.):
         """Several parallel gauss beams
 
@@ -198,7 +198,7 @@ class Scalar_source_X(Scalar_field_X):
             t = t + self.u
         self.u = t
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def gauss_beams_several_inclined(self, A: float, num_beams: int, w0: float, x0: float, z0: float, max_angle: float):
         """Several inclined gauss beams
 

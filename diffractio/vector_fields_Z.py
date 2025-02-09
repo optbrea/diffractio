@@ -203,7 +203,7 @@ class Vector_field_Z():
         return get_instance_size_MB(self, verbose)
 
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def get(self, kind: get_vector_options, mode: str = 'modulus', **kwargs):
         """Takes the vector field and divide in Scalar_field_X.
 

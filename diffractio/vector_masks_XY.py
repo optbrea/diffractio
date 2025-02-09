@@ -91,7 +91,7 @@ class Vector_mask_XY(Vector_field_XY):
         return ""
     
 
-    @check_none('x','y')
+    @check_none('x', 'y')
     def __add__(self, other, kind: str = 'standard'):
         """adds two Vector_mask_XY. For example two  masks
 
@@ -113,7 +113,7 @@ class Vector_mask_XY(Vector_field_XY):
 
         return m3
 
-    @check_none('x','y')
+    @check_none('x', 'y')
     def __mul__(self, other):
         """
         Multilies the Vector_mask_XY matrix by another Vector_mask_XY.
@@ -146,7 +146,7 @@ class Vector_mask_XY(Vector_field_XY):
 
         return m3
 
-    @check_none('x','y')
+    @check_none('x', 'y')
     def __rmul__(self, other):
         """
         Multilies the Vector_mask_XY matrix by another Vector_mask_XY.
@@ -181,7 +181,7 @@ class Vector_mask_XY(Vector_field_XY):
         return new_field
 
 
-    @check_none('x','y')
+    @check_none('x', 'y')
     def apply_circle(self, r0: tuple[float, float] | None = None,
                      radius: tuple[float, float] | None = None):
         """The same circular mask is applied to all the Jones Matrix.
@@ -211,7 +211,7 @@ class Vector_mask_XY(Vector_field_XY):
         self.M11 = self.M11 * u_pupil.u
 
 
-    @check_none('x','y')
+    @check_none('x', 'y')
     def pupil(self, r0: tuple[float, float] | None = None,
               radius: tuple[float, float] | None = None, angle: float = 0*degrees):
         """place a pupil in the mask. If r0 or radius are None, they are computed using the x,y parameters.
@@ -284,7 +284,7 @@ class Vector_mask_XY(Vector_field_XY):
         self.M11.real = np.where(np.real(self.M11) == -0, 0, np.real(self.M11))
 
 
-    @check_none('x','y')
+    @check_none('x', 'y')
     def complementary_masks(self, mask: Scalar_mask_XY, pol_state_0: Jones_matrix, pol_state_1: Jones_matrix,           is_binarized: bool=True):
         """Creates a vector mask from a scalar mask. It assign an pol_state_0 to 0 values and a pol_state_1 to 1 values..
         For generality, ik mask is a decimal number between 0 and 1, it takes the linear interpolation.

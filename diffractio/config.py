@@ -26,12 +26,12 @@ CONF_DRAWING = dict()
 CONF_DRAWING['color_intensity'] = cm.gist_heat  # cm.gist_heat  #cm.hot
 CONF_DRAWING['color_amplitude'] = cm.jet
 CONF_DRAWING['color_amplitude_sign'] = cm.seismic
-CONF_DRAWING['color_phase'] = cm.twilight  # twilight .twilight hsv
+CONF_DRAWING['color_phase'] = cm.twilight  #twilight .twilight hsv
 CONF_DRAWING['color_real'] = cm.seismic
 CONF_DRAWING['color_stokes'] = cm.seismic
 CONF_DRAWING['color_n'] = cm.Blues
-CONF_DRAWING['percentage_intensity'] = 0.0 # percentage of intensity not shown in phase
-CONF_DRAWING['percentage_Ez'] = 0.0 # percentage of intensity to show Ez
+CONF_DRAWING['percentage_intensity'] = 0.0  #percentage of intensity not shown in phase
+CONF_DRAWING['percentage_Ez'] = 0.0  #percentage of intensity to show Ez
 
 
 
@@ -63,7 +63,7 @@ Options_rmul = Literal['intensity', 'amplitude', 'phase']
 Options_squares_nxm = Literal['amplitude', 'intensity', 'gray_levels']
 video_isovalue_Options = Literal['intensity', 'refractive_index']
 
-get_scalar_options = Literal['intensity', 'phase','field']
+get_scalar_options = Literal['intensity', 'phase', 'field']
 get_vector_options = Literal['E', 'H', 'EH', 'fields', 'intensity', 'intensities', 'phases', 'poynting_vector', 
                              'poynting_vector_averaged',  'poynting_total',  'energy_density', 'irradiance', 
                              'stokes', 'params_ellipse']

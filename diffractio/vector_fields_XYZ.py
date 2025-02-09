@@ -141,7 +141,7 @@ class Vector_field_XYZ():
         self.CONF_DRAWING = CONF_DRAWING
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __str__(self):
         """Represents data from class."""
 
@@ -171,7 +171,7 @@ class Vector_field_XYZ():
         return ""
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __add__(self, other):
         """adds two Vector_field_XY. For example two light sources or two masks
 
@@ -234,7 +234,7 @@ class Vector_field_XYZ():
         if verbose is True:
             print(dict0.keys())
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def clear_field(self):
         """simple - removes the field: self.E=0 """
 
@@ -266,7 +266,7 @@ class Vector_field_XYZ():
 
 
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def get(self, kind: get_vector_options, mode: str = 'modulus', **kwargs):
         """Takes the vector field and divide in Scalar_field_X.
 
@@ -281,7 +281,7 @@ class Vector_field_XYZ():
         return data
 
 
-    @check_none('x','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def incident_field(self, E0: Vector_field_XY  | None = None, u0: Scalar_field_XY  | None = None, 
                        j0: Jones_vector  | None = None, z0: float | None = None):
         """Includes the incident field in Vector_field_XZ. 
@@ -453,7 +453,7 @@ class Vector_field_XYZ():
         return self
         
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def intensity(self):
         """"Returns intensity.
         """
@@ -463,7 +463,7 @@ class Vector_field_XYZ():
         return intensity
 
     
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def normalize(self, kind='amplitude', new_field: bool = False):
         """Normalizes the field so that intensity.max()=1.
 
@@ -477,7 +477,7 @@ class Vector_field_XYZ():
         return normalize_field(self, kind, new_field)
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def to_Vector_field_XY(self,
                            iz0: int | None = None,
                            z0: float | None = None):
@@ -507,7 +507,7 @@ class Vector_field_XYZ():
         return field_output
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def to_Vector_field_XZ(self,
                            iy0: int | None = None,
                            y0: float | None = None):
@@ -547,7 +547,7 @@ class Vector_field_XYZ():
         return field_output
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def to_Vector_field_YZ(self,
                            ix0: int | None = None,
                            x0: float | None = None):
@@ -585,7 +585,7 @@ class Vector_field_XYZ():
 
         return field_output
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def to_Vector_field_Z(self, kind: str = 'amplitude', x0: int | None = None,
                           y0: int | None = None, has_draw: bool = True,
                           z_scale: str = 'um'):
@@ -638,7 +638,7 @@ class Vector_field_XYZ():
         return (field_x, field_y, field_z)
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def draw_XY(self,
                 z0: float,
                 kind: Draw_Vector_XY_Options = 'intensity',
@@ -674,7 +674,7 @@ class Vector_field_XYZ():
                     reduce_matrix=reduce_matrix)
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def draw_XZ(self,
                 kind: Draw_Vector_XZ_Options = 'intensity',
                 y0: float = 0*mm,
@@ -701,7 +701,7 @@ class Vector_field_XYZ():
         return h1
 
 
-    @check_none('x','y','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def draw_YZ(self,
                 kind: Draw_Vector_XZ_Options = 'intensity',
                 x0: float = 0*mm,

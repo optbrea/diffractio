@@ -118,7 +118,7 @@ class Vector_field_XZ():
         self.CONF_DRAWING = CONF_DRAWING
 
 
-    @check_none('x','z','Ex','Ey',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', raise_exception=bool_raise_exception)
     def __str__(self):
         """Represents data from class."""
 
@@ -150,7 +150,7 @@ class Vector_field_XZ():
         return ""
 
 
-    @check_none('x','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __add__(self, other):
         """adds two Vector_field_X. For example two light sources or two masks
 
@@ -215,7 +215,7 @@ class Vector_field_XZ():
             print(dict0.keys())
 
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def clear_field(self):
         """Removes the fields Ex, Ey, Ez"""
 
@@ -260,7 +260,7 @@ class Vector_field_XZ():
 
 
 
-    @check_none('x','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def incident_field(self, E0: Vector_field_X  | None = None, u0: Scalar_field_X  | None = None, 
                        j0: Jones_vector  | None = None, z0: float | None = None):
         """Includes the incident field in Vector_field_XZ. 
@@ -291,7 +291,7 @@ class Vector_field_XZ():
             self.Ey[iz, :] = self.Ey[iz, :] + E0.Ey
 
 
-    @check_none('x','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def final_field(self):
         """Returns the final field as a Vector_field_X."""
 
@@ -327,7 +327,7 @@ class Vector_field_XZ():
         return edges
         
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def get(self, kind: get_vector_options, mode: str = 'modulus', **kwargs):
         """Takes the vector field and divide in Scalar_field_X.
 
@@ -341,7 +341,7 @@ class Vector_field_XZ():
         data = get_vector(self, kind, mode, **kwargs)
         return data
 
-    @check_none('x','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def apply_mask(self, u, new_field: bool = False):
         """Multiply field by binary scalar mask: self.Ex = self.Ex * u.u
 
@@ -360,7 +360,7 @@ class Vector_field_XZ():
             return E_new
         
 
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def FP_WPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, 
                has_H=True, verbose: bool = False):
         """
@@ -466,7 +466,7 @@ class Vector_field_XZ():
             return (self.Ex, self.Ey, self.Ez), (self.Hx, self.Hy, self.Hz)
 
 
-    @check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def intensity(self):
         """ "Returns intensity."""
         intensity = np.abs(self.Ex) ** 2 + np.abs(self.Ey) ** 2 + np.abs(self.Ez) ** 2
@@ -474,7 +474,7 @@ class Vector_field_XZ():
         return intensity
 
 
-    # @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     # def Poynting_vector(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
     #     "Poynting Vector"
 
@@ -548,7 +548,7 @@ class Vector_field_XZ():
 
 
 
-    # @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     # def Poynting_vector_averaged(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
     #     "Averaged Poynting Vector"
 
@@ -626,7 +626,7 @@ class Vector_field_XZ():
     #     return Sx, Sy, Sz
 
 
-    # @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     # def Poynting_total(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
 
     #     Sx, Sy, Sz = self.Poynting_vector_averaged(has_draw=False)
@@ -660,7 +660,7 @@ class Vector_field_XZ():
     #     return S
 
 
-    # @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     # def energy_density(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
 
     #     epsilon = self.n**2
@@ -685,7 +685,7 @@ class Vector_field_XZ():
     #     return U
 
 
-    # @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     # def irradiance(self, kind: str | tuple[float, float, float] = "modulus", has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):# -> Any | Any:
     #     """Irradiance of the field.
         
@@ -783,7 +783,7 @@ class Vector_field_XZ():
         return energy_z1, energy_z2, energy_z3
 
 
-    @check_none('x','z','n')
+    @check_none('x', 'z', 'n')
     def surface_detection(self,
                           mode: int = 1,
                           min_incr: float = 0.1,
@@ -935,7 +935,7 @@ class Vector_field_XZ():
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
 
 
-    @check_none('x','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_intensities__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
@@ -1010,7 +1010,7 @@ class Vector_field_XZ():
 
 
 
-    @check_none('x','z','Ex','Ey','Ez',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_phases__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
@@ -1099,7 +1099,7 @@ class Vector_field_XZ():
             cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', fraction=0.046, shrink=0.5)
 
 
-    @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_fields__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
@@ -1167,7 +1167,7 @@ class Vector_field_XZ():
         return h1, h2, h3, h4
 
 
-    @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_EH__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',
@@ -1276,7 +1276,7 @@ class Vector_field_XZ():
 
         return self
 
-    @check_none('x','z','Ex','Ey','Ez','Hx','Hy','Hz',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_E2H2__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
         scale = 'scaled',

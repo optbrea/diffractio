@@ -84,7 +84,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.type = 'Scalar_source_XY'
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def plane_wave(self, A: float = 1, theta: float = 0., phi: float = 0., z0: float = 0.):
         """Plane wave. self.u = A * np.exp(1.j * k *
                          (self.X * np.sin(theta) * np.cos(phi) +
@@ -104,7 +104,7 @@ class Scalar_source_XY(Scalar_field_XY):
                              self.Y * np.sin(theta) * np.sin(phi) + z0 * np.cos(theta)))
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def gauss_beam(self,
                    r0: tuple[float, float],
                    w0: tuple[float, float] | float,
@@ -172,7 +172,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = amplitude * phase1 * phase2
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def spherical_wave(self, r0: tuple[float, float], z0: tuple[float, float] | float, A: float = 1, 
                         radius: float =0., normalize: bool = False):
         """Spherical wave.
@@ -214,7 +214,7 @@ class Scalar_source_XY(Scalar_field_XY):
             self.u = self.u / np.abs(self.u.max() + 1.012034e-12)
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def vortex_beam(self, A: float, r0: tuple[float, float], w0: tuple[float, float] | float, m: int):
         """Vortex beam.
 
@@ -242,7 +242,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = A * amplitude / np.abs(amplitude).max()
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def hermite_gauss_beam(self, r0: tuple[float, float], A: float,
                            w0: tuple[float, float] | float, n: int, m: int, z: float,
                            z0: tuple[float, float] | float):
@@ -311,7 +311,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = A * Ex * Ey * Ef
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def laguerre_beam(self, r0: tuple[float, float], A: float,
                       w0: tuple[float, float] | float, n: int, l: int,
                       z: float, z0: float):
@@ -361,7 +361,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = A * Er * Ef
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def zernike_beam(self, A: float, r0: tuple[float, float], radius: float,
                      n: tuple[int], m: tuple[int], c_nm: tuple[float]):
         """Zernike beam.
@@ -390,7 +390,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = A * np.exp(1.j * np.real(phase))
 
 
-    @check_none('X','Y',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def bessel_beam(self,
                     A: float,
                     r0: tuple[float, float],
@@ -433,7 +433,7 @@ class Scalar_source_XY(Scalar_field_XY):
             z0 * np.cos(theta))
 
 
-    @check_none('X','Y','u',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'u', raise_exception=bool_raise_exception)
     def plane_waves_dict(self, params: dict):
         """Several plane waves with parameters defined in dictionary
 
@@ -455,7 +455,7 @@ class Scalar_source_XY(Scalar_field_XY):
                  np.sin(p['theta']) * np.sin(p['phi']) + p['z0'] * np.cos(p['theta'])))
 
 
-    @check_none('X','Y','u',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'u', raise_exception=bool_raise_exception)
     def plane_waves_several_inclined(self, A: float, num_beams: tuple[int, int],
                                      max_angle: tuple[float, float], z0: float = 0):
         """Several paralel plane waves.
@@ -484,7 +484,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = t
 
 
-    @check_none('X','Y','u',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'u', raise_exception=bool_raise_exception)
     def gauss_beams_several_parallel(self,
                                      r0: tuple[float, float],
                                      A: float,
@@ -530,7 +530,7 @@ class Scalar_source_XY(Scalar_field_XY):
         self.u = t
 
 
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def gauss_beams_several_inclined(self, A: float, num_beams, w0: tuple[float, float] | float, r0: tuple[float, float], z0: tuple[float, float] | float, max_angle: tuple[float, float]):
         """Several inclined gauss beams
 

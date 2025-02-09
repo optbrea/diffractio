@@ -95,7 +95,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         self.type = "Scalar_mask_XZ"
 
 
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def object_by_surfaces(
         self, rotation_point: tuple[float, float], refractive_index: complex | float | str,
         Fs: list, angle: float, v_globals: dict = {}, verbose: bool = False
@@ -153,7 +153,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             return ipasa
 
 
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def extrude_mask(self, t, z0: float, z1: float, refractive_index: complex | float | str,
                      angle: float = 0*degrees, v_globals: dict = {}):
         """
@@ -221,7 +221,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         self.n[ipasa] = refractive_index
         return ipasa
 
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def mask_from_array(
         self,
         r0=(0*um, 0*um),
@@ -288,7 +288,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
 
-    # @check_none('x','z',raise_exception=bool_raise_exception)
+    # @check_none('x', 'z', raise_exception=bool_raise_exception)
     # def mask_from_array_proposal(
     #     self,
     #     r0: tuple[float, float] = (0*um, 0*um),
@@ -384,7 +384,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
 
 
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def insert_array_masks(self, txz, refractive_index: float, space: tuple[float], margin: tuple[float] | float = 0, angle: float = 0*degrees):
         """Generates a matrix of shapes given in txz.
 
@@ -431,7 +431,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         self.n = n_new + self.n_background
         return self
 
-    #@check_none('x','z','u',raise_exception=bool_raise_exception)
+    #@check_none('x', 'z', 'u', raise_exception=bool_raise_exception)
     def repeat_structure(self,                 num_repetitions: tuple[int,int],                 position: str = 'center',                 new_field: bool = True):
         """Repeat the structure (n x m) times.
 
@@ -474,7 +474,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return t_new
 
     
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def add_surfaces(
         self, fx, x_sides: tuple[float, float],
         refractive_index: complex | float | str, min_incr: float = 0.1, angle: float = 0*degrees):
@@ -508,8 +508,8 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         iz_r,ix_r = (diff1a < -min_incr).nonzero()
         
         # plt.figure()
-        # plt.plot(ix_l, iz_l,'r.')
-        # plt.plot(ix_r, iz_r,'b.')
+        # plt.plot(ix_l, iz_l, 'r.')
+        # plt.plot(ix_r, iz_r, 'b.')
 
         x_lens_l = x0[ix_l]
         h_lens_l = z0[iz_l]
@@ -535,8 +535,8 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         fx2_n = np.concatenate((x_lens_r, h_lens_r)).reshape(2, len_z2).T
             
         # plt.figure()
-        # plt.plot(fx1_n[:,0], fx1_n[:,1],'g.')
-        # plt.plot(fx2_n[:,0], fx2_n[:,1],'k.')
+        # plt.plot(fx1_n[:,0], fx1_n[:,1], 'g.')
+        # plt.plot(fx2_n[:,0], fx2_n[:,1], 'k.')
 
         previous_profile = self.borders
         self.clear_refractive_index()
@@ -558,7 +558,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return previous_profile, new_profile
 
 
-    @check_none('n',raise_exception=bool_raise_exception)
+    @check_none('n', raise_exception=bool_raise_exception)
     def discretize_refractive_index(
         self, num_layers: tuple[int, int] | None = None, n_layers: NDArrayComplex | complex = None,
         new_field: bool = False
@@ -728,7 +728,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         # TODO: cuidado con n_min y n_background ¿es lo mismo?
 
 
-    @check_none('x','z','X',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', 'X', raise_exception=bool_raise_exception)
     def dots(self, positions: tuple[float, float], refractive_index: float = 1.):
         """Generates 1 or several point masks at positions r0
 
@@ -853,7 +853,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return ipasa
 
 
-    @check_none('n',raise_exception=bool_raise_exception)
+    @check_none('n', raise_exception=bool_raise_exception)
     def slit(self, r0: tuple[float, float], aperture: float, depth: float,
              refractive_index: complex | float | str, refractive_index_center: complex | float | str = "",
              angle: float = 0, rotation_point: tuple[float, float] | None = None):
@@ -1391,7 +1391,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         )
         return ipasa
 
-    @check_none('x','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'z', raise_exception=bool_raise_exception)
     def rough_sheet(self, r0: tuple[float, float], size: float, t: float, s: float,
                     refractive_index: complex | float | str, angle: float = 0*degrees,
                     rotation_point: tuple[float, float] | None = None):

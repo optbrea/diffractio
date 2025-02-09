@@ -43,7 +43,7 @@ def check_none(*variables, raise_exception = bool_raise_exception):
     return decorator
 
 
-@check_none('Ex','Ey','Ez',raise_exception=bool_raise_exception)
+@check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
 def get_vector(cls, kind: get_vector_options, mode='modulus', **kwargs):
     """Takes the vector field and divide in Scalar_field_X.
 
@@ -99,14 +99,14 @@ def get_vector(cls, kind: get_vector_options, mode='modulus', **kwargs):
         return S_total
 
     elif kind == 'energy_density':
-        epsilon = cls.n**2
         permeability = 4*np.pi*1e-7
+        epsilon = cls.n**2 * permeability
         U = epsilon * np.real(np.abs(cls.Ex)**2 + np.abs(cls.Ey)**2 + np.abs(cls.Ez)**2) + permeability * (np.abs(cls.Hx)**2 + np.abs(cls.Hy)**2 + np.abs(cls.Hz)**2)
         return U
 
     elif kind == 'irradiance':
-        epsilon = cls.n ** 2
-        permeability = 4 * np.pi * 1e-7
+        permeability = 4*np.pi*1e-7
+        epsilon = cls.n**2 * permeability
 
         Sx, Sy, Sz = cls.get('poynting_vector_averaged')
         

@@ -1291,7 +1291,7 @@ def determine_extrema(I_far: np.array, angles_x: np.array,  is_angles: bool = Fa
         plt.figure(**kwargs)
         
         if is_angles:
-            function(angles_x/degrees, I_far,'k')
+            function(angles_x/degrees, I_far, 'k')
             function(angles_x[i_maxima]/degrees, I_far[i_maxima], 'ro')
             function(angles_x[i_minima]/degrees, I_far[i_minima], 'bo')
 
@@ -1300,7 +1300,7 @@ def determine_extrema(I_far: np.array, angles_x: np.array,  is_angles: bool = Fa
             plt.xlabel('angles $\,(^{\circ})$')
             plt.grid('on')
         else:
-            function(angles_x, I_far,'k')
+            function(angles_x, I_far, 'k')
             function(angles_x[i_maxima], I_far[i_maxima], 'ro')
             function(angles_x[i_minima], I_far[i_minima], 'bo')
 
@@ -1429,11 +1429,11 @@ def envelopes(angles: np.array, I_far: np.array, has_draw: bool = True, has_loga
     
     if has_draw:
         plt.figure(figsize=(20,5))
-        plt.plot(angles/degrees, differences,'k')
+        plt.plot(angles/degrees, differences, 'k')
         plt.plot(angles/degrees, np.zeros_like(angles), 'k-.')
         plt.title('Differences')
-        plt.plot(angles[i_to_solve]/degrees, differences[i_to_solve],'ro')
-        plt.plot(angles_maxima/degrees, np.zeros_like(angles_maxima),'go')
+        plt.plot(angles[i_to_solve]/degrees, differences[i_to_solve], 'ro')
+        plt.plot(angles_maxima/degrees, np.zeros_like(angles_maxima), 'go')
         plt.xlabel(r'$\theta$ (degrees)')
         plt.ylabel("Enolventes")
 
@@ -1451,7 +1451,7 @@ def envelopes(angles: np.array, I_far: np.array, has_draw: bool = True, has_loga
 
     if has_draw:
         plt.figure(figsize=(20,5))
-        plt.plot(angles/degrees, Contrast,'k')
+        plt.plot(angles/degrees, Contrast, 'k')
         plt.ylim(0,1.05)
         plt.xlim(angles[0]/degrees, angles[-1]/degrees)
         plt.xlabel(r'$\theta$ (degrees)')
@@ -1459,7 +1459,7 @@ def envelopes(angles: np.array, I_far: np.array, has_draw: bool = True, has_loga
 
 
         plt.figure(figsize=(20,5))
-        function(angles/degrees, I_far,'k')
+        function(angles/degrees, I_far, 'k')
         function(angles_maxima/degrees, I_maxima, 'ro')
         function(angles/degrees, I_max_interpolated, 'r')  # nejor interpolacion por splines ?
 

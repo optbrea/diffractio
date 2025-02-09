@@ -57,7 +57,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
 
 
 
-    @check_none('X','Y','Z','n', raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'Z', 'n', raise_exception=bool_raise_exception)
     def mask_from_function(
             self, r0: tuple[float, float, float], refractive_index: complex | float | str, fs: tuple[str], rotation: dict | None, v_globals: dict = {}):
         """
@@ -94,7 +94,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
         self.n[ipasa] = refractive_index
         return ipasa
 
-    @check_none('X','Y','Z',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'Z', raise_exception=bool_raise_exception)
     def object_by_surfaces(self,
                            r0: tuple[float, float,float],
                            refractive_index: float,
@@ -233,7 +233,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
         self.n = self.n.astype(complex)
 
 
-    #@check_none('X','Y','Z',raise_exception=bool_raise_exception)
+    #@check_none('X', 'Y', 'Z', raise_exception=bool_raise_exception)
     def sphere(self, r0: tuple[float, float, float], radius: tuple[float],
                 refractive_index: float, rotation: dict | None = None) -> bool:
         """ Insert a cylinder in background. If something previous, is removed.
@@ -274,7 +274,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
         return ipasa
 
 
-    @check_none('X','Y','Z',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'Z', raise_exception=bool_raise_exception)
     def cube(self,
                r0: tuple[float, float, float],
                size: tuple[float, float, float],
@@ -321,7 +321,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
         return ipasa
 
 
-    @check_none('X','Y','Z',raise_exception=bool_raise_exception)
+    @check_none('X', 'Y', 'Z', raise_exception=bool_raise_exception)
     def cylinder(self, r0: tuple[float], radius: tuple[float], length: float,
                  refractive_index: float, rotation: dict | None = None):
         """ Insert a cylinder in background. If something previous, is removed.
@@ -560,7 +560,7 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
 
 
 
-    @check_none('x','y','z',raise_exception=bool_raise_exception)
+    @check_none('x', 'y', 'z', raise_exception=bool_raise_exception)
     def stl(self, filename: str, refractive_index: float, Dx: float | None = None, Dy: float | None = None, 
             Dz: float | None = None, has_draw: bool = False, verbose: bool = False):
         """

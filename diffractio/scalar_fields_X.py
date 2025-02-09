@@ -127,7 +127,7 @@ class Scalar_field_X():
         self.type = "Scalar_field_X"
         self.date = get_date()
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def __str__(self):
         """Represents main data of the atributes."""
 
@@ -155,7 +155,7 @@ class Scalar_field_X():
             print(" - info:       {}".format(self.info))
         return ""
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def __add__(self, other):
         """Adds two Scalar_field_x. For example two light sources or two masks.
 
@@ -180,7 +180,7 @@ class Scalar_field_X():
         return t
 
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def add(self, other, kind):
         """Adds two Scalar_field_x. For example two light sources or two masks.
 
@@ -201,7 +201,7 @@ class Scalar_field_X():
            
         return t
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def __sub__(self, other):
         """Substract two Scalar_field_x. For example two light sources or two masks.
 
@@ -218,7 +218,7 @@ class Scalar_field_X():
         u3.u = self.u - other.u
         return u3
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def __mul__(self, other):
         """Multiply two fields. For example  :math: `u_1(x)= u_0(x)*t(x)`
 
@@ -234,7 +234,7 @@ class Scalar_field_X():
         return new_field
 
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def __rmul__(self, number: float | complex | int):
         """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
 
@@ -257,7 +257,7 @@ class Scalar_field_X():
         return t
 
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def rmul(self, number, kind):
         """Multiply a field by a number.  For example  :math: `u_1(x)= m * u_0(x)`.
 
@@ -312,7 +312,7 @@ class Scalar_field_X():
         else:
             self.u = np.conj(self.u)
 
-    @check_none('x','u')
+    @check_none('x', 'u')
     def oversampling(self, factor_rate: int | tuple):
         """Overfample function has been implemented in scalar X, XY, XZ, and XYZ frames reduce the pixel size of the masks and fields. 
         This is also performed with the cut_resample function. However, this function oversamples with integer factors.
@@ -344,7 +344,7 @@ class Scalar_field_X():
 
         self = reduce_to_1(self)
 
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def clear_field(self):
         """Removes the field so that self.u = 0."""
         self.u = np.zeros_like(self.u, dtype=complex)
@@ -390,7 +390,7 @@ class Scalar_field_X():
                 raise Exception("no dictionary in load_data")
 
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def cut_resample(
             self, x_limits: NDArrayFloat | None = None, num_points: int | None = None,
             new_field: bool = False, interp_kind: str = "linear"):
@@ -399,7 +399,7 @@ class Scalar_field_X():
 
         Args:
             x_limits (numpy.array): (x0,x1) - starting and final points to cut, if '' - takes the current limit x[0] and x[-1]
-            num_points (int): it resamples x, and u [],'',0,None -> it leave the points as it is
+            num_points (int): it resamples x, and u [], '',0,None -> it leave the points as it is
             new_field (bool): if True it returns a new Scalar_field_X
             interp_kind (str): 'linear', 'nearest', 'zero', 'slinear', 'quadratic', 'cubic'
 
@@ -467,7 +467,7 @@ class Scalar_field_X():
         self.u = u0.u
         
         
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def get(self, kind: get_scalar_options):
         """Get parameters from Scalar field.
 
@@ -496,7 +496,7 @@ class Scalar_field_X():
         return normalize_field(self, kind, new_field)
 
 
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def inverse_amplitude(self, new_field: bool = False):
         """Inverts the amplitude of the mask, phase is equal as initial
 
@@ -523,7 +523,7 @@ class Scalar_field_X():
             new.u = new_amplitude
             return new
 
-    @check_none('x','u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def inverse_phase(self, new_field: bool = False):
         """Inverts the phase of the mask, amplitude is equal as initial
 
@@ -549,7 +549,7 @@ class Scalar_field_X():
             new.u = new_amplitude
             return new
 
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def filter(self, size: float):
         """ Filters the field with a slit of a certain size.
 
@@ -563,7 +563,7 @@ class Scalar_field_X():
         slit.slit(x0=0, size=size)
         self.u = fft_filter(self.u, slit.u)
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def insert_mask(self, t1, x0_mask1: float, clean: bool = True, kind_position: str = "left"):
         """Insert mask t1 in mask self. It is performed using interpolation.
 
@@ -601,7 +601,7 @@ class Scalar_field_X():
             i_pos = (self.x > t1.x[0]) * (self.x < t1.x[-1])
             self.u[i_pos] = u_new[i_pos]
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def pupil(self, x0, radius):
         """Place a pupil in the field.
 
@@ -675,7 +675,7 @@ class Scalar_field_X():
             self.u = u_new
             self.x = x_new
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def fft(self, z: float | None = None, shift: bool = True,
             remove0: bool = False, matrix: bool = False,
             new_field: bool = False, verbose: bool = False):
@@ -731,7 +731,7 @@ class Scalar_field_X():
             self.u = ttf1
             self.x = x_new
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def ifft(self, z: float | None = None, shift: bool = True,
              remove0: bool = False, matrix: bool = False,
              new_field: bool = False, verbose: bool = False):
@@ -786,7 +786,7 @@ class Scalar_field_X():
             if verbose is True:
                 print("x0={},x1={}".format(x_new[0], x_new[-1]))
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def _RS_(self, z: float, n: float, matrix: bool = False,
              new_field: bool = True, fast: bool = False, kind: str = "z",
              xout: None | NDArrayFloat = None, verbose: bool = True):
@@ -887,7 +887,7 @@ class Scalar_field_X():
         else:
             self.u = Usalida
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def RS(self, z: float, amplification: int = 1, n: float = 1.,
            new_field: bool = True, matrix: bool = False, xout: None | NDArrayFloat = None,
            fast: bool = False, kind: str = "z", verbose: bool = True):
@@ -1312,7 +1312,7 @@ class Scalar_field_X():
 
         if has_draw:
             plt.figure(**kwargs)
-            function(angles/degrees, I_far,'k')
+            function(angles/degrees, I_far, 'k')
             plt.ylim(0,I_far.max())
             plt.xlim(angles[0]/degrees, angles[-1]/degrees)
             plt.xlabel('angles (degrees)')
@@ -1325,7 +1325,7 @@ class Scalar_field_X():
 
 
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def MTF(self, kind: str = "mm", has_draw: bool = True):
         """Computes the MTF of a field,.
 
@@ -1373,7 +1373,7 @@ class Scalar_field_X():
         return fx, mtf_norm
 
 
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def intensity(self):
         """Intensity.
 
@@ -1400,7 +1400,7 @@ class Scalar_field_X():
         return average_intensity
 
 
-    @check_none('u',raise_exception=bool_raise_exception)
+    @check_none('u', raise_exception=bool_raise_exception)
     def get_edges(self, kind_transition: str = "amplitude", min_step: int = 0,
                   verbose: bool = False, filename: str = ""):
         """Determine locations of edges for a binary mask.
@@ -1423,7 +1423,7 @@ class Scalar_field_X():
         return pos_transitions, type_transitions, raising, falling
 
 
-    @check_none('x',raise_exception=bool_raise_exception)
+    @check_none('x', raise_exception=bool_raise_exception)
     def get_RS_minimum_z(self, n: float = 1., quality: int = 1, verbose: bool = True):
         """Determines the minimum available distance for RS algorithm. If higher or lower quality parameters is required you can add as a parameter
 
@@ -1463,7 +1463,7 @@ class Scalar_field_X():
 
         return z_min
 
-    @check_none('x', 'u',raise_exception=bool_raise_exception)
+    @check_none('x', 'u', raise_exception=bool_raise_exception)
     def draw(self, kind: Draw_X_Options = "intensity", logarithm: float = 0.,
         normalize: bool = False, cut_value: float | None = None, filename: str = "",
         scale: str = ""):

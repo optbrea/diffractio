@@ -497,7 +497,7 @@ def DOF(z: NDArrayFloat, widths: NDArrayFloat, w_factor: float = np.sqrt(2), w_f
             xytext=(z[i_right + i_w0], -widths[i_right + i_w0]),
             arrowprops=dict(arrowstyle="<->"),
         )
-        plt.text(z[i_w0], -widths.mean(), "$z_{R}$", fontsize=18)
+        plt.text(z[i_w0], -widths.mean(), r"$z_{R}$", fontsize=18)
         plt.xlim(z[0], z[-1])
         plt.ylim(-widths.max(), widths.max())
 
@@ -1306,7 +1306,7 @@ def determine_extrema(I_far: np.array, angles_x: np.array,  is_angles: bool = Fa
 
             plt.ylim(I_far.min(),I_far.max())
             plt.xlim(angles_x[0]/um, angles_x[-1]/um)
-            plt.xlabel('x ($\mu$m)')
+            plt.xlabel(r'x($\mu$m)')
             plt.grid('on')         
         
     return (i_minima, i_maxima), (angles_x[i_minima], angles_x[i_maxima]), (I_far[i_minima], I_far[i_maxima])

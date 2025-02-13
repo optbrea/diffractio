@@ -1284,7 +1284,7 @@ class Vector_field_XY():
 
             phase[intensity < percentage_intensity * (intensity.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_y$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_y$")
             plt.clim(-180, 180)
 
             plt.subplots_adjust(left=0,
@@ -1320,7 +1320,7 @@ class Vector_field_XY():
 
             phase[intensity < percentage_intensity * (intensity.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_y$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_y$")
             plt.clim(-180, 180)
             plt.ylabel('')
             plt.gca().set_yticks([])
@@ -1332,7 +1332,7 @@ class Vector_field_XY():
 
             phase[intensity < percentage_intensity * (intensity.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_z$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_z$")
             plt.clim(-180, 180)
             plt.ylabel('')
             plt.gca().set_yticks([])
@@ -1391,12 +1391,12 @@ class Vector_field_XY():
 
             h1 = plt.subplot(1, 2, 1)
 
-            self.__draw1__(intensity1, color_intensity, "$I_x$")
+            self.__draw1__(intensity1, color_intensity, r"$I_x$")
             plt.clim(0, intensity_max)
 
             h2 = plt.subplot(1, 2, 2)
 
-            self.__draw1__(intensity2, color_intensity, "$I_y$")
+            self.__draw1__(intensity2, color_intensity, r"$I_y$")
             plt.clim(0, intensity_max)
 
             plt.ylabel('')
@@ -1418,12 +1418,12 @@ class Vector_field_XY():
 
             h1 = plt.subplot(1, 3, 1)
 
-            self.__draw1__(intensity1, color_intensity, "$I_x$")
+            self.__draw1__(intensity1, color_intensity, r"$I_x$")
             # plt.clim(0, intensity_max)
 
             h2 = plt.subplot(1, 3, 2)
 
-            self.__draw1__(intensity2, color_intensity, "$I_y$")
+            self.__draw1__(intensity2, color_intensity, r"$I_y$")
             # plt.clim(0, intensity_max)
 
             plt.ylabel('')
@@ -1431,7 +1431,7 @@ class Vector_field_XY():
         
             h3 = plt.subplot(1, 3, 3)
 
-            self.__draw1__(intensity3, color_intensity, "$I_z$")
+            self.__draw1__(intensity3, color_intensity, r"$I_z$")
             # plt.clim(0, intensity_max)
 
             plt.ylabel('')
@@ -1487,7 +1487,7 @@ class Vector_field_XY():
 
         h2 = plt.subplot(1, 2, 2)
 
-        self.__draw1__(intensity_z, color_intensity, "$I_z$")
+        self.__draw1__(intensity_z, color_intensity, r"$I_z$")
         plt.ylabel('')
         plt.gca().set_yticks([])
         
@@ -1918,23 +1918,23 @@ class Vector_field_XY():
 
         plt.figure(figsize=(1.75 * tx, 0.95 * ty))
         h1 = plt.subplot(1,4, 1)
-        self.__draw1__(S0, color_intensity, "$S_0$")
+        self.__draw1__(S0, color_intensity, r"$S_0$")
         plt.clim(0, intensity_max)
 
         h2 = plt.subplot(1,4, 2)
-        self.__draw1__(S1, color_stokes, "$S_1$")
+        self.__draw1__(S1, color_stokes, r"$S_1$")
         plt.clim(-intensity_max, intensity_max)
         plt.ylabel('')
         plt.gca().set_yticks([])
         
         h3 = plt.subplot(1,4, 3)
-        self.__draw1__(S2, color_stokes, "$S_2$")
+        self.__draw1__(S2, color_stokes, r"$S_2$")
         plt.clim(-intensity_max, intensity_max)
         plt.ylabel('')
         plt.gca().set_yticks([])    
         
         h4 = plt.subplot(1,4, 4)
-        self.__draw1__(S3, color_stokes, "$S_3$")
+        self.__draw1__(S3, color_stokes, r"$S_3$")
         plt.clim(-intensity_max, intensity_max)
         plt.ylabel('')
         plt.gca().set_yticks([])    

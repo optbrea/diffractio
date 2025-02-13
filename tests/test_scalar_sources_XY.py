@@ -194,7 +194,7 @@ class Test_Scalar_sources_XY():
 
         # Dos drawings, uno para la amplitude y otro para phase
         plt.figure(figsize=(10, 4.5))
-        plt.suptitle("$Vortices$", fontsize=20)
+        plt.suptitle("Vortices", fontsize=20)
 
         for m in range(M):
             u.vortex_beam(A=1, r0=(0*um, 0*um), w0=100*um, m=m)

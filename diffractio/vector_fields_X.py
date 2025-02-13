@@ -343,7 +343,7 @@ class Vector_field_X():
         plt.plot(self.x, intensity, 'k', lw=2)
         plt.xlim(self.x[0], self.x[-1])
         plt.ylim(ymin=0)
-        plt.xlabel('x ($\mu$m)', fontsize=16)
+        plt.xlabel(r'x($\mu$m)', fontsize=16)
         plt.ylabel('I(x)', fontsize=16)
 
         return h1
@@ -553,11 +553,11 @@ class Vector_field_X():
 
         h1 = plt.subplot(2, 2, 1)
 
-        self.__draw1__(intensity_x, "$I_x$")
+        self.__draw1__(intensity_x, r"$I_x$")
         plt.clim(0, intensity_max)
 
         h2 = plt.subplot(2, 2, 2)
-        self.__draw1__(intensity_y, "$I_y$")
+        self.__draw1__(intensity_y, r"$I_y$")
         plt.clim(0, intensity_max)
 
         h3 = plt.subplot(2, 2, 3)
@@ -571,7 +571,7 @@ class Vector_field_X():
         phase = np.angle(self.Ey)
         phase[intensity_y < percentage_intensity * (intensity_y.max())] = 0
 
-        self.__draw1__(phase/degrees, color_phase, "$\phi_y$")
+        self.__draw1__(phase/degrees, color_phase, r"$\phi_y$")
         plt.clim(-180, 180)
         h4 = plt.gca()
         plt.subplots_adjust(left=0,
@@ -608,19 +608,19 @@ class Vector_field_X():
 
         plt.figure(figsize=(2 * tx, 2 * ty))
         h1 = plt.subplot(2, 2, 1)
-        self.__draw1__(S0, "$S_0$")
+        self.__draw1__(S0, "r$S_0$")
         plt.ylim(0, intensity_max)
 
         h2 = plt.subplot(2, 2, 2)
-        self.__draw1__(S1, "$S_1$")
+        self.__draw1__(S1, r"$S_1$")
         plt.ylim(-intensity_max, intensity_max)
 
         h3 = plt.subplot(2, 2, 3)
-        self.__draw1__(S2, "$S_2$")
+        self.__draw1__(S2, r"$S_2$")
         plt.ylim(-intensity_max, intensity_max)
 
         h4 = plt.subplot(2, 2, 4)
-        self.__draw1__(S3, "$S_3$")
+        self.__draw1__(S3, r"$S_3$")
         plt.ylim(-intensity_max, intensity_max)
 
         plt.subplots_adjust(left=0,
@@ -660,11 +660,11 @@ class Vector_field_X():
         plt.ylim(0, max_intensity)
 
         h3 = plt.subplot(2, 2, 3)
-        self.__draw1__(theta/degrees, "$\phi$")
+        self.__draw1__(theta/degrees, r"$\phi$")
         plt.ylim(-180, 180)
 
         h4 = plt.subplot(2, 2, 4)
-        self.__draw1__(h, "$h$")
+        self.__draw1__(h, r"$h$")
         plt.ylim(-180, 180)
 
         plt.subplots_adjust(left=0, bottom=0, right=1, top=1, wspace=0.05, hspace=0)
@@ -685,6 +685,6 @@ class Vector_field_X():
         plt.plot(self.x, data, 'k', lw=2)
         plt.xlim(self.x[0], self.x[-1])
         plt.ylim(ymin=0)
-        plt.xlabel('x ($\mu$m)')
+        plt.xlabel(r'x($\mu$m)')
         plt.ylabel(ylabel)
         plt.title(title)

@@ -1859,14 +1859,14 @@ class Scalar_field_XY():
         if kind == 'mm':
             # frec_x = fx
             # frec_y = fy
-            text_x = "$f_x (cycles/mm)$"
-            text_y = "$f_y (cycles/mm)$"
+            text_x = r"$f_x (cycles/mm)$"
+            text_y = r"$f_y (cycles/mm)$"
         elif kind == 'degrees':
             print("not implemented yet")
             # frec_x = fx
             # frec_y = fy
-            text_x = "$f_x (cycles/deg - not yet)$"
-            text_y = "$f_x (cycles/deg - not yet)$"
+            text_x = r"$f_x (cycles/deg - not yet)$"
+            text_y = r"$f_x (cycles/deg - not yet)$"
 
         if has_draw is True:
             draw2D(
@@ -2578,7 +2578,7 @@ class Scalar_field_XY():
 
         plt.axis('scaled')
         plt.axis(extension)
-        plt.title("$intensity$")
+        plt.title("intensity")
         h1.set_cmap(self.CONF_DRAWING["color_intensity"])
         # if self.type == 'Scalar_mask_XY':
         #     plt.clim(0, 1)
@@ -2598,7 +2598,7 @@ class Scalar_field_XY():
 
         plt.axis('scaled')
         plt.axis(extension)
-        plt.title("$phase$")
+        plt.title("phase")
         plt.clim(-180, 180)
         h2.set_cmap(self.CONF_DRAWING["color_phase"])  #
         plt.subplots_adjust(0.01, 0.01, 0.99, 0.95, 0.35, 0.35)

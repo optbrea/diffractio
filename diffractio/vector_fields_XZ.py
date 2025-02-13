@@ -505,12 +505,12 @@ class Vector_field_XZ():
 
     #             plt.subplot(1, 3, 2)
     #             plt.plot(self.z, Sy)
-    #             plt.title("$S_y$")
+    #             plt.title(r"$S_y$")
     #             plt.ylim(-S_lim, S_lim)
 
     #             plt.subplot(1, 3, 3)
     #             plt.plot(self.z, Sz)
-    #             plt.title("$S_z$")
+    #             plt.title(r"$S_z$")
     #             plt.ylim(-S_lim, S_lim)
 
     #             plt.suptitle("Pointing vector")
@@ -526,7 +526,7 @@ class Vector_field_XZ():
     #             IDimage.set_clim(-S_lim, S_lim)
     
     #             plt.subplot(1, 3, 2)
-    #             plt.title("$S_y$")
+    #             plt.title(r"$S_y$")
     #             id_fig, ax, IDimage = draw2D_xz(Sy, z0, x0, axs[1], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_y$", cmap=cmap)
     #             plt.axis(scale)
     #             draw_edges(self, plt,  draw_borders, **kwargs)
@@ -534,7 +534,7 @@ class Vector_field_XZ():
     
     #             plt.subplot(1, 3, 3)
     #             id_fig, ax, IDimage = draw2D_xz(Sz, z0, x0,axs[2], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_z$", cmap=cmap)
-    #             plt.title("$S_z$")
+    #             plt.title(r"$S_z$")
     #             plt.axis(scale)
     #             draw_edges(self, plt,  draw_borders, **kwargs)
     #             IDimage.set_clim(-S_lim, S_lim)
@@ -580,12 +580,12 @@ class Vector_field_XZ():
 
     #             plt.subplot(1, 3, 2)
     #             plt.plot(self.z, Sy)
-    #             plt.title("$S_y$")
+    #             plt.title(r"$S_y$")
     #             plt.ylim(-S_lim, S_lim)
 
     #             plt.subplot(1, 3, 3)
     #             plt.plot(self.z, Sz)
-    #             plt.title("$S_z$")
+    #             plt.title(r"$S_z$")
     #             plt.ylim(-S_lim, S_lim)
 
     #             plt.suptitle("Average Pointing vector")
@@ -605,7 +605,7 @@ class Vector_field_XZ():
     #             IDimage.set_clim(-S_lim, S_lim)
     
     #             plt.subplot(1, 3, 2)
-    #             plt.title("$S_y$")
+    #             plt.title(r"$S_y$")
     #             id_fig, ax, IDimage = draw2D_xz(Sy, z0, x0, axs[1], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_y$", cmap=cmap)
     #             plt.axis(scale)
     #             draw_edges(self, plt,  draw_borders, **kwargs)
@@ -613,7 +613,7 @@ class Vector_field_XZ():
     
     #             plt.subplot(1, 3, 3)
     #             id_fig, ax, IDimage = draw2D_xz(Sz, z0, x0,axs[2], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_z$", cmap=cmap)
-    #             plt.title("$S_z$")
+    #             plt.title(r"$S_z$")
     #             plt.axis(scale)
     #             draw_edges(self, plt,  draw_borders, **kwargs)
     #             IDimage.set_clim(-S_lim, S_lim)
@@ -641,7 +641,7 @@ class Vector_field_XZ():
     #             plt.subplot(1, 1, 1)
     #             plt.plot(self.z, S)
 
-    #             plt.suptitle("$S_{total}$")
+    #             plt.suptitle(r"$S_{total}$")
     #         elif num_dims == 2:
 
     #             fig, axs = plt.subplots(nrows=1, ncols=1)
@@ -1132,7 +1132,7 @@ class Vector_field_XZ():
 
         h1 = plt.subplot(2, 2, 1)
 
-        self.__draw1__( intensity_x, color_intensity, "$I_x$")
+        self.__draw1__( intensity_x, color_intensity, r"$I_x$")
         plt.axis(scale)
         draw_edges(self, plt, draw_borders, **kwargs)
         plt.clim(0, intensity_max)
@@ -1415,7 +1415,7 @@ class Vector_field_XZ():
 
         fig, axs = plt.subplots(nrows=1, ncols=3, sharex=True,  figsize=(2 * tx, 1 * ty))
         plt.subplot(1, 3, 1)
-        plt.title("$S_x$")
+        plt.title(r"$S_x$")
         id_fig, ax, IDimage = draw2D_xz(Sx, z0, x0, axs[0], xlabel=r'z ($\mu$m)', ylabel=r'x ($\mu$m)', title=r"$S_x$", cmap=cmap)
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders,  **kwargs)
@@ -1423,7 +1423,7 @@ class Vector_field_XZ():
         # axes[0].set_axis_off()
 
         plt.subplot(1, 3, 2)
-        plt.title("$S_y$")
+        plt.title(r"$S_y$")
         id_fig, ax, IDimage = draw2D_xz(Sy, z0, x0, axs[1], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_y$", cmap=cmap)
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, **kwargs)
@@ -1432,7 +1432,7 @@ class Vector_field_XZ():
 
         plt.subplot(1, 3, 3)
         id_fig, ax, IDimage = draw2D_xz(Sz, z0, x0,axs[2], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_z$", cmap=cmap)
-        plt.title("$S_z$")
+        plt.title(r"$S_z$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, **kwargs)
         IDimage.set_clim(-S_lim, S_lim)
@@ -1475,7 +1475,7 @@ class Vector_field_XZ():
 
         fig, axs = plt.subplots(nrows=1, ncols=3, sharex=True,  figsize=(2 * tx, 1 * ty))
         plt.subplot(1, 3, 1)
-        plt.title("$S_z$")
+        plt.title(r"$S_z$")
         id_fig, ax, IDimage = draw2D_xz(Sx, z0, x0, axs[0], xlabel=r'z ($\mu$m)', ylabel=r'x ($\mu$m)', title=r"$S_x$", cmap=cmap)
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders,  **kwargs)
@@ -1483,7 +1483,7 @@ class Vector_field_XZ():
         # axes[0].set_axis_off()
 
         plt.subplot(1, 3, 2)
-        plt.title("$S_y$")
+        plt.title(r"$S_y$")
         id_fig, ax, IDimage = draw2D_xz(Sy, z0, x0, axs[1], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_y$", cmap=cmap)
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, **kwargs)
@@ -1492,7 +1492,7 @@ class Vector_field_XZ():
 
         plt.subplot(1, 3, 3)
         id_fig, ax, IDimage = draw2D_xz(Sz, z0, x0,axs[2], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_z$", cmap=cmap)
-        plt.title("$S_z$")
+        plt.title(r"$S_z$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, **kwargs)
         IDimage.set_clim(-S_lim, S_lim)
@@ -1630,25 +1630,25 @@ class Vector_field_XZ():
 
         plt.figure(figsize=(1.5 * tx, 1.5 * ty))
         h1 = plt.subplot(2,2,1)
-        self.__draw1__(S0, color_intensity, "$S_0$")
+        self.__draw1__(S0, color_intensity, r"$S_0$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='w.')
         plt.clim(0, intensity_max)
 
         h2 = plt.subplot(2,2,2)
-        self.__draw1__(S1, color_stokes, "$S_1$")
+        self.__draw1__(S1, color_stokes, r"$S_1$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='k.')
         plt.clim(-intensity_max, intensity_max)
 
         h3 = plt.subplot(2,2,3)
-        self.__draw1__(S2, color_stokes, "$S_2$")
+        self.__draw1__(S2, color_stokes, r"$S_2$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='k.')
         plt.clim(-intensity_max, intensity_max)
 
         h4 = plt.subplot(2,2,4)
-        self.__draw1__(S3, color_stokes, "$S_3$")
+        self.__draw1__(S3, color_stokes, r"$S_3$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='k.')
         plt.clim(-intensity_max, intensity_max)

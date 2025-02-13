@@ -1356,11 +1356,11 @@ class Scalar_field_X():
 
         if kind == "mm":
             frec = fx
-            text_x = "$f_x (cycles/mm)$"
+            text_x = r"$f_x (cycles/mm)$"
         elif kind == "degrees":
             print("not implemented yet")
             frec = fx
-            text_x = "$f_x (cycles/deg - not yet)$"
+            text_x = r"$f_x (cycles/deg - not yet)$"
 
         if has_draw is True:
             plt.figure()

@@ -688,7 +688,7 @@ class Vector_mask_XY(Vector_field_XY):
             axs[1, 1].set_title("J11")
 
             plt.tight_layout()
-            plt.suptitle("$\Re$ (Jones)", fontsize=15)
+            plt.suptitle(r"$\Re$ (Jones)", fontsize=15)
             cax = plt.axes([0.89, 0.2, 0.03, 0.6])
             cbar = plt.colorbar(im1, cax=cax, shrink=0.66)
 
@@ -713,7 +713,7 @@ class Vector_mask_XY(Vector_field_XY):
             axs[1, 1].set_title("J11")
 
             plt.tight_layout()
-            plt.suptitle("$\Im$ (Jones)", fontsize=15)
+            plt.suptitle(r"$\Im$ (Jones)", fontsize=15)
             cax = plt.axes([0.89, 0.2, 0.03, 0.6])
             cbar = plt.colorbar(im1, cax=cax, shrink=0.66)
 

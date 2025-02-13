@@ -1274,7 +1274,7 @@ class Vector_field_XY():
 
             phase[intensity < percentage_intensity * (intensity.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_x$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_x$")
             plt.clim(-180, 180)
 
             h2 = plt.subplot(1, 2, 2)
@@ -1310,7 +1310,7 @@ class Vector_field_XY():
 
             phase[intensity < percentage_intensity * (intensity.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_x$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_x$")
             plt.clim(-180, 180)
 
             h2 = plt.subplot(1, 3, 2)
@@ -1561,7 +1561,7 @@ class Vector_field_XY():
             phase = np.angle(self.Ex)
             phase[amplitude1 < percentage_intensity * (amplitude1.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_x$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_x$")
             plt.clim(-180, 180)
 
             h4 = plt.subplot(2, 2, 4)
@@ -1611,7 +1611,7 @@ class Vector_field_XY():
             phase = np.angle(self.Ex)
             phase[amplitude1 < percentage_intensity * (amplitude1.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_x$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_x$")
             plt.clim(-180, 180)
 
             h5 = plt.subplot(2, 3, 5)
@@ -1696,7 +1696,7 @@ class Vector_field_XY():
             )
 
             id_fig, ax, IDimage = draw2D_XY(
-                E_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel="y $(\mu m)$", color=cmap, title=r'E$_x$')
+                E_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel=r"y $(\mu m)$", color=cmap, title=r'E$_x$')
             plt.axis(scale)
             draw_edges(self, axs[0, 0], draw_borders, **kwargs)
             IDimage.set_clim(-E_max,E_max)
@@ -1716,19 +1716,19 @@ class Vector_field_XY():
 
 
             id_fig, ax, IDimage = draw2D_XY(
-                H_x, self.x, self.y, ax=axs[1, 0], xlabel="x $(\mu m)$", ylabel="y $(\mu m)$", color=cmap, title=r'H$_x$')
+                H_x, self.x, self.y, ax=axs[1, 0], xlabel=r"x $(\mu m)$", ylabel=r"y $(\mu m)$", color=cmap, title=r'H$_x$')
             plt.axis(scale)
             draw_edges(self, axs[1, 0], draw_borders, **kwargs)
             IDimage.set_clim(-H_max,H_max)
 
             id_fig, ax, IDimage = draw2D_XY(
-                H_y, self.x, self.y, ax=axs[1, 1], xlabel="x $(\mu m)$", ylabel="", color=cmap, title=r'H$_y$')
+                H_y, self.x, self.y, ax=axs[1, 1], xlabel=r"x $(\mu m)$", ylabel="", color=cmap, title=r'H$_y$')
             plt.axis(scale)
             draw_edges(self, axs[1, 1], draw_borders, **kwargs)
             IDimage.set_clim(-H_max,H_max)
 
             id_fig, ax, IDimage = draw2D_XY(
-                H_z, self.x, self.y, ax=axs[1,2], xlabel="x $(\mu m)$", ylabel="", color=cmap, title=r'H$_z$')
+                H_z, self.x, self.y, ax=axs[1,2], xlabel=r"x $(\mu m)$", ylabel="", color=cmap, title=r'H$_z$')
             # ax.colorbar()
             plt.axis(scale)
             draw_edges(self, axs[1,2], draw_borders, **kwargs)
@@ -1742,11 +1742,11 @@ class Vector_field_XY():
             )
 
             id_fig, ax, IDimage = draw2D_XY(
-                E_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel="y $(\mu m)$", color=cmap, title=r'E$_x$')
+                E_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel=r"y $(\mu m)$", color=cmap, title=r'E$_x$')
             draw_edges(self, axs[0,0], draw_borders, **kwargs)
             IDimage.set_clim(-E_max,E_max)
             id_fig, ax, IDimage = draw2D_XY(
-                E_y, self.x, self.y, ax=axs[0, 1],  xlabel="x $(\mu m)$", ylabel="y $ (\mu m)$", color=cmap, title=r'E$_y$')
+                E_y, self.x, self.y, ax=axs[0, 1],  xlabel=r"x $(\mu m)$", ylabel="y $ (\mu m)$", color=cmap, title=r'E$_y$')
             draw_edges(self, axs[0,1], draw_borders, **kwargs)
             IDimage.set_clim(-E_max,E_max)
 
@@ -1823,7 +1823,7 @@ class Vector_field_XY():
             )
 
             id_fig, ax, IDimage = draw2D_XY(
-                E2_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel="y $(\mu m)$", color=cmap, title=r'E$^2_x$')
+                E2_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel=r"y $(\mu m)$", color=cmap, title=r'E$^2_x$')
             plt.axis(scale)
             #draw_edges(self, axs[0, 0], draw_borders, color='k.')
             IDimage.set_clim(0,E2_max)
@@ -1842,19 +1842,19 @@ class Vector_field_XY():
             # ax.colorbar()
 
             id_fig, ax, IDimage = draw2D_XY(
-                H2_x, self.x, self.y, ax=axs[1, 0], xlabel="x $(\mu m)$", ylabel="y $(\mu m)$", color=cmap, title=r'H$^2_x$')
+                H2_x, self.x, self.y, ax=axs[1, 0], xlabel=r"x $(\mu m)$", ylabel=r"y $(\mu m)$", color=cmap, title=r'H$^2_x$')
             plt.axis(scale)
             #draw_edges(self, axs[0, 1], draw_borders, color='k.')
             IDimage.set_clim(0,H2_max)
 
             id_fig, ax, IDimage = draw2D_XY(
-                H2_y, self.x, self.y, ax=axs[1, 1], xlabel="x $(\mu m)$", ylabel="", color=cmap, title=r'H$^2_y$')
+                H2_y, self.x, self.y, ax=axs[1, 1], xlabel=r"x $(\mu m)$", ylabel="", color=cmap, title=r'H$^2_y$')
             plt.axis(scale)
             #draw_edges(self, axs[1, 1], draw_borders, color='k.')
             IDimage.set_clim(0,H2_max)
 
             id_fig, ax, IDimage = draw2D_XY(
-                H2_z, self.x, self.y, ax=axs[1,2], xlabel="x $(\mu m)$", ylabel="", color=cmap, title=r'H$^2_z$')
+                H2_z, self.x, self.y, ax=axs[1,2], xlabel=r"x $(\mu m)$", ylabel="", color=cmap, title=r'H$^2_z$')
             # ax.colorbar()
             plt.axis(scale)
             #draw_edges(self, axs[2, 1], draw_borders, color='k.')
@@ -1868,11 +1868,11 @@ class Vector_field_XY():
             )
 
             id_fig, ax, IDimage = draw2D_XY(
-                E2_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel="y $(\mu m)$", color=cmap, title=r'E$_x$')
+                E2_x, self.x, self.y, ax=axs[0, 0], xlabel="", ylabel=r"y $(\mu m)$", color=cmap, title=r'E$_x$')
             #draw_edges(self, plt,  draw_borders, color='k.')
             IDimage.set_clim(0,E2_max)
             id_fig, ax, IDimage = draw2D_XY(
-                E2_y, self.x, self.y, ax=axs[0, 1],  xlabel="x $(\mu m)$", ylabel="y $ (\mu m)$", color=cmap, title=r'E$_y$')
+                E2_y, self.x, self.y, ax=axs[0, 1],  xlabel=r"x $(\mu m)$", ylabel="y $ (\mu m)$", color=cmap, title=r'E$_y$')
             #draw_edges(self, plt,  draw_borders, color='k.')
             IDimage.set_clim(0,E2_max)
 

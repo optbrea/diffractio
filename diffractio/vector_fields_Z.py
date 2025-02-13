@@ -529,7 +529,7 @@ class Vector_field_Z():
         phase = np.angle(self.Ex)
         phase[intensity_x < percentage_intensity * (intensity_x.max())] = 0
 
-        self.__draw1__(phase/degrees, color_phase, "$\phi_x$")
+        self.__draw1__(phase/degrees, color_phase, r"$\phi_x$")
         plt.clim(-180, 180)
 
         h4 = plt.subplot(2, 2, 4)

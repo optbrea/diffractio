@@ -1568,7 +1568,7 @@ class Vector_field_XY():
             phase = np.angle(self.Ey)
             phase[amplitude2 < percentage_intensity * (amplitude2.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_y$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_y$")
             plt.clim(-180, 180)
             plt.ylabel('')
             plt.gca().set_yticks([])
@@ -1618,7 +1618,7 @@ class Vector_field_XY():
             phase = np.angle(self.Ey)
             phase[amplitude2 < percentage_intensity * (amplitude2.max())] = 0
 
-            self.__draw1__(phase/degrees, color_phase, "$\phi_y$")
+            self.__draw1__(phase/degrees, color_phase, r"$\phi_y$")
             plt.clim(-180, 180)
             plt.ylabel('')
             plt.gca().set_yticks([])
@@ -1972,7 +1972,7 @@ class Vector_field_XY():
         plt.clim(0, max_intensity)
 
         h3 = plt.subplot(2, 2, 3)
-        self.__draw1__(theta/degrees, color_phase, "$\phi$")
+        self.__draw1__(theta/degrees, color_phase, r"$\phi$")
         plt.clim(-180, 180)
         h4 = plt.subplot(2, 2, 4)
         self.__draw1__(h, "gist_heat", "$h$")
@@ -2185,8 +2185,8 @@ def draw2D_XY(
         x,
         y,
         ax=None,
-        xlabel="r$x  (\mu m)$",
-        ylabel="r$y  (\mu m)$",
+        xlabel=r"$x  (\mu m)$",
+        ylabel=r"$y  (\mu m)$",
         title="",
         color="YlGnBu",  # YlGnBu  seismic
         interpolation='bilinear',  # 'bilinear', 'nearest'

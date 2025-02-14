@@ -1156,7 +1156,7 @@ class Vector_field_XZ():
         phase = np.angle(self.Ey)
         phase[intensity_y < percentage_intensity * (intensity_y.max())] = 0
 
-        self.__draw1__(phase/degrees, color_phase, "$\phi_y$")
+        self.__draw1__(phase/degrees, color_phase, r"$\phi_y$")
         plt.axis(scale)
         draw_edges(self, plt, draw_borders, **kwargs)
         plt.clim(-180, 180)
@@ -1694,7 +1694,7 @@ class Vector_field_XZ():
         plt.clim(0, max_intensity)
 
         h3 = plt.subplot(2, 2, 3)
-        self.__draw1__(theta/degrees, color_phase, "$\phi$")
+        self.__draw1__(theta/degrees, color_phase, r"$\phi$")
         plt.clim(-180, 180)
         h4 = plt.subplot(2, 2, 4)
         self.__draw1__(h, "gist_heat", "$h$")
@@ -2041,7 +2041,7 @@ def draw2D_xz(
         y,
         ax=None,
         xlabel=r"x $(\mu m)$",
-        ylabel="r$y  (\mu m)$",
+        ylabel=r"$y  (\mu m)$",
         title="",
         cmap="YlGnBu",  # YlGnBu  seismic
         interpolation='bilinear',  # 'bilinear', 'nearest'

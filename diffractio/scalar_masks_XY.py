@@ -1175,20 +1175,41 @@ class Scalar_mask_XY(Scalar_field_XY):
         """Generates a circular sector.
 
         Args:
-            r0 (int, int): position of center
+            r0 (float, float): position of center
             radii (float) or (float, float): radius
             angles (float, float): initial and final angle in radians.
-
         """
+
 
         if isinstance(radii, float):
             radii = (0, radii)
 
-        [rho, theta] = cart2pol(self.X - r0[0], self.Y - r0[1])
+            
+        # Shift the grid to the center
+        X_shifted = self.X - r0[0]
+        Y_shifted = self.Y - r0[1]
 
-        ix = (theta > angles[0]) & (theta <= angles[1]) & (rho >= radii[0]) & (
-            rho < radii[1])
-        self.u[ix] = 1
+        # Convert to polar coordinates
+        rho = np.sqrt(X_shifted**2 + Y_shifted**2)
+        theta = np.arctan2(Y_shifted, X_shifted)
+
+        # Normalize angles to [0, 2π]
+        theta = np.mod(theta, 2 * np.pi)
+        angle_start, angle_end = np.mod(angles[0], 2 * np.pi), np.mod(angles[1], 2 * np.pi)
+        
+
+        # Handle angle wrapping
+        if angle_start > angle_end:
+            angle_mask = (theta >= angle_start) | (theta <= angle_end)
+        else:
+            angle_mask = (theta >= angle_start) & (theta <= angle_end)
+
+        # Create the mask
+        radius_mask = (rho >= radii[0]) & (rho <= radii[1])
+        sector_mask = angle_mask & radius_mask
+
+        self.u[sector_mask] = 1
+        return self
 
 
     def super_gauss(self, r0: tuple[float, float], radius: tuple[float] | float,

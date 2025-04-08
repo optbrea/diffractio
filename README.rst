@@ -289,7 +289,7 @@ Authors
 
 * Jesús del Hoyo Muñoz
 
-* Francisco Jose Torcal-Milla
+* Francisco José Torcal-Milla
 
 
 

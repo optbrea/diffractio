@@ -11,7 +11,7 @@ Development Lead
     **Universidad Complutense de Madrid**,
     Faculty of Physical Sciences,
     Department of Optics
-    Plaza de las ciencias 1,
+    Plaza de las Ciencias 1,
     ES-28040 Madrid (Spain)
 
 
@@ -22,4 +22,4 @@ Contributors
 
 * Jesús del Hoyo Muñoz
 
-* Francisco Javier Torcal-Milla
+* Francisco José Torcal-Milla

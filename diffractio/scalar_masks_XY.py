@@ -1171,7 +1171,7 @@ class Scalar_mask_XY(Scalar_field_XY):
 
 
     @check_none('X', 'Y', raise_exception=bool_raise_exception)
-    def circular_sector(self, r0: tuple[float, float], radii: float | tuple[float], angles: float):
+    def circular_sector(self, r0: tuple[float, float], radii: float | tuple[float], angles: tuple[float, float]):
         """Generates a circular sector.
 
         Args:

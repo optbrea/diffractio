@@ -72,7 +72,7 @@ from scipy.interpolate import RegularGridInterpolator
 from .__init__ import degrees, mm, np, plt, num_max_processors
 from .config import bool_raise_exception, CONF_DRAWING, Draw_pyvista_Options, video_isovalue_Options, get_scalar_options
 from .config import  Draw_XZ_Options, Draw_XY_Options, Draw_XYZ_Options
-from .utils_common import get_date, load_data_common, save_data_common, check_none, oversampling, get_scalar, add, sub, rmul
+from .utils_common import get_date, get_instance_size_MB, load_data_common, save_data_common, check_none, oversampling, get_scalar, add, sub, rmul
 from .utils_drawing import normalize_draw
 from .utils_math import get_k, nearest, reduce_to_1
 from .utils_multiprocessing import _pickle_method, _unpickle_method

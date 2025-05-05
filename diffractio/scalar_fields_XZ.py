@@ -2022,7 +2022,7 @@ class Scalar_field_XZ():
             plt.legend()
 
         if verbose:
-            print("width = {:2.2f} um".format(widths))
+            print("width = {} um".format(widths))
 
         return widths, positions_center
 

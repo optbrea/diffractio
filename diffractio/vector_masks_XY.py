@@ -358,18 +358,13 @@ class Vector_mask_XY(Vector_field_XY):
             polarizer (2x2 numpy.matrix): Jones_matrix
         """
 
-        if isinstance(polarizer, Jones_matrix):
-            M = polarizer.M
-        else:
-            M = polarizer
+        [M00, M01, M10, M11] = polarizer.parameters.components()
 
-        uno = np.ones_like(self.X, dtype=complex)
-        M = np.asarray(M)
         
-        self.M00 = uno * M[0, 0]
-        self.M01 = uno * M[0, 1]
-        self.M10 = uno * M[1, 0]
-        self.M11 = uno * M[1, 1]
+        self.M00 = M00
+        self.M01 = M01
+        self.M10 = M10
+        self.M11 = M11
 
 
     def vacuum(self):

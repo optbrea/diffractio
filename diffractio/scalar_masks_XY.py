@@ -57,7 +57,7 @@ import matplotlib.path as mpath
 
 from .__init__ import degrees, np, plt, sp, um
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
-from .utils_math import (cart2pol, fft_convolution2d, laguerre_polynomial_nk,
+from .utils_math import (cart2pol, fft_convolution2d, laguerre_polynomial_nk, make_edge,
                          nearest, nearest2)
 from .config import bool_raise_exception, Options_squares_nxm
 from .utils_common import check_none
@@ -272,6 +272,17 @@ class Scalar_mask_XY(Scalar_field_XY):
             return filter
         else:
             self.u = covolved_image
+            
+            
+    @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
+    def make_edge(self, edge_size,  filter='square', new_field=False):
+        
+        new_mask=make_edge(self, edge_size, filter=filter, new_field=True)
+        
+        if new_field is True:
+            return new_mask
+        else:
+            self.u = new_mask.u
 
     # __MASKS____________________________________________
 
@@ -1816,6 +1827,40 @@ class Scalar_mask_XY(Scalar_field_XY):
         u[ipasa] = 1
 
         self.u = u * t
+
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
+    def arrow(self, r0, length, width, percent=0.5, angle_arrow=45*degrees):
+        """
+        arrow. Geneates an arrow in the plane of the mask. The arrow is filled.
+
+        Args:
+            r0 (float, float): position of the arrow. starting at the center of the shaft
+            length (float): length of the arrow
+            width (float): width of the shaft
+            percent (float, optional): percentage of the arrowhead with respect the total length. Defaults to 0.5.
+            angle_arrow (float, optional): Angle of the arrow. Defaults to 45*degrees.
+
+        Todo: 
+            implement rotation of the arrow
+        """
+
+        dx, dy = r0
+
+
+        vertices = np.array([(0,  -width/2), 
+                            (length*percent, -width/2), 
+                            (length*percent, -length*percent*np.tan(angle_arrow)), 
+                            (length, 0), 
+                            (length*percent, length*percent*np.tan(angle_arrow)), 
+                            (length*percent, width/2), 
+                            (0,   width/2),
+                            (0,   -width/2),
+                            ])
+
+        vertices[:,0] = vertices[:,0] + dx
+        vertices[:,1] = vertices[:,1] + dy
+
+        self.polygon(vertices)
 
 
     @check_none('X', 'Y', raise_exception=bool_raise_exception)

@@ -1065,3 +1065,32 @@ def filter_edge_2D(x: NDArrayFloat, y: NDArrayFloat, size: float = 1.1, exponent
     exp2 = np.exp(-(2 * (Y - y_center) / (Dy))**np.abs(exponent))
 
     return exp1 * exp2
+
+
+def make_edge(self, edge_size,  filter, new_field=False):
+    """
+    make_edge. We have a XY or XZ mask, and we want to make a mask with the edges of the original mask.
+    The edges are defined by the convolution of the original mask with a filter. The filter is a mask (square, circle, or used defined)
+
+
+    Args:
+        edge_size (float): size of the edge
+        filter (str or Scalar_mask_XY): filter to be used. It can be 'square', 'circle' or a user defined mask.
+            - square: square filter
+            - circle: circular filter
+            - user defined: a mask defined by the user
+        new_field (bool, optional): If True generates a new mask. Defaults to False.
+
+    Returns:
+        None or Scalar_mask_XY: Returns a new mask if new_field is True. Otherwise, it modifies the current mask.
+    """
+
+    mask_in = self.duplicate()
+    mask_in.widen(radius = edge_size, new_field=False, mask=filter, binarize=True)
+    mask=self-mask_in
+    
+    if new_field:
+        return mask
+    else:
+        self.u = mask.u
+    

@@ -237,17 +237,23 @@ class Scalar_mask_XY(Scalar_field_XY):
 
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
-    def widen(self, radius: float, new_field: bool = True, binarize=True):
+    def widen(self, radius: float, new_field: bool = True, binarize=True, mask: str = 'square' ):
         """Widens a mask using a convolution of a certain radius
 
         Args:
-            radius (float): radius of convolution
+            radius (float): radius of convolution in micrometers.
             new_field (bool): returns a new XY field
             binarize (bool): binarizes result.
+            mask (str or Scalar_mask_XY): mask for the convolution
         """
 
         filter = Scalar_mask_XY(self.x, self.y, self.wavelength)
-        filter.circle(r0=(0*um, 0*um), radius=radius, angle=0*degrees)
+        if mask == 'square':
+            filter.square(r0=(0*um, 0*um), size=2*radius, angle=0*degrees)
+        elif mask == 'circle':
+            filter.circle(r0=(0*um, 0*um), radius=radius, angle=0*degrees)
+        else:
+            filter = mask
 
         image = np.abs(self.u)
         filtrado = np.abs(filter.u) / np.abs(filter.u.sum())

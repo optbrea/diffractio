@@ -678,11 +678,11 @@ class Scalar_field_XY():
             axes[0].plot(self.x, profile_x)
             axes[0].plot(self.x, profile_x_normalized)
             axes[0].set_title("Intensity profile_x")
-            axes[0].set_xlabel("$x (\mu m)$")
+            axes[0].set_xlabel(r"$x (\mu m)$")
             axes[1].plot(self.y, profile_y)
             axes[1].plot(self.y, profile_y_normalized)
             axes[1].set_title("Intensity profile_y")
-            axes[0].set_ylabel("$y (\mu m)$")
+            axes[0].set_ylabel(r"$y (\mu m)$")
             plt.tight_layout()
             plt.show()  
 

@@ -55,7 +55,7 @@ import matplotlib.path as mpath
 
 
 
-from .__init__ import degrees, np, plt, sp, um
+from .__init__ import degrees, np, plt, sp, um, mm
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
 from .utils_math import (cart2pol, fft_convolution2d, laguerre_polynomial_nk, make_edge,
                          nearest, nearest2)
@@ -137,7 +137,7 @@ class Scalar_mask_XY(Scalar_field_XY):
 
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
-    def area(self, percentage: float):
+    def area(self, percentage: float, verbose: bool = False):
         """Computes area where mask is not 0
 
         Args:
@@ -150,14 +150,41 @@ class Scalar_mask_XY(Scalar_field_XY):
             area(percentage=0.001)
         """
 
-        intensity = np.abs(self.u)**2
-        max_intensity = intensity.max()
-        num_pixels_1 = sum(sum(intensity > max_intensity * percentage))
-        num_pixels = len(self.x) * len(self.y)
+        intensity = self.intensity()
+
+        max_intensity = intensity.max()  # Find the maximum intensity
+
+        # Calculate the number of pixels above the threshold
+        num_pixels_above_threshold = np.sum(intensity > max_intensity * percentage)
+
+        # Total number of pixels
+        total_pixels = intensity.size
+
+        # Calculate the pixel dimensions
         delta_x = self.x[1] - self.x[0]
         delta_y = self.y[1] - self.y[0]
 
-        return (num_pixels_1 / num_pixels) * (delta_x * delta_y)
+        # Compute the area based on the proportion of pixels above the threshold
+        area = (num_pixels_above_threshold) * (delta_x * delta_y)
+
+        # max_intensity = intensity.max()
+        # num_pixels_1 = sum(sum(intensity > max_intensity * percentage))
+        # num_pixels = len(self.x) * len(self.y)
+        # delta_x = self.x[1] - self.x[0]
+        # delta_y = self.y[1] - self.y[0]
+
+        # area = (num_pixels_1 / num_pixels) * (delta_x * delta_y)
+
+        if verbose is True:
+            if area < 10000:
+                print("area: {:2.2f} um^2".format(area))
+            else:
+                print("area: {:2.2f} mm^2".format(area / mm**2))
+
+        return area
+    
+   
+
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
     def inverse_amplitude(self, new_field: bool = False):

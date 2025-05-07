@@ -642,6 +642,76 @@ class Scalar_field_XY():
         data = get_scalar(self, kind)
         return data
 
+
+    @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
+    def get_mask_size(self, threshold=0, has_draw=False, verbose=False):
+        """get_mask_size. Computes the size of the mask in x and y directions.
+
+        Args:
+            threshold (float, optional): % of maximum intensity to determine size, if not binary. Defaults to 0.
+            has_draw (bool, optional): it draws profiles. Defaults to False.
+            verbose (bool, optional): It shows the size. Defaults to False.
+
+        Returns:
+            (float, float): size in micrometers of the mask in x and y directions
+        """
+
+        dx = self.x[1] - self.x[0]
+        dy = self.y[1] - self.y[0]
+
+        intensity = self.intensity()
+
+        profile_x = intensity.sum(axis=0)
+        profile_x = profile_x / np.max(profile_x)
+        profile_x_normalized = profile_x / np.max(profile_x)
+        profile_x_normalized[profile_x_normalized<threshold] = 0
+        profile_x_normalized[profile_x_normalized>=threshold] = 1
+
+        profile_y = intensity.sum(axis=1)
+        profile_y = profile_y / np.max(profile_y)
+        profile_y_normalized = profile_y / np.max(profile_y)
+        profile_y_normalized[profile_y_normalized<threshold] = 0
+        profile_y_normalized[profile_y_normalized>=threshold] = 1
+
+        if has_draw:
+            fig, axes = plt.subplots(1, 2, figsize=(12, 6))
+            axes[0].plot(self.x, profile_x)
+            axes[0].plot(self.x, profile_x_normalized)
+            axes[0].set_title("Intensity profile_x")
+            axes[0].set_xlabel("$x (\mu m)$")
+            axes[1].plot(self.y, profile_y)
+            axes[1].plot(self.y, profile_y_normalized)
+            axes[1].set_title("Intensity profile_y")
+            axes[0].set_ylabel("$y (\mu m)$")
+            plt.tight_layout()
+            plt.show()  
+
+        non_zero_indices_x = np.nonzero(profile_x_normalized)[0]
+        if len(non_zero_indices_x) == 0:
+            return None, None
+        first_non_zero_index_x = non_zero_indices_x[0]
+        last_non_zero_index_x = non_zero_indices_x[-1]
+
+        non_zero_indices_y = np.nonzero(profile_y_normalized)[0]
+        if len(non_zero_indices_y) == 0:
+            return None, None
+        first_non_zero_index_y = non_zero_indices_y[0]
+        last_non_zero_index_y = non_zero_indices_y[-1]
+
+        size_x = (last_non_zero_index_x - first_non_zero_index_x) * dx
+        size_y = (last_non_zero_index_y - first_non_zero_index_y) * dy
+        
+        
+        if verbose:
+            if size_x > 1*mm or size_y > 1*mm:
+                print("mask size: {:2.2f} mm, {:2.2f} mm".format(size_x/mm, size_y/mm))
+            else:
+                print("mask size: {:2.2f} um, {:2.2f} um".format(size_x/um, size_y/um))
+
+
+        return size_x, size_y
+
+
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
     def pupil(self, r0: tuple[float, float] | None = None,
               radius: float | tuple[float, float] | None = None,

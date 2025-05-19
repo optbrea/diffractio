@@ -1,6 +1,6 @@
 traitlets
 nodejs
-numpy>=1.20,<2
+numpy
 scipy
 matplotlib
 py_pol

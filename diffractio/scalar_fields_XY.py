@@ -188,6 +188,8 @@ class Scalar_field_XY():
             t = add(self, other, kind='mask')
         elif self.type == 'Scalar_source_XY' or 'Scalar_field_XY':
             t = add(self, other, kind='source')
+
+        t.type = self.type
             
         return t
 
@@ -239,6 +241,7 @@ class Scalar_field_XY():
         """
         new_field = Scalar_field_XY(self.x, self.y, self.wavelength)
         new_field.u = self.u * other.u
+        new_field.type = self.type
 
         return new_field
 
@@ -527,15 +530,24 @@ class Scalar_field_XY():
 
 
     @check_none('x', 'y', 'u')
-    def oversampling(self, factor_rate: int | tuple):
-        """Overfample function has been implemented in scalar X, XY, XZ, and XYZ frames reduce the pixel size of the masks and fields. 
+    def oversampling(self, factor_rate: int | tuple, new_field: bool = False):
+        """oversampling. It has been implemented in scalar X, XY, XZ, and XYZ frames reduce the pixel size of the masks and fields. 
         This is also performed with the cut_resample function. However, this function oversamples with integer factors.
         
         Args:
             factor_rate (int | tuple, optional): factor rate. Defaults to 2.
+            new_field (bool, optional): if True, returns a new field. Defaults to False.
         """
 
-        self = oversampling(self, factor_rate)
+
+
+        if new_field is True:
+            cls = self.duplicate()
+            cls = oversampling(cls, factor_rate)
+            return cls
+        else:
+            self = oversampling(self, factor_rate)
+
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
     def cut_resample(self,
@@ -748,7 +760,7 @@ class Scalar_field_XY():
             (Yrot)**2 / (radiusy**2 + 1e-15) < 1
         pupil0[ipasa] = 1
         self.u = self.u * pupil0
-
+        return self
     """
     def fft_proposal(self,
                      z=0,
@@ -2298,17 +2310,17 @@ class Scalar_field_XY():
 
             dist = factor * (heights[1] - heights[0])
 
-            discretized_image = np.exp(1j * (ang))
+            discretized_image = np.exp(1j * ang)
 
             for i in range(num_levels + 1):
                 center = heights[i]
-                abajo = (ang) > (center - dist/2)
-                arriba = (ang) <= (center + dist/2)
+                abajo = ang > (center - dist/2)
+                arriba = ang <= (center + dist/2)
                 Trues = abajo * arriba
-                discretized_image[Trues] = np.exp(1j * (center))  # - np.pi
+                discretized_image[Trues] = np.exp(1j * center)  # - np.pi
 
-            Trues = (ang) > (center + dist/2)
-            discretized_image[Trues] = np.exp(1j * (heights[0]))  # - np.pi
+            Trues = ang > (center + dist/2)
+            discretized_image[Trues] = np.exp(1j * heights[0])  # - np.pi
 
             phase = np.angle(discretized_image) / np.pi
             phase[phase == 1] = -1

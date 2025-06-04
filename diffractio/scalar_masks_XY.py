@@ -730,7 +730,7 @@ class Scalar_mask_XY(Scalar_field_XY):
         if type(r0[0]) in (int, float):
             i_x0, _, _ = nearest(self.x, x0)
             i_y0, _, _ = nearest(self.y, y0)
-            u[i_x0, i_y0] = 1
+            u[i_y0, i_x0] = 1
         else:
             i_x0s, _, _ = nearest2(self.x, x0)
             i_y0s, _, _ = nearest2(self.y, y0)
@@ -741,7 +741,7 @@ class Scalar_mask_XY(Scalar_field_XY):
             j_ycercano, _, _ = nearest(self.y, y_j)
             if x_i < self.x.max() and x_i > self.x.min() and y_j < self.y.max(
             ) and y_j > self.y.min():
-                uj[i_xcercano, j_ycercano] = 1
+                uj[j_ycercano, i_xcercano] = 1
         num_points = int(uj.sum())
         u = fftconvolve(uj, t1.u, mode='same')
         if top_one:

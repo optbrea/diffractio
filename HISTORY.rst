@@ -2,6 +2,17 @@
 History
 =======
 
+1.0.1
+--------------------------------
+Beta state
+
+* Improvements:
+
+  - numpy to 2.0
+  - new maskXY: widen, get_mask_size, arrow and make_edge
+  
+
+  
 
 1.0.0
 --------------------------------

@@ -15,3 +15,4 @@ pyvista
 python-ffmpeg
 pyqt5
 opencv-python
+psutil

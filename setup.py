@@ -10,12 +10,14 @@ with open('README.rst', encoding='utf8') as readme_file:
 with open('HISTORY.rst', encoding='utf8') as history_file:
     history = history_file.read()
 
+with open('requirements.txt', encoding='utf8') as req:
+    requirements = req.readlines()
 
-requirements = [
-    'matplotlib', 'numpy', 'scipy', 'ezdxf',
-    'screeninfo', 'Pillow', 'numexpr', 'pandas', 'py_pol',
-    'ipywidgets', 'ipympl>=0.9.3', 'opencv-python', 'psutil', 'pyvista', 'python-ffmpeg', 'pyqt5',
-]
+# requirements = [
+#     'matplotlib', 'numpy', 'scipy', 'ezdxf',
+#     'screeninfo', 'Pillow', 'numexpr', 'pandas', 'py_pol',
+#     'ipywidgets', 'ipympl>=0.9.3', 'opencv-python', 'psutil', 'pyvista', 'python-ffmpeg', 'pyqt5',
+# ]
 
 setup_requirements = [
     'pytest-runner',

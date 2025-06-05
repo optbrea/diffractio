@@ -750,7 +750,7 @@ class Scalar_mask_XY(Scalar_field_XY):
             A[A > 1] = 1
             u = A * np.exp(1j * phase)
             # u[u > 1] = 1
-        self.u = u
+        self.u = u.transpose()
         return num_points
 
     @check_none('x', 'y', 'X', 'Y', raise_exception=bool_raise_exception)

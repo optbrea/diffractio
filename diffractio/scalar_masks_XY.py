@@ -1856,7 +1856,7 @@ class Scalar_mask_XY(Scalar_field_XY):
         self.u = u * t
 
     @check_none('X', 'Y', raise_exception=bool_raise_exception)
-    def arrow(self, r0, length, width, percent=0.5, angle_arrow=45*degrees):
+    def arrow(self, r0, length, width, percent=0.5, angle_arrow=45*degrees, has_draw=False, verbose=False):
         """
         arrow. Geneates an arrow in the plane of the mask. The arrow is filled.
 
@@ -1866,6 +1866,8 @@ class Scalar_mask_XY(Scalar_field_XY):
             width (float): width of the shaft
             percent (float, optional): percentage of the arrowhead with respect the total length. Defaults to 0.5.
             angle_arrow (float, optional): Angle of the arrow. Defaults to 45*degrees.
+            has_draw (bool, optional): If True, the arrow is drawn. Defaults to False.
+            verbose (bool, optional): If True, the vertices of the arrow are printed. Defaults to False.
 
         Todo: 
             implement rotation of the arrow
@@ -1886,6 +1888,72 @@ class Scalar_mask_XY(Scalar_field_XY):
 
         vertices[:,0] = vertices[:,0] + dx
         vertices[:,1] = vertices[:,1] + dy
+
+        if verbose:
+            print("Arrow vertices:")
+            print(vertices)
+
+        if has_draw:
+
+            plt.figure()
+            plt.plot(vertices[:,0], vertices[:,1], 'ko', ms=4)
+            plt.fill(vertices[:,0], vertices[:,1], 'k', alpha=0.5)
+            plt.axis('scaled')
+
+
+        self.polygon(vertices)
+
+
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
+    def arrow_thin(self, r0, length, width, length_lateral, angle_arrow=45*degrees, has_draw=False, verbose=False):
+        """
+        arrow. Geneates an arrow in the plane of the mask. The arrow is filled.
+
+        Args:
+            r0 (float, float): position of the arrow. starting at the center of the shaft
+            length (float): length of the arrow
+            width (float): width of the shaft
+            percent (float, optional): percentage of the arrowhead with respect the total length. Defaults to 0.5.
+            angle_arrow (float, optional): Angle of the arrow. Defaults to 45*degrees.
+            has_draw (bool, optional): If True, the arrow is drawn. Defaults to False.
+            verbose (bool, optional): If True, the vertices of the arrow are printed. Defaults to False.
+
+        Todo: 
+            implement rotation of the arrow
+        """
+
+        x0, y0 = r0
+
+        l,w,s,a = length, width, length_lateral, angle_arrow
+
+
+        vertices = np.array([[0,  -w/2], 
+                            [l, -w/2], 
+                            [l-s*np.cos(a), -w/2 - s*np.sin(a)], 
+                            [l-s*np.cos(a)+w*np.sin(a), -w/2 - s*np.sin(a)- w*np.cos(a)], 
+                            #[l+w, -w/2],
+                            [l+w+2*w*np.cos(a), 0],
+                            #[l+w, +w/2], 
+                            [l-s*np.cos(a)+w*np.sin(a), +w/2 + s*np.sin(a)+ w*np.cos(a)], 
+                            [l-s*np.cos(a), +w/2 + s*np.sin(a)],       
+                            [l, +w/2], 
+                            [0,   +w/2],
+                            [0,   -w/2],
+                            ])
+
+        vertices[:,0] = vertices[:,0] + x0
+        vertices[:,1] = vertices[:,1] + y0
+
+        if verbose:
+            print("Arrow vertices:")
+            print(vertices)
+
+        if has_draw:
+
+            plt.figure()
+            plt.plot(vertices[:,0], vertices[:,1], 'ko', ms=4)
+            plt.fill(vertices[:,0], vertices[:,1], 'k', alpha=0.5)
+            plt.axis('scaled')
 
         self.polygon(vertices)
 

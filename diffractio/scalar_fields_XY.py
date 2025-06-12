@@ -79,6 +79,8 @@ from .__init__ import np, plt
 from .__init__ import degrees, mm, seconds, um
 
 from .config import bool_raise_exception, CONF_DRAWING, Draw_XY_Options, Save_mask_Options, get_scalar_options
+from .config import options_pupil
+
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
 from .utils_common import get_date, load_data_common, save_data_common, add, check_none, oversampling, get_scalar, rmul
 from .utils_drawing import (draw2D, normalize_draw, prepare_drawing,
@@ -725,15 +727,16 @@ class Scalar_field_XY():
 
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
-    def pupil(self, r0: tuple[float, float] | None = None,
+    def pupil(self,  r0: tuple[float, float] | None = None,
               radius: float | tuple[float, float] | None = None,
-              angle: float = 0*degrees):
+              angle: float = 0*degrees, kind: options_pupil ='direct'):
         """place a pupil in the field. If r0 or radius are None, they are computed using the x,y parameters.
 
         Args:
             r0 (float, float): center of circle/ellipse
             radius (float, float) or (float): radius of circle/ellipse
             angle (float): angle of rotation in radians
+            kind (str): 'direct' or 'inverse'. If direct, the pupil is dark. If inverse, the pupil is clear (removes everyting outside radius, but tranmission is 1).
         """
 
         if r0 is None:
@@ -760,6 +763,8 @@ class Scalar_field_XY():
             (Yrot)**2 / (radiusy**2 + 1e-15) < 1
         pupil0[ipasa] = 1
         self.u = self.u * pupil0
+        if kind == 'inverse':
+            self.u[~ipasa] = 1
         return self
     """
     def fft_proposal(self,

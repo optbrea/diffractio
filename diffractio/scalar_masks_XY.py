@@ -1253,9 +1253,126 @@ class Scalar_mask_XY(Scalar_field_XY):
         sector_mask = angle_mask & radius_mask
 
         self.u[sector_mask] = 1
-        return self
 
 
+    def radial_skeleton(self, r0: tuple[float, float], num_arms: int,   width: float, 
+                        length: float=0,  radius: float=0):
+        """Radial Skeletonn: central circle or not with n numbers of arms.
+
+        Args:
+            r0 (tuple[float, float]): central circle center.
+            num_arms (int): number of arms.
+            width (float): width of arms.
+            length (float, optional): length of arms. Defaults to 0.
+            radius (float, optional): radius of the central circle. Defaults to 0.
+
+        """
+
+        self.type = 'Scalar_mask_XY'
+        angles = np.linspace(0, 180*degrees, num_arms+1)
+        rectangle = Scalar_mask_XY(self.x, self.y, self.wavelength)
+        mask = Scalar_mask_XY(self.x, self.y, self.wavelength)
+        
+        if length == 0:
+            length = np.sqrt((self.x[-1]-self.x[0])**2 + (self.y[-1]-self.y[0])**2)
+
+        for angle in angles[0:-1]:
+            rectangle.square(r0=r0, size=(length, width), angle=angle)
+            mask = mask + rectangle
+
+
+        # Add the central circle if radius is greater than 0
+        if radius>0:
+            circle = Scalar_mask_XY(self.x, self.y, self.wavelength)
+            circle.circle(r0=r0, radius=radius)
+            mask = mask + circle
+
+        self.u = mask.u
+        self.inverse_amplitude()
+
+
+    def angular_skeleton(self, r0: tuple[float, float], period: float, fill_factor: float, first_radius = 0, num_rings: int = 0, verbose: bool = False):
+        """Structure based on several rings, with the same thickness.
+            Args:
+                r0 (float, float): (x0,y0) center.
+                period: thickness of the rings.
+                fill_factor: Ratio between the ring thickness and the period (thickness/period). 
+                            It defines the proportion of each period that is filled with material.
+                first radius: radius of the central circle.
+                num_rings: number of rings. If num_rings=0, the number of rings is infinity
+                verbose: If True, prints additional information about the structure.
+            """
+
+        if num_rings == 0:
+            num_rings = np.sqrt((self.x[-1]-self.x[0])**2+(self.y[-1]-self.y[0])**2)/(2*period)
+            num_rings = int(num_rings)
+
+        thickness = fill_factor*period
+
+        centers = np.array(range(1, num_rings+1))*period
+
+        if first_radius > period:
+            first_radius = first_radius % period
+
+        centers = centers + first_radius
+
+        inner_radius = centers - thickness/2
+        outer_radius = centers + thickness/2
+
+        if verbose:
+            print("Inner radii:", inner_radius)
+            print("Outer radii:", outer_radius)
+            print("Number of rings:", num_rings)
+            print("Thickness:", thickness)
+            print("Period:", period)
+
+        self.rings(r0=r0, inner_radius=inner_radius, outer_radius=outer_radius)
+        self.inverse_amplitude()
+
+
+    def bullseye(self, r0: tuple[float, float], num_arms: int, period: float, fill_factor: float, 
+                first_radius = 0, radius: float=0, num_rings=int):
+        """ Bullseye: A structure based on multiple concentric rings of equal thickness (angular skeleton). 
+                    It may include a central circle and a set of radial arms (radial skeleton). 
+
+        Args:
+            r0 (tuple[float, float]): center of the angular and radial skeleton.
+            num_arms (int): number of arms.
+            width (float): width of the arm.
+            period (float): thickness of the rings.
+            fill_factor (float): Ratio between the ring thickness and the period (thickness/period). 
+                                It defines the proportion of each period that is filled with material.
+            first_radius (int, optional): radius of the first radius of th agular skeleton. Defaults to 0.
+            radius (float, optional): radius of the central circle of the radial skeleton. Defaults to 0.
+            num_rings (_type_, optional): number of rings of the angular skeleton. Defaults to int.
+
+        Returns:
+            angular skeleton mask + radial skeleton mask.
+        """
+        
+        thickness = period * fill_factor
+
+        length = np.sqrt((self.x[-1]-self.x[0])**2+(self.y[-1]-self.y[0])**2)
+
+        t1 = self.duplicate()
+        t1.angular_skeleton(r0=r0, period=period, fill_factor=fill_factor, first_radius=first_radius, num_rings=num_rings)
+        t1.inverse_amplitude()
+       
+        t2 = self.duplicate()
+        t2.radial_skeleton(r0=r0, num_arms=num_arms, length=length, width=thickness,  radius=radius)
+        t2.inverse_amplitude()
+
+        t3 = self.duplicate()
+        t3.circle(r0=r0, radius=radius - thickness)
+        
+        t4 = t1 + t2 
+        t4.inverse_amplitude()
+
+        t4 = t4 + t3
+        self.u = t4.u
+        self.type = 'Scalar_mask_XY'
+        
+        
     def super_gauss(self, r0: tuple[float, float], radius: tuple[float] | float,
                     power: float = 2, angle: float = 0*degrees):
         """Supergauss mask.

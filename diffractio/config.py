@@ -51,6 +51,9 @@ Draw_Vector_XZ_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 
 Draw_pyvista_Options = Literal['volume', 'clip', 'slices', 'projections']
 Draw_interactive_Options = Literal['intensity', 'amplitude', 'phase']
 
+# Options for pupil in Scalar_XY
+options_pupil = Literal['direct', 'inverse']
+
 Save_mask_Options = Literal['amplitude', 'phase', 'intensity']
 
 Options_Diffractio_kind = Literal['scalar', 'vector']

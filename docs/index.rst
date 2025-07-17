@@ -16,6 +16,7 @@ Welcome to Diffractio: Python diffraction and interference's  documentation!
    tutorials_vector
    examples_scalar
    examples_vector
+   examples_advanced
    functioning
    contributing
    authors

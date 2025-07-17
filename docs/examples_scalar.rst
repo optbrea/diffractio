@@ -10,7 +10,6 @@ Examples for scalar propagation
    source/examples_scalar/far_near_field.ipynb
    source/examples_scalar/gauss_beam.ipynb
    source/examples_scalar/reflection_refraction.ipynb
-   source/examples_scalar/lenses.ipynb
    source/examples_scalar/arago_point.ipynb
    source/examples_scalar/diffraction_slit.ipynb
    source/examples_scalar/diffraction_objects.ipynb
@@ -21,7 +20,6 @@ Examples for scalar propagation
    source/examples_scalar/photon_sieve.ipynb
    source/examples_scalar/talbot_effect.ipynb
    source/examples_scalar/blazed_grating.ipynb
-   source/examples_scalar/dammann.ipynb
    source/examples_scalar/double_grating.ipynb
    source/examples_scalar/variable_refractive_index.ipynb
-   source/examples_scalar/image_formation.ipynb
+

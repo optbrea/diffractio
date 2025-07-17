@@ -934,7 +934,8 @@ class Vector_field_XZ():
         cb_ax = fig.add_axes([0.1, 0, 0.8, 0.05])
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
 
-
+        return id_fig, ax, IDimage
+    
     @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def __draw_intensities__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
@@ -1008,6 +1009,7 @@ class Vector_field_XZ():
             cb_ax = fig.add_axes([0.1, 0, 0.8, 0.05])
             cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
 
+        return fig, axs
 
 
     @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
@@ -1098,6 +1100,7 @@ class Vector_field_XZ():
             cb_ax = fig.add_axes([0.1, 0, 0.8, 0.05])
             cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', fraction=0.046, shrink=0.5)
 
+        return fig, axs
 
     @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_fields__(self,  logarithm: float,  normalize: bool,  cut_value: float,
@@ -1772,8 +1775,7 @@ class Vector_field_XZ():
         angles = np.linspace(0, 360*degrees, 64)
 
         if ax is False:
-            self.draw("intensity", logarithm=logarithm, cmap=color_intensity, scale=scale)
-            ax = plt.gca()
+            id_fig, ax, IDimage=self.draw("intensity", logarithm=logarithm, cmap=color_intensity, scale=scale)
 
         for i, xi in enumerate(ix_centers):
             for j, yj in enumerate(iz_centers):

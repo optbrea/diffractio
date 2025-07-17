@@ -1616,7 +1616,8 @@ class Vector_field_XZ():
         draw_borders=False,
         scale = 'scaled',
         color_intensity=CONF_DRAWING["color_intensity"],
-        color_stokes=CONF_DRAWING["color_stokes"], **kwargs
+        color_stokes=CONF_DRAWING["color_stokes"], 
+        horizontal = True, **kwargs
     ):
         """__internal__: computes and draws CI, CQ, CU, CV parameters"""
 
@@ -1631,26 +1632,40 @@ class Vector_field_XZ():
 
         intensity_max = S0.max()
 
-        plt.figure(figsize=(1.5 * tx, 1.5 * ty))
-        h1 = plt.subplot(2,2,1)
+        if horizontal:
+            plt.figure(figsize=(3 * tx, 1 * ty))
+            h1 = plt.subplot(1,4,1)
+        else:
+            plt.figure(figsize=(1.5 * tx, 1.5 * ty))
+            h1 = plt.subplot(2,2,1)
+
         self.__draw1__(S0, color_intensity, r"$S_0$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='w.')
         plt.clim(0, intensity_max)
 
-        h2 = plt.subplot(2,2,2)
+        if horizontal:
+            h2 = plt.subplot(1,4,2)
+        else:
+            h2 = plt.subplot(2,2,2)
         self.__draw1__(S1, color_stokes, r"$S_1$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='k.')
         plt.clim(-intensity_max, intensity_max)
 
-        h3 = plt.subplot(2,2,3)
+        if horizontal:
+            h3 = plt.subplot(1,4,3)
+        else:
+            h3 = plt.subplot(2,2,3)
         self.__draw1__(S2, color_stokes, r"$S_2$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='k.')
         plt.clim(-intensity_max, intensity_max)
 
-        h4 = plt.subplot(2,2,4)
+        if horizontal:
+            h4 = plt.subplot(1,4,4)
+        else:
+            h4 = plt.subplot(2,2,4)
         self.__draw1__(S3, color_stokes, r"$S_3$")
         plt.axis(scale)
         draw_edges(self, plt,  draw_borders, color='k.')

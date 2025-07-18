@@ -1289,13 +1289,15 @@ class Scalar_field_XZ():
         elif spectrum in ('', None, [], 0):
             spectrum = np.ones_like(wavelengths)
 
+        u_final = Scalar_field_XZ(self.x, self.z, self.wavelength)
         I_final = np.zeros_like(self.u, dtype=float)
         for i, wavelength in enumerate(wavelengths):
             u_temp = initial_field(wavelength)
             u_temp.WPM(verbose=False)
-            I_final = I_final + spectrum[i] * np.abs(u_temp.u)**2
-        u_temp.u = np.sqrt(I_final)
-        return u_temp
+            I_final = I_final + spectrum[i] * u_temp.intensity()
+        u_final.u = np.sqrt(I_final)
+        self.u = u_final.u
+        return u_final
     
 
     @check_none('x', 'z', 'u')

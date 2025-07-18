@@ -6,7 +6,7 @@ Scalar propagation
 --------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :numbered:
    :glob:
 
@@ -20,7 +20,7 @@ Vector propagation
 --------------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :numbered:
    :glob:
 

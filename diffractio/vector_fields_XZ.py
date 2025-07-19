@@ -259,6 +259,153 @@ class Vector_field_XZ():
         return normalize_field(self, kind, new_field)
 
 
+    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
+    # def cut_resample(self,
+    #                  x_limits: tuple[float, float] | None = None,
+    #                  z_limits: tuple[float, float] | None = None,
+    #                  num_points: int | None = None,
+    #                  new_field: bool = False,
+    #                  interp_kind: tuple[int, int] = (3, 1)):
+    #     """Cuts the field to the range (x0,x1). (z0,z1). If one of this x0,x1 positions is out of the self.x range it do nothing. It is also valid for resampling the field, just write x0,x1 as the limits of self.x
+
+    #     Args:
+    #         x_limits (float,float): (x0,x1) starting and final points to cut. if '' - takes the current limit x[0] and x[-1]
+    #         z_limits (float,float): (z0,z1) - starting and final points to cut. if '' - takes the current limit z[0] and z[-1]
+    #         num_points (int): it resamples x, z and u. [], '',0,None -> it leave the points as it is
+    #         new_field (bool): it returns a new Scalar_field_Xz
+    #         interp_kind (int): numbers between 1 and 5
+    #     """
+    #     if x_limits is None:
+    #         x0 = self.x[0]
+    #         x1 = self.x[-1]
+    #     else:
+    #         x0, x1 = x_limits
+
+    #     if z_limits is None:
+    #         z0 = self.z[0]
+    #         z1 = self.z[-1]
+    #     else:
+    #         z0, z1 = z_limits
+
+    #     if x0 < self.x[0]:
+    #         x0 = self.x[0]
+    #     if x1 > self.x[-1]:
+    #         x1 = self.x[-1]
+
+    #     if z0 < self.z[0]:
+    #         z0 = self.z[0]
+    #     if z1 > self.z[-1]:
+    #         z1 = self.z[-1]
+
+    #     i_x0, _, _ = nearest(self.x, x0)
+    #     i_x1, _, _ = nearest(self.x, x1)
+    #     i_z0, _, _ = nearest(self.z, z0)
+    #     i_z1, _, _ = nearest(self.z, z1)
+
+    #     kxu, kxn = interp_kind
+
+    #     if num_points not in ([], '', 0, None):
+    #         num_points_x, num_points_z = num_points
+    #         x_new = np.linspace(x0, x1, num_points_x)
+    #         z_new = np.linspace(z0, z1, num_points_z)
+    #         X_new, z_new = np.meshgrid(x_new, z_new)
+
+    #         f_interp_abs_x = RectBivariateSpline(self.x,
+    #                                              self.z,
+    #                                              np.abs(self.Ex),
+    #                                              kx=kxu,
+    #                                              kz=kxu,
+    #                                              s=0)
+    #         f_interp_phase_x = RectBivariateSpline(self.x,
+    #                                                self.z,
+    #                                                np.angle(self.Ex),
+    #                                                kx=kxu,
+    #                                                kz=kxu,
+    #                                                s=0)
+
+    #         f_interp_abs_y = RectBivariateSpline(self.x,
+    #                                              self.z,
+    #                                              np.abs(self.Ey),
+    #                                              kx=kxu,
+    #                                              kz=kxu,
+    #                                              s=0)
+    #         f_interp_phase_y = RectBivariateSpline(self.x,
+    #                                                self.z,
+    #                                                np.angle(self.Ey),
+    #                                                kx=kxu,
+    #                                                kz=kxu,
+    #                                                s=0)
+
+    #         f_interp_abs_z = RectBivariateSpline(self.x,
+    #                                              self.z,
+    #                                              np.abs(self.Ez),
+    #                                              kx=kxu,
+    #                                              kz=kxu,
+    #                                              s=0)
+    #         f_interp_phase_z = RectBivariateSpline(self.x,
+    #                                                self.z,
+    #                                                np.angle(self.Ez),
+    #                                                kx=kxu,
+    #                                                kz=kxu,
+    #                                                s=0)
+            
+    #         f_interp_abs_n = RectBivariateSpline(self.x,
+    #                                              self.z,
+    #                                              np.abs(self.n),
+    #                                              kx=kxu,
+    #                                              kz=kxu,
+    #                                              s=0)
+    #         f_interp_phase_n = RectBivariateSpline(self.x,
+    #                                                self.z,
+    #                                                np.angle(self.n),
+    #                                                kx=kxu,
+    #                                                kz=kxu,
+    #                                                s=0)
+
+    #         Ex_new_abs = f_interp_abs_x(x_new, z_new)
+    #         Ex_new_phase = f_interp_phase_x(x_new, z_new)
+    #         Ex_new = Ex_new_abs * np.exp(1j * Ex_new_phase)
+
+    #         Ey_new_abs = f_interp_abs_z(x_new, z_new)
+    #         Ey_new_phase = f_interp_phase_z(x_new, z_new)
+    #         Ey_new = Ey_new_abs * np.exp(1j * Ey_new_phase)
+
+    #         Ez_new_abs = f_interp_abs_z(x_new, z_new)
+    #         Ez_new_phase = f_interp_phase_z(x_new, z_new)
+    #         Ez_new = Ez_new_abs * np.exp(1j * Ez_new_phase)
+
+    #         n_new_abs = f_interp_abs_n(x_new, z_new)
+    #         n_new_phase = f_interp_phase_n(x_new, z_new)
+    #         n_new = n_new_abs * np.exp(1j * n_new_phase)
+
+    #     else:
+    #         i_s = slice(i_x0, i_x1)
+    #         j_s = slice(i_z0, i_z1)
+    #         x_new = self.x[i_s]
+    #         z_new = self.z[j_s]
+    #         X_new, Z_new = np.meshgrid(x_new, z_new)
+    #         Ex_new = self.Ex[i_s, j_s]
+    #         Ey_new = self.Ey[i_s, j_s]
+    #         Ez_new = self.Ez[i_s, j_s]
+    #         n_new = self.n[i_s, j_s]
+
+    #     if new_field is False:
+    #         self.x = x_new
+    #         self.z = z_new
+    #         self.Ex = Ex_new
+    #         self.Ey = Ey_new
+    #         self.Ez = Ez_new
+    #         self.X = X_new
+    #         self.Z = Z_new
+    #         self.n = n_new
+    #     else:
+    #         field = Vector_field_XZ(x=x_new,
+    #                                 z=z_new,
+    #                                 wavelength=self.wavelength)
+    #         field.Ex = Ex_new
+    #         field.Ez = Ez_new
+    #         field.n = n_new
+    #         return field
 
     @check_none('x', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def incident_field(self, E0: Vector_field_X  | None = None, u0: Scalar_field_X  | None = None, 
@@ -422,7 +569,6 @@ class Vector_field_XZ():
                 filter_edge = 1
             else:
                 filter_edge = filter_function
-
 
             E_step, H_step = FP_WPM_schmidt_kernel(
                 self.Ex[j - 1, :],
@@ -1353,7 +1499,7 @@ class Vector_field_XZ():
         E_y = np.abs(self.Ey)**2
         E_y = normalize_draw(E_y, logarithm, normalize, cut_value)
 
-        E_z = np.abs(self.Ex)**2
+        E_z = np.abs(self.Ez)**2
         E_z = normalize_draw(E_z, logarithm, normalize, cut_value)
 
         H_x = np.abs(self.Hx)**2
@@ -1772,14 +1918,17 @@ class Vector_field_XZ():
         cmap_intensity = CONF_DRAWING["color_intensity"]
         cmap_phase = CONF_DRAWING["color_phase"]    
 
+        kwargs2 = dict(kwargs)
+        kwargs2['color'] = 'w.'
+
         id_fig, ax, IDimage = draw2D_xz(
             A, self.z, self.x, ax=axs[0, 0], scale=scale, xlabel="", ylabel=r"x $(\mu m)$", cmap=cmap_intensity, title=r'A')
-        draw_edges(self, axs[0, 0], draw_borders, **kwargs)
+        draw_edges(self, axs[0, 0], draw_borders, **kwargs2)
         IDimage.set_clim(0,max_intensity)
         
         id_fig, ax, IDimage = draw2D_xz(
             B, self.z, self.x, ax=axs[0, 1], scale=scale, xlabel="", ylabel="", cmap=cmap_intensity, title=r'B')
-        draw_edges(self, axs[0, 1], draw_borders, **kwargs)
+        draw_edges(self, axs[0, 1], draw_borders, **kwargs2)
         IDimage.set_clim(0,max_intensity)
 
         id_fig, ax, IDimage = draw2D_xz(
@@ -1823,18 +1972,19 @@ class Vector_field_XZ():
         logarithm: float = 0.,
         normalize: bool = False,
         cut_value="",
-        scale='scaled',
         draw_borders=False,
-        num_ellipses=(21, 21),
+        scale='scaled',
+        num_ellipses=(31, 31),
         amplification=0.75,
         color_line="w",
-        line_width=1,
+        line_width=.75,
         draw_arrow=True,
         head_width=.5,
         ax=False,
         color_intensity=CONF_DRAWING["color_intensity"], 
         **kwargs
     ):
+    
         """
 
         Args:
@@ -1889,9 +2039,8 @@ class Vector_field_XZ():
         angles = np.linspace(0, 360*degrees, 64)
 
         if ax is False:
-            id_fig, ax, IDimage=self.draw("intensity", logarithm=logarithm, cmap=color_intensity, scale=scale)
-
-
+            id_fig, ax, IDimage=self.__draw_intensity__( logarithm=logarithm, normalize=normalize, 
+                            cut_value=cut_value, draw_borders=draw_borders, scale = scale)
 
         for i, xi in enumerate(ix_centers):
             for j, yj in enumerate(iz_centers):
@@ -1902,21 +2051,14 @@ class Vector_field_XZ():
                 size_dim = min(size_x, size_z)
 
                 if max_r > 0 and max_r**2 > percentage_intensity * intensity_max:
-                    Ex = Ex / max_r * size_dim * amplification/2 + (+self.x[int(xi)])
+                    Ex = Ex / max_r * size_dim * amplification/2 + self.x[int(xi)]
                     Ey = Ey / max_r * size_dim * amplification/2 + self.z[int(yj)]
 
                     ax.plot(Ey, Ex, color_line, lw=line_width)
                     if draw_arrow:
-                        ax.arrow(
-                            Ey[0],
-                            Ex[0],
-                            Ey[0] - Ey[1],
-                            Ex[0] - Ex[1],
-                            width=0,
-                            head_width=head_width,
-                            fc=color_line,
-                            ec=color_line,
-                            length_includes_head=False,
+                        ax.arrow( Ey[0], Ex[0], Ey[0] - Ey[1], Ex[0] - Ex[1],
+                            width=0, head_width=head_width, fc=color_line,
+                            ec=color_line, length_includes_head=False,
                         )
 
 

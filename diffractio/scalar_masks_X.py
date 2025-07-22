@@ -183,41 +183,6 @@ class Scalar_mask_X(Scalar_field_X):
         self.u = t * np.exp(1.j * k * (index - 1) * (F2 - F1))
         self.u[t == 0] = 0
 
-    def fourier_grating_X(self, x0: float, period: float, size: float, fourier: np.ndarray = None, orders: list = None, values: list = None):
-
-        """
-        Generates a 1D diffraction grating profile using Fourier coefficients.
-
-        Args:
-            x0     : Center of the grating.
-            period : Grating period.
-            size   : Width of the region where the grating is defined. If size = 0, it applies to the entire domain.
-            fourier: Array of Fourier coefficients [order: value].
-            orders : List of Fourier coefficients orders.
-            values : List os Fourier coefficientes values.
-
-        Returns:
-            self : grating complex field.
-        """
-        
-        if fourier is None:
-            fourier = np.transpose([orders, values])
-
-        if size == 0:
-            t = np.zeros_like(self.x, dtype=complex) # Creates a variable to store the transmittance values as a function of the grating size.
-
-            for n, a in fourier:
-                t += a * np.exp(1j * 2 * np.pi * n * self.x / period) # In each iteration, it calculates the transmittance for each coefficient and index across the entire extent of the defined grating, 
-                # and sums them together.
-        else:
-            t = np.zeros_like(self.x, dtype=complex) 
-            mask = (self.x >= (x0 - size / 2)) & (self.x <= (x0 + size / 2))  # Creates a mask in the defined grating region.
-
-            for n, a in fourier:
-                t[mask] += a * np.exp(1j * 2 * np.pi * n * self.x[mask] / period) # Calculates the transmittance only in the defined region.
-        
-        self.u = t
-
     def dots(self, x0: float | NDArrayFloat):
         """Generates 1 or several point masks at positions x0
 
@@ -642,6 +607,34 @@ class Scalar_mask_X(Scalar_field_X):
         percentage_real = self.u.sum() / len(self.x)
 
         return positions, percentage_real
+
+
+    def fourier_grating(self, x0: float, period: float,  fourier: np.ndarray = None, orders: list = None, values: list = None):
+
+        """
+        Generates a 1D diffraction grating profile using Fourier coefficients. 
+        Fourier coefficients are defined as a list of tuples, where each tuple contains the order and the corresponding value.
+        Args:
+            x0     : Center of the grating.
+            period : Grating period.
+            fourier: Array of Fourier coefficients [order: value].
+            orders : List of Fourier coefficients orders.
+            values : List os Fourier coefficientes values.
+
+        Returns:
+            self : grating complex field.
+        """
+        
+        if fourier is None:
+            fourier = np.transpose(np.array([orders, values]))
+
+        t=np.zeros_like(self.x, dtype=complex)
+        
+        for n, a in fourier:
+            t += a * np.exp(1j * 2 * np.pi * n * self.x / period) # Calculates the transmittance only in the defined region.
+        
+        self.u = t
+
 
     def sine_grating(self, x0: float, period: float, amp_min: float = 0, amp_max: float = 1):
         """Sinusoidal grating

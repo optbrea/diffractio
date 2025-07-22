@@ -804,40 +804,7 @@ class Scalar_mask_XY(Scalar_field_XY):
         u[u > 1] = 1
         self.u = u
         return num_points
-    
-    def fourier_grating_XY(self, x0: float, period: float, fourier: np.ndarray = None, orders: list = None, values: list = None):
-
-        """
-        Generates a 2D diffraction grating profile using Fourier coefficients.
-
-        Args:
-            x0     : Center of the grating.
-            fourier: Array of Fourier coefficients [order: value].
-            orders : List of Fourier coefficients orders.
-            values : List os Fourier coefficientes values.
-
-        Returns:
-            self : Object with the generated grating stored in self.u as a 2D array.
-        """
-
-        if orders is not None():
-            orders = np.array(orders)
-        
-        if values is not None():
-            values = np.array(values)
-
-        if fourier is None:
-            fourier = np.transpose([orders, values])
-
-        t = np.zeros_like(self.x, dtype=complex) 
-
-        for n, a in fourier:
-            t += a * np.exp(1j * 2 * np.pi * n * self.x / period) 
-
-        Txy = np.tile(t, (len(self.y), 1))  # Replicate the x axis transmittance in every point of the y axis.
-                                                
-        self.u = Txy
-
+  
     @check_none('x', 'y', raise_exception=bool_raise_exception)
     def dots(self, r0: tuple[float, float]):
         """Generates 1 or several point masks at positions r0
@@ -2475,6 +2442,41 @@ class Scalar_mask_XY(Scalar_field_XY):
         # normalization between 0 and 2pi
         phase = np.remainder(phase, phase_max)
         self.u = np.exp(1j * phase)
+
+
+  
+    def fourier_grating(self, x0: float, period: float, fourier: np.ndarray = None, orders: list = None, values: list = None):
+
+        """
+        Generates a 2D diffraction grating profile using Fourier coefficients.
+
+        Args:
+            x0     : Center of the grating.
+            fourier: Array of Fourier coefficients [order: value].
+            orders : List of Fourier coefficients orders.
+            values : List os Fourier coefficientes values.
+
+        Returns:
+            self : Object with the generated grating stored in self.u as a 2D array.
+        """
+
+        if orders is not None:
+            orders = np.array(orders)
+        
+        if values is not None:
+            values = np.array(values)
+
+        if fourier is None:
+            fourier = np.transpose([orders, values])
+
+        t = np.zeros_like(self.x, dtype=complex) 
+
+        for n, a in fourier:
+            t += a * np.exp(1j * 2 * np.pi * n * self.x / period) 
+
+        Txy = np.tile(t, (len(self.y), 1))  # Replicate the x axis transmittance in every point of the y axis.
+                                                
+        self.u = Txy
 
 
     @check_none('x', 'y', raise_exception=bool_raise_exception)

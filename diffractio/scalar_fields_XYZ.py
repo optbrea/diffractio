@@ -168,6 +168,10 @@ class Scalar_field_XYZ():
         Imax = (np.abs(self.u)**2).max()
         phase_min = (np.angle(self.u)).min()/degrees
         phase_max = (np.angle(self.u)).max()/degrees
+        n_min = np.abs(self.n).min()
+        n_max = np.abs(self.n).max()
+        kappa_min = np.imag(self.n).min()
+        kappa_max = np.imag(self.n).max()
         print("{}\n - x:  {},   y:  {},  z:  {},   u:  {}".format(
             self.type, self.x.shape, self.y.shape, self.z.shape, self.u.shape))
         print(
@@ -179,6 +183,10 @@ class Scalar_field_XYZ():
         print(
             " - zmin:       {:2.2f} um,  zmax:      {:2.2f} um,  Dz:   {:2.2f} um"
             .format(self.z[0], self.z[-1], self.z[1] - self.z[0]))
+        print(" - n_min:       {:2.2f},     n_max:      {:2.2f}".format(
+            n_min, n_max))
+        print(" - kappa_min:       {:2.2f},     kappa_max:      {:2.2f}".format(
+            kappa_min, kappa_max))
         print(" - Imin:       {:2.2f},     Imax:      {:2.2f}".format(
             Imin, Imax))
         print(" - phase_min:  {:2.2f} deg, phase_max: {:2.2f} deg".format(
@@ -542,6 +550,56 @@ class Scalar_field_XYZ():
 
         intensity = (np.abs(self.u)**2)
         return intensity
+
+
+    
+    @check_none('x', 'y', 'z', 'u')
+    def check_intensity(self, has_draw: bool = True, normalized: bool = True):
+        """
+        Checks that intensity distribution is not lost by edges. It can be executed after a RS or BPM propagation.
+
+        Args:
+            has_draw (bool): Draws the intensity
+            normalized (bool): Draws it normalized
+
+        Returns:
+            (np.array): array with intensity I(z)
+        """
+
+        intensity_prof = np.sum((np.abs(self.u)**2), axis=1)
+        intensity_prof = np.sum(intensity_prof, axis=0)
+
+        I_max = intensity_prof[0]
+        
+        if normalized is True:
+            intensity_prof = intensity_prof / I_max
+        if has_draw is True:
+            plt.figure()
+            plt.plot(self.z / mm, intensity_prof, 'k')
+            plt.grid()
+            plt.xlabel(r"$z\,(mm)$")
+            plt.ylabel(r"$I(z)$")
+            plt.ylim(bottom=0)
+            plt.xlim(self.z[0]/mm, self.z[-1]/mm)
+
+
+    @check_none('x', 'y', 'z', 'u')
+    def search_focus(self, verbose=True):
+        """Search for location of maximum.
+
+        Args:
+            verbose (bool): If True prints the focus position.
+
+        Returns:
+            (x, y  z): positions of focus
+        """
+        intensity = np.abs(self.u)**2
+
+        ix, iy, iz = np.unravel_index(intensity.argmax(), intensity.shape)
+        if verbose is True:
+            print(("x = {:2.3f} um, y = {:2.3f} um, z = {:2.3f} um".format(
+                self.x[ix],  self.y[iy], self.z[iz])))
+        return self.x[ix], self.y[iy], self.z[iz]
 
 
     @check_none('x', 'y', 'z', 'u')

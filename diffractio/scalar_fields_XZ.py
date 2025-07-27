@@ -161,8 +161,10 @@ class Scalar_field_XZ():
         Imax = (np.abs(self.u)**2).max()
         phase_min = (np.angle(self.u)).min()/degrees
         phase_max = (np.angle(self.u)).max()/degrees
-        nmin = self.n.min()
-        nmax = self.n.max()
+        n_min = np.abs(self.n).min()
+        n_max = np.abs(self.n).max()
+        kappa_min = np.imag(self.n).min()
+        kappa_max = np.imag(self.n).max()
         print("{}\n - x:  {},   z:  {},   u:  {}".format(
             self.type, self.x.shape, self.z.shape, self.u.shape))
         print(
@@ -172,7 +174,9 @@ class Scalar_field_XZ():
             " - zmin:       {:2.2f} um,  zmax:      {:2.2f} um,  Dz:   {:2.2f} um"
             .format(self.z[0], self.z[-1], self.z[1] - self.z[0]))
         print(" - nmin:       {:2.2f},     nmax:      {:2.2f}".format(
-            nmin, nmax))
+            n_min, n_max))
+        print(r" - kappa_min:       {:2.2f},     kappa_max:      {:2.2f}".format(
+            kappa_min, kappa_max))
         print(" - Imin:       {:2.2f},     Imax:      {:2.2f}".format(
             Imin, Imax))
         print(" - phase_min:  {:2.2f} deg, phase_max: {:2.2f} deg".format(
@@ -182,7 +186,6 @@ class Scalar_field_XZ():
         print(" - date:       {}".format(self.date))
         if self.info != "":
             print(" - info:       {}".format(self.info))
-        return ""
         return ""
 
     @check_none('x', 'z', 'u', raise_exception=bool_raise_exception)
@@ -1395,7 +1398,7 @@ class Scalar_field_XZ():
             (np.array): array with intensity I(z)
         """
 
-        intensity_prof = np.sum((np.abs(self.u)**2), axis=0)
+        intensity_prof = np.sum((np.abs(self.u)**2), axis=1)
         I_max = intensity_prof[0]
         if normalized is True:
             intensity_prof = intensity_prof / I_max
@@ -1406,6 +1409,7 @@ class Scalar_field_XZ():
             plt.xlabel(r"$z\,(mm)$")
             plt.ylabel(r"$I(z)$")
             plt.ylim(bottom=0)
+            plt.xlim(self.z[0]/mm, self.z[-1]/mm)
 
         return intensity_prof
 

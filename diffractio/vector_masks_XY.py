@@ -360,11 +360,10 @@ class Vector_mask_XY(Vector_field_XY):
 
         [M00, M01, M10, M11] = polarizer.parameters.components()
 
-        
-        self.M00 = M00
-        self.M01 = M01
-        self.M10 = M10
-        self.M11 = M11
+        self.M00 = M00 * np.ones_like(self.X)
+        self.M01 = M01 * np.ones_like(self.X)
+        self.M10 = M10 * np.ones_like(self.X)
+        self.M11 = M11 * np.ones_like(self.X)
 
 
     def vacuum(self):
@@ -408,6 +407,7 @@ class Vector_mask_XY(Vector_field_XY):
         PL = Jones_matrix('m0')
         PL.half_waveplate(azimuth=azimuth)
         self.from_py_pol(PL)
+
 
     def polarizer_retarder(self, R: float=0*degrees, p1: float=1, p2: float=1, azimuth: float=0*degrees):
         """Generates an XY retarder.

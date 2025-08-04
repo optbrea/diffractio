@@ -36,7 +36,7 @@ The magnitude is related to microns: `micron = 1.`
 # flake8: noqa
 
 
-from .__init__ import degrees, np, um
+from .__init__ import degrees, np, um, plt
 from .config import bool_raise_exception
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
 from .utils_common import check_none
@@ -139,6 +139,56 @@ class Scalar_mask_XYZ(Scalar_field_XYZ):
         self.n[ipasa] = refractive_index
         return ipasa
 
+
+    def add_thin_mask(self, t, z0: float | None = None, h: float = 0. , has_draw: bool = False):
+        """Incident field for the experiment. It takes a Scalar_source_X field
+
+        Args:
+            t (Scalar_source_X): field produced by Scalar_source_X (or a X field)
+            z0 (float): position of the incident field. if None, '', [], is at the beginning
+            has_draw (bool): if True, it draws the refractive index and the phase
+        """
+
+
+        amplitude = np.abs(t.u)
+        
+        phase = np.angle(t.u)
+        phase = phase - phase.min()
+        
+        dz = self.z[1]-self.z[0]
+        num_layers = int(h/dz)+1
+            
+        hj = dz*num_layers
+        
+        n_real = self.n_background + self.wavelength * phase / (2 * np.pi * hj)  
+
+        if amplitude.all() == 1:
+            kappa = np.zeros_like(self.x)
+        else:
+            kappa = -self.wavelength * np.log(amplitude) / (2 * np.pi * hj)
+            kappa[amplitude==0]=100
+        
+        n_complex = n_real + 1j*kappa
+        
+        if has_draw:
+            fig, axs = plt.subplots(1,3)
+            axs[0].imshow(n_real)
+            axs[1].imshow(kappa)
+            axs[2].imshow(phase)
+
+        if z0 is None:
+            self.n[0:num_layers] = n_complex
+        else:
+            iz, _, _ = nearest(self.z, z0)
+            
+            generated = np.broadcast_to(n_complex,(num_layers,)+n_complex.shape)
+            generated = np.broadcast_to(n_complex[...,None],n_complex.shape+(num_layers,))
+            
+            # print(generated.shape)
+            # print(self.n[:, :, iz:iz+num_layers].shape)
+            
+            self.n[:, :, iz:iz+num_layers] = generated
+            
 
 
     def extrude_mask_XY(self, txy: Scalar_mask_XY, refractive_index: float | complex | None, z0: float | None = None, z1: float | None = None, keep_rest = True,

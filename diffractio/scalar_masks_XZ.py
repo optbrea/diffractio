@@ -95,6 +95,52 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         self.type = "Scalar_mask_XZ"
 
 
+
+    def add_thin_mask(self, t, z0: float | None = None, h: float = 0. , has_draw: bool = False):
+        """Incident field for the experiment. It takes a Scalar_source_X field
+
+        Args:
+            t (Scalar_source_X): field produced by Scalar_source_X (or a X field)
+            z0 (float): position of the incident field. if None, '', [], is at the beginning
+            h (float): thickness of the mask. If h=0, then the mask is a thin mask. 
+            has_draw (bool): if True, it draws the real and imaginary part of the refractive index.
+        """
+
+
+        amplitude = np.abs(t.u)
+        
+        phase = np.angle(t.u)
+        
+        dz = self.z[1]-self.z[0]
+        num_layers = int(h/dz)+1
+        
+        hj = dz*num_layers
+        
+        n_real = self.n_background + self.wavelength * phase / (2 * np.pi * hj)  
+
+        if amplitude.all() == 1:
+            kappa = np.zeros_like(self.x)
+        else:
+            kappa = -self.wavelength * np.log(amplitude) / (2 * np.pi * hj)
+            kappa[amplitude==0]=10000
+        
+        
+        n_complex = n_real + 1j*kappa
+        
+        if has_draw:
+            fig, axs = plt.subplots(2)
+            fig.suptitle('Vertically stacked subplots')
+            axs[0].plot(self.x, n_real)
+            axs[1].plot(self.x, kappa)
+
+        if z0 is None:
+            self.n[0:num_layers] = n_complex
+        else:
+            iz, _, _ = nearest(self.z, z0)
+            self.n[iz:iz+num_layers, :] = n_complex
+            
+
+
     @check_none('x', 'z', raise_exception=bool_raise_exception)
     def object_by_surfaces(
         self, rotation_point: tuple[float, float], refractive_index: complex | float | str,

@@ -10,8 +10,8 @@ Beta state
 
   - numpy to 2.0
   - new maskXY: widen, get_mask_size, arrow and make_edge
+  - scalar_XZ and scalar_XYZ: add_thin_mask function has been implemented, to add a X_mask or XY mask in XZ or XYZ frames. 
   
-
   
 
 1.0.0

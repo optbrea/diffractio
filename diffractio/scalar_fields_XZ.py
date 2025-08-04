@@ -1771,6 +1771,17 @@ class Scalar_field_XZ():
         plt.xlabel(r'z ($\mu m$)')
         plt.ylabel(r'x ($\mu m$)')
         plt.title(title)
+        if n_draw.min() < 1:
+            if n_draw.max() > 100:
+                plt.clim(0, 100)
+            else:
+                plt.clim(0, n_draw.max())
+        elif n_draw.min() > 1:
+            if n_draw.max() > 100:
+                plt.clim(n_draw.min(), 100)
+            else:
+                plt.clim(n_draw.min(), n_draw.max())
+
 
         plt.axis(extension)
         h1.set_cmap(colormap_kind)  # flag OrRd # Reds_r gist_heat # gist_heat

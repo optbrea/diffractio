@@ -573,6 +573,7 @@ class Scalar_field_XYZ():
         
         if normalized is True:
             intensity_prof = intensity_prof / I_max
+
         if has_draw is True:
             plt.figure()
             plt.plot(self.z / mm, intensity_prof, 'k')
@@ -596,9 +597,11 @@ class Scalar_field_XYZ():
         intensity = np.abs(self.u)**2
 
         ix, iy, iz = np.unravel_index(intensity.argmax(), intensity.shape)
+        
         if verbose is True:
             print(("x = {:2.3f} um, y = {:2.3f} um, z = {:2.3f} um".format(
                 self.x[ix],  self.y[iy], self.z[iz])))
+            
         return self.x[ix], self.y[iy], self.z[iz]
 
 

@@ -22,4 +22,5 @@ Examples for scalar propagation
    source/examples_scalar/blazed_grating.ipynb
    source/examples_scalar/double_grating.ipynb
    source/examples_scalar/variable_refractive_index.ipynb
+   source/examples_scalar/partial_coherent_source.ipynb
 

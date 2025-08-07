@@ -28,6 +28,7 @@ The magnitude is related to microns: `mifcron = 1.`
     * plane_wave
     * gauss_beam
     * spherical_wave
+    * wavelets
     * plane_waves_dict
     * plane_waves_several_inclined
     * gauss_beams_several_parallel
@@ -37,7 +38,6 @@ The magnitude is related to microns: `mifcron = 1.`
     * Polychromatic and extendes sources are defined in scalar_fields_X.py for multiprocessing purposes.
 """
 # flake8: noqa
-
 
 
 from .__init__ import degrees, np, um
@@ -136,6 +136,75 @@ class Scalar_source_X(Scalar_field_X):
         if normalize is True:
             self.u = self.u / np.abs(self.u.max() + 1.012034e-12)
 
+
+    @check_none('x', raise_exception=bool_raise_exception)
+    def wavelets(self, kind: str, x0s: NDArray, z0s: NDArray, As: NDArray, phases: NDArray = 0, w0: float = 0.): 
+        """Generates a beam profile z(x) with wavelets: spherical waves or gaussian beams. Each wavelet is defined by its position (x0, z0), amplitude A, and phase.
+        The resulting field is the sum of all wavelets, each contributing a spherical or gaussian wave at its respective position. 
+        The phase is useful for generating beams with partially coherence, where each wavelet can have a different phase.
+        If the phase is constant, then the resulting field is a coherent superposition of wavelets.
+
+        Args:
+            kind (str): 'spherical' or 'gaussian'
+            x0s (NDArray): array of x0 positions
+            y0s (NDArray): array of y0 positions
+            z0s (NDArray): array of z0 positions
+            As (NDArray): array of amplitudes at the positions x0s
+            phases (NDArray, optional): array of phases at the positions x0s. Defaults to 0.
+            w0 (float, optional): beam waist for Gaussian profile. Defaults to 0. If w0=0, then the beam waist is equal to the wavlength.
+
+        Raises:
+            ValueError: If kind is not 'spherical' or 'gaussian'.
+            ValueError: If x0s, y0s, z0s, and As do not have the same length.  
+
+        Returns:
+            Scalar_source_X: Amplitude distribution at the origin for the given light profile.
+        """
+        if kind not in ['spherical', 'gaussian']:
+            raise ValueError("kind must be 'spherical' or 'gaussian'")
+        
+
+        
+        if isinstance(x0s, (list, tuple)):
+            x0s = np.array(x0s)
+        if isinstance(z0s, (list, tuple)):
+            z0s = np.array(z0s)
+        if isinstance(As, (list, tuple)):
+            As = np.array(As)
+        if isinstance(phases, (list, tuple)):
+            phases = np.array(phases)
+
+        if isinstance(phases, (int, float)):
+            phases = phases * np.ones_like(x0s)
+
+        if isinstance(As, (int, float)):
+            As = As * np.ones_like(x0s)
+        
+        if isinstance(z0s, (int, float)):
+            z0s = z0s * np.ones_like(x0s)
+
+        if isinstance(x0s, (int, float)):
+            x0s = x0s * np.ones_like(z0s)
+
+        if len(x0s) != len(z0s) or len(x0s) != len(As) or len(x0s) != len(phases):
+            raise ValueError("x0s, z0s, As, and phases must have the same length")
+
+        if w0 == 0:
+            w0 = self.wavelength
+
+        # Initialize the field
+        self.u = np.zeros_like(self.x, dtype=np.complex128)
+
+        u0 = self.duplicate(clear=True)
+
+        for i, x0, z0, A in zip(range(len(x0s)), x0s, z0s, As):
+            if kind == 'spherical':
+                u0.spherical_wave(A=A, x0=x0, z0=z0)
+            elif kind == 'gaussian':
+                u0.gauss_beam(A=A, x0=x0, z0=z0, w0=w0)
+
+            # Add the contribution of this source to the total field
+            self.u = self.u + u0.u * np.exp(1j * phases[i])
 
     @check_none('x', raise_exception=bool_raise_exception)
     def plane_waves_dict(self, params: dict):

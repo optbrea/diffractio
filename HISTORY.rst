@@ -2,19 +2,22 @@
 History
 =======
 
-1.0.1
+1.1.0 (2025-08-07)
 --------------------------------
 Beta state
 
 * Improvements:
 
-  - numpy to 2.0
-  - new maskXY: widen, get_mask_size, arrow and make_edge
-  - scalar_XZ and scalar_XYZ: add_thin_mask function has been implemented, to add a X_mask or XY mask in XZ or XYZ frames. 
-  
+  - numpy to 2.0.
+
+  - new maskXY: widen, get_mask_size, arrow and make_edge.
+
+  - 'scalar_mask_XZ' and 'scalar_mask_XYZ': add_thin_mask function has been implemented, to add a X_mask or XY mask in XZ or XYZ frames.
+
+  - 'scalar_source_X' and scalar_source_XY: wavelets function has been implemented to generate a field with spherical waves or gaussian beams.
   
 
-1.0.0
+1.0.0 (2025-01-14)
 --------------------------------
 Beta state
 

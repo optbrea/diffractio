@@ -60,7 +60,7 @@ def roughness_1D(x: NDArrayFloat, t: float, s: float, kind: str = "normal"):
     weigths = np.abs(weigths / np.sqrt((weigths**2).sum()))
 
     if kind == "normal":
-        h_no_corr = s * np.random.randn(2 * N_width + 1)
+        h_no_corr = s * np.random.randn(2 * N_width + 2)
         h_corr = fft_convolution1d(h_no_corr, weigths)
         h_corr = h_corr[0: len(x)]
     elif kind == "uniform":

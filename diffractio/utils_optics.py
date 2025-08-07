@@ -113,7 +113,7 @@ def roughness_2D(x: NDArrayFloat, y: tuple[float, float], t: float, s: float):
     weigths = np.exp(-2 * (desp_width**2 / tx**2 + desp_length**2 / ty**2))
     weigths = np.abs(weigths / np.sqrt((weigths**2).sum()))
 
-    h_no_corr = s * np.random.randn(2 * N_width + 1, 2 * N_length + 1)
+    h_no_corr = s * np.random.randn(2 * N_width + 2, 2 * N_length + 2)
     h_corr = fft_convolution2d(h_no_corr, weigths)
     h_corr = h_corr[0: len(x), 0: len(y)]
 

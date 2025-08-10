@@ -174,6 +174,82 @@ class Scalar_source_XY(Scalar_field_XY):
 
 
     @check_none('X', 'Y', raise_exception=bool_raise_exception)
+    def super_gauss_beam(self,
+                   r0: tuple[float, float],
+                   w0: tuple[float, float] | float,
+                   z0: tuple[float, float] | float,
+                   pow: tuple[float, float] | float = 2.,
+                   alpha: float = 0.,
+                   beta: float = 0.,
+                   A: float = 1,
+                   theta: float = 0.,
+                   phi: float = 0.):
+        """Gauss Beam.
+
+        Args:
+            r0 (float, float): (x,y) position of center
+            w0 (float, float): (wx,wy) minimum beam width
+            z0 (float): (z0x, z0y) position of beam width for each axis (could be different)
+            pow (float): power of the super-Gaussian profile
+            alpha (float): rotation angle of the axis of the elliptical gaussian amplitude
+            beta (float): rotation angle of the axis of the main directions of the wavefront (it can be different from alpha)
+            A (float): maximum amplitude
+            theta (float): angle in radians (angle of k with respect to z))
+
+        TODO: Change function to similar to Scalar_mask_XY.super_gauss
+
+        """
+
+        if isinstance(w0, (float, int, complex)):
+            w0 = (w0, w0)
+
+        if isinstance(z0, (float, int, complex)):
+            z0 = (z0, z0)
+
+        if isinstance(pow, (float, int, complex)):
+            pow = (pow, pow)
+
+        w0x, w0y = w0
+        # w0 = np.sqrt(w0x * w0y)
+        x0, y0 = r0
+        z0x, z0y = z0
+        powx, powy = pow
+        k = 2 * np.pi / self.wavelength
+
+        z_rayleigh_x = k * w0x**2/2
+        z_rayleigh_y = k * w0y**2/2
+
+        phaseGouy_x = np.arctan2(z0x, z_rayleigh_x)
+        phaseGouy_y = np.arctan2(z0y, z_rayleigh_y)
+
+        wx = w0x * np.sqrt(1 + (z0x / z_rayleigh_x)**2)
+        wy = w0y * np.sqrt(1 + (z0y / z_rayleigh_y)**2)
+
+        if z0x == 0:
+            R_x = 1e10
+        else:
+            R_x = -z0x * (1 + (z_rayleigh_x / z0x)**2)
+
+        if z0y == 0:
+            R_y = 1e10
+        else:
+            R_y = -z0y * (1 + (z_rayleigh_y / z0y)**2)
+
+        amplitude = (A * (w0x / wx) * (w0y / wy) * np.exp(
+            -np.abs((self.X * np.cos(alpha) + self.Y * np.sin(alpha) - x0))**powx /
+            (wx**powx)) * np.exp(
+                -np.abs((-self.X * np.sin(alpha) + self.Y * np.cos(alpha) - y0))**powy /
+                (wy**powy)))
+        phase1 = np.exp(1.j * k * (self.X * np.sin(theta) * np.cos(phi) +
+                                   self.Y * np.sin(theta) * np.sin(phi)))
+        phase2 = np.exp(1j * (k * z0x - phaseGouy_x + k * ((self.X * np.cos(beta) + self.Y * np.sin(beta))**2) / (2 * R_x))) * \
+            np.exp(1j * (k * z0y - phaseGouy_y + k * ((-self.X * np.sin(beta) + self.Y * np.cos(beta))**2) / (2 * R_y)))
+
+        self.u = amplitude * phase1 * phase2
+
+        return self
+
+    @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def spherical_wave(self, r0: tuple[float, float], z0: tuple[float, float] | float, A: float = 1, 
                         radius: float =0., normalize: bool = False):
         """Spherical wave.
@@ -292,7 +368,7 @@ class Scalar_source_XY(Scalar_field_XY):
 
         Args:
             lc (float, float) | float: correlation length in micrometers
-            s (float): standard deviation in microns, for example $\lambda$/2.
+            s (float): standard deviation in microns, for example wavelength/2.
             has_draw (bool, optional): Whether to draw the result. Defaults to True.
             verbose (bool, optional): Prints statistics about the roughness. Defaults to True.
 
@@ -304,7 +380,7 @@ class Scalar_source_XY(Scalar_field_XY):
 
         k = 2 * np.pi / self.wavelength
 
-        t_rough=roughness_2D(x=self.x,y=self.y, t=lc, s=s)
+        t_rough=roughness_2D(x=self.x, y=self.y, t=lc, s=s)
 
         self.u *= np.exp(1j * k * t_rough)  # Apply roughness to the source.
 

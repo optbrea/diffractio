@@ -1375,6 +1375,7 @@ class Scalar_mask_XY(Scalar_field_XY):
         
     def super_gauss(self, r0: tuple[float, float], radius: tuple[float] | float,
                     power: float = 2, angle: float = 0*degrees):
+
         """Supergauss mask.
 
         Args:
@@ -1383,12 +1384,7 @@ class Scalar_mask_XY(Scalar_field_XY):
             power (float): value of exponential
             angle (float): angle of rotation in radians
 
-        Example:
-
-            super_gauss(r0=(0*um, 0*um), radius=(250*um,
-                        125*um), angle=0*degrees, potencia=2)
         """
-        # si solamente un numero, posiciones y radius son los mismos para ambos
 
         if isinstance(radius, (float, int, complex)):
             radiusx, radiusy = (radius, radius)
@@ -1399,8 +1395,10 @@ class Scalar_mask_XY(Scalar_field_XY):
         x0, y0 = r0
 
         Xrot, Yrot = self.__rotate__(angle, (x0, y0))
-        R = np.sqrt(Xrot**2 + Yrot**2)
-        self.u = np.exp(-R**power / (2 * radiusx**power))
+        R = np.sqrt(Xrot**2/ (2*radiusx**2) + Yrot**2/ (2*radiusy**2))
+        self.u = np.exp(-R**power)
+
+
 
 
     @check_none('x', 'y', raise_exception=bool_raise_exception)
@@ -2592,7 +2590,7 @@ class Scalar_mask_XY(Scalar_field_XY):
         levels = range(num_rows*num_columns)
         k = 0
         for j in range(num_columns):
-            for i in range(num_rows):
+            for i in range(num_rows-1,-1,-1):
                 #print(pos_x[i], pos_y[j])
                 t1.square(r0=(pos_x[i], pos_y[j]), size=(size_x, size_y), angle=0*degrees)
                 self.u = self.u + levels[k]*t1.u

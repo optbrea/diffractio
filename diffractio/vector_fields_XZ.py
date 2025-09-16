@@ -259,153 +259,219 @@ class Vector_field_XZ():
         return normalize_field(self, kind, new_field)
 
 
-    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
-    # def cut_resample(self,
-    #                  x_limits: tuple[float, float] | None = None,
-    #                  z_limits: tuple[float, float] | None = None,
-    #                  num_points: int | None = None,
-    #                  new_field: bool = False,
-    #                  interp_kind: tuple[int, int] = (3, 1)):
-    #     """Cuts the field to the range (x0,x1). (z0,z1). If one of this x0,x1 positions is out of the self.x range it do nothing. It is also valid for resampling the field, just write x0,x1 as the limits of self.x
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
+    def cut_resample(self,
+                     x_limits: tuple[float, float] | None = None,
+                     z_limits: tuple[float, float] | None = None,
+                     num_points: int | None = None,
+                     new_field: bool = False,
+                     interp_kind: tuple[int, int] = (3, 1)):
+        """Cuts the field to the range (x0,x1). (z0,z1). If one of this x0,x1 positions is out of the self.x range it do nothing. It is also valid for resampling the field, just write x0,x1 as the limits of self.x
 
-    #     Args:
-    #         x_limits (float,float): (x0,x1) starting and final points to cut. if '' - takes the current limit x[0] and x[-1]
-    #         z_limits (float,float): (z0,z1) - starting and final points to cut. if '' - takes the current limit z[0] and z[-1]
-    #         num_points (int): it resamples x, z and u. [], '',0,None -> it leave the points as it is
-    #         new_field (bool): it returns a new Scalar_field_Xz
-    #         interp_kind (int): numbers between 1 and 5
-    #     """
-    #     if x_limits is None:
-    #         x0 = self.x[0]
-    #         x1 = self.x[-1]
-    #     else:
-    #         x0, x1 = x_limits
+        Args:
+            x_limits (float,float): (x0,x1) starting and final points to cut. if '' - takes the current limit x[0] and x[-1]
+            z_limits (float,float): (z0,z1) - starting and final points to cut. if '' - takes the current limit z[0] and z[-1]
+            num_points (int): it resamples x, z and u. [], '',0,None -> it leave the points as it is
+            new_field (bool): it returns a new Scalar_field_Xz
+            interp_kind (int): numbers between 1 and 5
+        """
+        if x_limits is None:
+            x0 = self.x[0]
+            x1 = self.x[-1]
+        else:
+            x0, x1 = x_limits
 
-    #     if z_limits is None:
-    #         z0 = self.z[0]
-    #         z1 = self.z[-1]
-    #     else:
-    #         z0, z1 = z_limits
+        if z_limits is None:
+            z0 = self.z[0]
+            z1 = self.z[-1]
+        else:
+            z0, z1 = z_limits
 
-    #     if x0 < self.x[0]:
-    #         x0 = self.x[0]
-    #     if x1 > self.x[-1]:
-    #         x1 = self.x[-1]
+        if x0 < self.x[0]:
+            x0 = self.x[0]
+        if x1 > self.x[-1]:
+            x1 = self.x[-1]
 
-    #     if z0 < self.z[0]:
-    #         z0 = self.z[0]
-    #     if z1 > self.z[-1]:
-    #         z1 = self.z[-1]
+        if z0 < self.z[0]:
+            z0 = self.z[0]
+        if z1 > self.z[-1]:
+            z1 = self.z[-1]
 
-    #     i_x0, _, _ = nearest(self.x, x0)
-    #     i_x1, _, _ = nearest(self.x, x1)
-    #     i_z0, _, _ = nearest(self.z, z0)
-    #     i_z1, _, _ = nearest(self.z, z1)
+        i_x0, _, _ = nearest(self.x, x0)
+        i_x1, _, _ = nearest(self.x, x1)
+        i_z0, _, _ = nearest(self.z, z0)
+        i_z1, _, _ = nearest(self.z, z1)
 
-    #     kxu, kxn = interp_kind
+        kxu, kxn = interp_kind
 
-    #     if num_points not in ([], '', 0, None):
-    #         num_points_x, num_points_z = num_points
-    #         x_new = np.linspace(x0, x1, num_points_x)
-    #         z_new = np.linspace(z0, z1, num_points_z)
-    #         X_new, z_new = np.meshgrid(x_new, z_new)
+        if num_points not in ([], '', 0, None):
+            num_points_x, num_points_z = num_points
+            x_new = np.linspace(x0, x1, num_points_x)
+            z_new = np.linspace(z0, z1, num_points_z)
+            X_new, z_new = np.meshgrid(x_new, z_new)
 
-    #         f_interp_abs_x = RectBivariateSpline(self.x,
-    #                                              self.z,
-    #                                              np.abs(self.Ex),
-    #                                              kx=kxu,
-    #                                              kz=kxu,
-    #                                              s=0)
-    #         f_interp_phase_x = RectBivariateSpline(self.x,
-    #                                                self.z,
-    #                                                np.angle(self.Ex),
-    #                                                kx=kxu,
-    #                                                kz=kxu,
-    #                                                s=0)
+            f_interp_abs_Ex = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.Ex),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_Ex = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.Ex),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
 
-    #         f_interp_abs_y = RectBivariateSpline(self.x,
-    #                                              self.z,
-    #                                              np.abs(self.Ey),
-    #                                              kx=kxu,
-    #                                              kz=kxu,
-    #                                              s=0)
-    #         f_interp_phase_y = RectBivariateSpline(self.x,
-    #                                                self.z,
-    #                                                np.angle(self.Ey),
-    #                                                kx=kxu,
-    #                                                kz=kxu,
-    #                                                s=0)
+            f_interp_abs_Ey = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.Ey),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_Ey = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.Ey),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
 
-    #         f_interp_abs_z = RectBivariateSpline(self.x,
-    #                                              self.z,
-    #                                              np.abs(self.Ez),
-    #                                              kx=kxu,
-    #                                              kz=kxu,
-    #                                              s=0)
-    #         f_interp_phase_z = RectBivariateSpline(self.x,
-    #                                                self.z,
-    #                                                np.angle(self.Ez),
-    #                                                kx=kxu,
-    #                                                kz=kxu,
-    #                                                s=0)
+            f_interp_abs_Ez = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.Ez),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_Ez = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.Ez),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
             
-    #         f_interp_abs_n = RectBivariateSpline(self.x,
-    #                                              self.z,
-    #                                              np.abs(self.n),
-    #                                              kx=kxu,
-    #                                              kz=kxu,
-    #                                              s=0)
-    #         f_interp_phase_n = RectBivariateSpline(self.x,
-    #                                                self.z,
-    #                                                np.angle(self.n),
-    #                                                kx=kxu,
-    #                                                kz=kxu,
-    #                                                s=0)
+            
+            f_interp_abs_Hx = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.Hx),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_Hx = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.Hx),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
 
-    #         Ex_new_abs = f_interp_abs_x(x_new, z_new)
-    #         Ex_new_phase = f_interp_phase_x(x_new, z_new)
-    #         Ex_new = Ex_new_abs * np.exp(1j * Ex_new_phase)
+            f_interp_abs_Hy = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.Hy),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_Hy = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.Hy),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
 
-    #         Ey_new_abs = f_interp_abs_z(x_new, z_new)
-    #         Ey_new_phase = f_interp_phase_z(x_new, z_new)
-    #         Ey_new = Ey_new_abs * np.exp(1j * Ey_new_phase)
+            f_interp_abs_Hz = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.Hz),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_Hz = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.Hz),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
+            
+            
+            
+            f_interp_abs_n = RectBivariateSpline(self.z,
+                                                 self.x,
+                                                 np.abs(self.n),
+                                                 kx=kxu,
+                                                 kz=kxu,
+                                                 s=0)
+            f_interp_phase_n = RectBivariateSpline(self.z,
+                                                   self.x,
+                                                   np.angle(self.n),
+                                                   kx=kxu,
+                                                   kz=kxu,
+                                                   s=0)
 
-    #         Ez_new_abs = f_interp_abs_z(x_new, z_new)
-    #         Ez_new_phase = f_interp_phase_z(x_new, z_new)
-    #         Ez_new = Ez_new_abs * np.exp(1j * Ez_new_phase)
+            Ex_new_abs = f_interp_abs_Ex(x_new, z_new)
+            Ex_new_phase = f_interp_phase_Ex(x_new, z_new)
+            Ex_new = Ex_new_abs * np.exp(1j * Ex_new_phase)
 
-    #         n_new_abs = f_interp_abs_n(x_new, z_new)
-    #         n_new_phase = f_interp_phase_n(x_new, z_new)
-    #         n_new = n_new_abs * np.exp(1j * n_new_phase)
+            Ey_new_abs = f_interp_abs_Ey(x_new, z_new)
+            Ey_new_phase = f_interp_phase_Ey(x_new, z_new)
+            Ey_new = Ey_new_abs * np.exp(1j * Ey_new_phase)
 
-    #     else:
-    #         i_s = slice(i_x0, i_x1)
-    #         j_s = slice(i_z0, i_z1)
-    #         x_new = self.x[i_s]
-    #         z_new = self.z[j_s]
-    #         X_new, Z_new = np.meshgrid(x_new, z_new)
-    #         Ex_new = self.Ex[i_s, j_s]
-    #         Ey_new = self.Ey[i_s, j_s]
-    #         Ez_new = self.Ez[i_s, j_s]
-    #         n_new = self.n[i_s, j_s]
+            Ez_new_abs = f_interp_abs_Ez(x_new, z_new)
+            Ez_new_phase = f_interp_phase_Ez(x_new, z_new)
+            Ez_new = Ez_new_abs * np.exp(1j * Ez_new_phase)
 
-    #     if new_field is False:
-    #         self.x = x_new
-    #         self.z = z_new
-    #         self.Ex = Ex_new
-    #         self.Ey = Ey_new
-    #         self.Ez = Ez_new
-    #         self.X = X_new
-    #         self.Z = Z_new
-    #         self.n = n_new
-    #     else:
-    #         field = Vector_field_XZ(x=x_new,
-    #                                 z=z_new,
-    #                                 wavelength=self.wavelength)
-    #         field.Ex = Ex_new
-    #         field.Ez = Ez_new
-    #         field.n = n_new
-    #         return field
+            Hx_new_abs = f_interp_abs_Hx(x_new, z_new)
+            Hx_new_phase = f_interp_phase_Hx(x_new, z_new)
+            Hx_new = Hx_new_abs * np.exp(1j * Hx_new_phase)
+
+            Hy_new_abs = f_interp_abs_Hy(x_new, z_new)
+            Hy_new_phase = f_interp_phase_Hy(x_new, z_new)
+            Hy_new = Hy_new_abs * np.exp(1j * Hy_new_phase)
+
+            Hz_new_abs = f_interp_abs_Hz(x_new, z_new)
+            Hz_new_phase = f_interp_phase_Hz(x_new, z_new)
+            Hz_new = Hz_new_abs * np.exp(1j * Hz_new_phase)
+
+
+            n_new_abs = f_interp_abs_n(x_new, z_new)
+            n_new_phase = f_interp_phase_n(x_new, z_new)
+            n_new = n_new_abs * np.exp(1j * n_new_phase)
+
+        else:
+            iz_s = slice(i_z0, i_z1)
+            jx_s = slice(i_x0, i_x1)
+            x_new = self.x[jx_s]
+            z_new = self.z[iz_s]
+            X_new, Z_new = np.meshgrid(x_new, z_new)
+            Ex_new = self.Ex[iz_s, jx_s]
+            Ey_new = self.Ey[iz_s, jx_s]
+            Ez_new = self.Ez[iz_s, jx_s]
+            Hx_new = self.Hx[iz_s, jx_s]
+            Hy_new = self.Hy[iz_s, jx_s]
+            Hz_new = self.Hz[iz_s, jx_s]            
+            
+            n_new = self.n[iz_s, jx_s]
+
+        if new_field is False:
+            self.x = x_new
+            self.z = z_new
+            self.Ex = Ex_new
+            self.Ey = Ey_new
+            self.Ez = Ez_new
+            self.Hx = Hx_new
+            self.Hy = Hy_new
+            self.Hz = Hz_new
+            self.X = X_new
+            self.Z = Z_new
+            self.n = n_new
+        else:
+            field = Vector_field_XZ(x=x_new,
+                                    z=z_new,
+                                    wavelength=self.wavelength)
+            field.Ex = Ex_new
+            field.Ey = Ey_new
+            field.Ez = Ez_new
+            field.Hx = Hx_new
+            field.Hy = Hy_new
+            field.Hz = Hz_new
+            field.n = n_new
+            return field
 
     @check_none('x', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def incident_field(self, E0: Vector_field_X  | None = None, u0: Scalar_field_X  | None = None, 

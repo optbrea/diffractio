@@ -103,6 +103,13 @@ def get_vector(cls, kind: get_vector_options, mode='modulus', **kwargs):
         epsilon = cls.n**2 * permeability
         U = epsilon * np.real(np.abs(cls.Ex)**2 + np.abs(cls.Ey)**2 + np.abs(cls.Ez)**2) + permeability * (np.abs(cls.Hx)**2 + np.abs(cls.Hy)**2 + np.abs(cls.Hz)**2)
         return U
+    
+    elif kind == 'energy_density2':
+        permeability = 4*np.pi*1e-7
+        c_light = 299792458*1e6
+        epsilon = cls.n**2 / (permeability*c_light**2)
+        U = epsilon * np.real(np.abs(cls.Ex)**2 + np.abs(cls.Ey)**2 + np.abs(cls.Ez)**2) + permeability * (np.abs(cls.Hx)**2 + np.abs(cls.Hy)**2 + np.abs(cls.Hz)**2)
+        return 0.5*U*1e8
 
     elif kind == 'irradiance':
         permeability = 4*np.pi*1e-7

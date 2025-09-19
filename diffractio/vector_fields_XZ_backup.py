@@ -583,7 +583,8 @@ class Vector_field_XZ():
         
 
     @check_none('x', 'z', raise_exception=bool_raise_exception)
-    def FP_WPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, verbose: bool = False):
+    def FP_WPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, 
+                verbose: bool = False):
         """
         WPM Method. 'schmidt methodTrue is very fast, only needs discrete number of refractive indexes'
 
@@ -688,7 +689,6 @@ class Vector_field_XZ():
         intensity = np.abs(self.Ex) ** 2 + np.abs(self.Ey) ** 2 + np.abs(self.Ez) ** 2
 
         return intensity
-
 
     
     def check_energy(self, kind = 'all', has_draw : bool = True):
@@ -909,9 +909,9 @@ class Vector_field_XZ():
         self.draw('energy_density', **params_white); plt.show()
         self.draw('irradiance', **params_white); plt.show()
         self.draw('ellipses', draw_arrow=False, **params_white); plt.show()
-        #self.draw('param_ellipses', **params_black); plt.show()
+        self.draw('param_ellipses', **params_black); plt.show()
 
-        self.check_energy('U')
+        self.check_energy()
 
 
     def __draw_intensity__(self,  logarithm: float,  normalize: bool,  cut_value: float,
@@ -2068,130 +2068,9 @@ class Vector_field_XZ():
         return h
 
 
+
+
 def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
-    """Step for Plane wave decomposition (PWD) algorithm.
-
-    Args:
-        Ex (np.array): field Ex
-        Ey (np.array): field Ey
-        n1 (np.array): refractive index at the first layer
-        n2 (np.array): refractive index at the second layer
-        k0 (float): wavenumber
-        kx (np.array): transversal wavenumber
-        wavelength (float): wavelength
-        dz (float): increment in distances: z[1]-z[0]
-
-    Returns:
-        E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.
-        H  list(Ex, Ey, Ez): Field H(z+dz) at at distance dz from the incident field.
-        
-    """
-
-    # amplitude of waveplanes
-    Exk = fftshift(fft(Ex))
-    Eyk = fftshift(fft(Ey))
-
-
-    kr = n1 * k0 # first layer
-    ks = n2 * k0 # second layer
-            
-    ky = np.zeros_like(kx) # we are in XZ frame
-    k_perp2 = kx**2 + ky**2
-
-    kz_r = np.sqrt(kr**2 - k_perp2) # first layer
-    kz_s = np.sqrt(ks**2 - k_perp2) # second layer
-
-    kr = kr.astype(np.complex128)
-    ks = ks.astype(np.complex128)
-
-    P = np.exp(1j * kz_s * dz)
-    Gamma = kz_r*kz_s + kz_s * k_perp2 / kz_r
-    
-
-    # Fresnel coefficients
-    t_TM, t_TE, _, _ = fresnel_equations_kx(kx, wavelength, n1, n2, [1, 1, 0, 0], has_draw=False)
-
-    t_TM = t_TM.astype(np.complex128)
-    t_TE = t_TE.astype(np.complex128)
-        
-    T00 = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks) 
-    T01 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-    T10 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-    T11 = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
-    
-    # Simpler since ky = 0, but keep to translate to 3D 
-    
-    # T00 = P * (t_TM*kx**2*Gamma) / (k_perp2*kr*ks) 
-    # T01 = np.zeros_like(kx) 
-    # T10 = np.zeros_like(kx)  
-    # T11 = P * (t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
-    
-    nan_indices = np.where(np.isnan(T00)) 
-    
-    option = 1 # TODO: fix better
-    
-    if option == 1:
-
-        T00[nan_indices]=T00[nan_indices[0]-1]
-        T01[nan_indices]=T01[nan_indices[0]-1]
-        T10[nan_indices]=T10[nan_indices[0]-1]
-        T11[nan_indices]=T11[nan_indices[0]-1] 
-        
-    elif option == 2:
-    
-        if len(nan_indices)>0:
-            T00_b = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks+1e-10) 
-            T01_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-10) 
-            T10_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-10) 
-            T11_b = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks+1e-10) 
-        
-            T00[nan_indices]=T00_b[nan_indices]
-            T01[nan_indices]=T01_b[nan_indices]
-            T10[nan_indices]=T10_b[nan_indices]
-            T11[nan_indices]=T11_b[nan_indices] 
-    
-    ex0 = T00 * Exk + T01 * Eyk
-    ey0 = T10 * Exk + T11 * Eyk 
-    ez0 = - (kx*ex0+ky*ey0) / (kz_s)
-    
-    # ex0 = T00 * Exk 
-    # ey0 = T11 * Eyk 
-    # ez0 = - (kx*ex0+ky*ey0) / (kz_r)
-    
-
-    
-    TM00 = -kx*ky*Gamma 
-    TM01 = -(ky*ky*Gamma + kz_s**2)
-    TM10 = +(kx*kx*Gamma + kz_s**2)
-    TM11 = +kx*ky*Gamma
-    TM20 = -ky*kz_s
-    TM21 = +kx*kz_s
-    
-    Z0 = 376.82  # ohms (impedance of free space)
-    H_factor = n2 / (ks * kz_s * Z0)
-    
-    hx0 = (TM00*ex0+TM01*ey0) * H_factor
-    hy0 = (TM10*ex0+TM11*ey0) * H_factor
-    hz0 = (TM20*ex0+TM21*ey0) * H_factor
-        
-
-
-    Ex_final = ifft(ifftshift(ex0))
-    Ey_final = ifft(ifftshift(ey0))
-    Ez_final = ifft(ifftshift(ez0))
-
-
-    Hx_final = ifft(ifftshift(hx0))
-    Hy_final = ifft(ifftshift(hy0))
-    Hz_final = ifft(ifftshift(hz0))
-
-    return (Ex_final, Ey_final, Ez_final), (Hx_final, Hy_final, Hz_final)
-
-
-
-
-
-def FP_PWD_kernel_simple_proposal(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     """Step for Plane wave decomposition (PWD) algorithm.
 
     Args:

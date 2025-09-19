@@ -44,14 +44,15 @@ The magnitude is related to microns: `micron = 1.`
 """
 
 import copy
-from matplotlib import rcParams
+from matplotlib import cm, rcParams
 import time
 from numpy import gradient
 from scipy.interpolate import RectBivariateSpline
+import cmath
 
 
 from .__init__ import degrees, eps, mm, np, plt
-from .config import (bool_raise_exception, CONF_DRAWING, 
+from .config import (Draw_refractive_index_Options, bool_raise_exception, CONF_DRAWING, 
                      get_vector_options, Draw_Vector_XZ_Options)
 from .utils_typing import npt, Any, NDArray, NDArrayFloat, NDArrayComplex
 from .utils_common import get_date, load_data_common, save_data_common, check_none, get_vector
@@ -541,15 +542,20 @@ class Vector_field_XZ():
         
 
     @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
-    def get(self, kind: get_vector_options, mode: str = 'modulus', **kwargs):
+    def get(self, kind: get_vector_options, mode: str = 'modulus', verbose: bool = False, **kwargs):
         """Takes the vector field and divide in Scalar_field_X.
 
         Args:
-            kind (str): 'fields', 'intensity', 'intensities', 'phases', 'stokes', 'params_ellipse'
+            kind (str): 'E', 'H', 'EH', 'fields', 'intensity', 'intensities', 'phases', 'poynting_vector', 
+                        'poynting_vector_averaged',  'poynting_total',  'energy_density', 'irradiance', 
+                        'stokes', 'params_ellipse'
 
         Returns:
             Vector_field_X: (Ex, Ey, Ez),
         """
+
+        if verbose is True:
+            print("get_vector_options:", get_vector_options)
 
         data = get_vector(self, kind, mode, **kwargs)
         return data
@@ -1107,6 +1113,9 @@ class Vector_field_XZ():
             elif kind == "param_ellipses":
                 id_fig = self.__draw_param_ellipse__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
 
+            elif kind == "refractive_index":
+                id_fig = self.__draw_refractive_index__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
+
             elif kind == "all":
                 self.__draw_all__(params_black=params_black, params_white=params_white)
                 id_fig = None
@@ -1451,28 +1460,30 @@ class Vector_field_XZ():
 
         """
 
-        E_x = self.Ex
+
+        E_x = np.real(self.Ex)
         E_x = normalize_draw(E_x, logarithm, normalize, cut_value)
 
-        E_y = self.Ey
+        E_y = np.real(self.Ey)
         E_y = normalize_draw(E_y, logarithm, normalize, cut_value)
 
-        E_z = self.Ez
+        E_z = np.real(self.Ez)      
         E_z = normalize_draw(E_z, logarithm, normalize, cut_value)
 
-        H_x = self.Hx
+        H_x = np.real(self.Hx)
         H_x = normalize_draw(H_x, logarithm, normalize, cut_value)
 
-        H_y = self.Hy
+        H_y = np.real(self.Hy)
         H_y = normalize_draw(H_y, logarithm, normalize, cut_value)
 
-        H_z = self.Hz
+        H_z = np.real(self.Hz)
         H_z = normalize_draw(H_z, logarithm, normalize, cut_value)
 
         tx, ty = rcParams["figure.figsize"]
 
         E_max = np.max((E_x.max(), E_y.max(), E_z.max()))
         H_max = np.max((H_x.max(), H_y.max(), H_z.max()))
+
 
         if draw_z is True:
 
@@ -1536,6 +1547,7 @@ class Vector_field_XZ():
         fig.subplots_adjust(right=1.25)
         cb_ax = fig.add_axes([0.2, 0, 0.6, 0.025])
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
+
         plt.tight_layout()
 
         return self
@@ -1879,7 +1891,13 @@ class Vector_field_XZ():
         color_stokes=CONF_DRAWING["color_stokes"], 
         orientation = 'horizontal', **kwargs
     ):
-        """__internal__: computes and draws CI, CQ, CU, CV parameters"""
+        """__internal__: computes and draws CI, CQ, CU, CV parameters
+        
+        The polarization state is obtained with Ex and Ey. If there is Ez field it is not considered. 
+
+        TODO: Include Ez field in the Stokes parameters.
+        """
+
 
         tx, ty = rcParams["figure.figsize"]
 
@@ -2128,6 +2146,133 @@ class Vector_field_XZ():
                         )
 
 
+    @check_none('x', 'z', 'n')
+    def __draw_refractive_index__(self,
+                                  logarithm: bool = False,
+                                  normalize: bool = False,
+                                  cut_value: float = 0,
+                                  draw_borders: bool = True,
+                                  scale: str = 'scaled',
+                                  colorbar_kind= 'vertical'
+                              ):
+        """Draws refractive index.
+
+        Args:
+            kind (str): 'all', 'real', 'imag'
+            draw_borders (bool): If True draw edges of objects
+            filename (str): if not '' stores drawing in file,
+            title (str): title of drawing
+            scale (str): '', 'scaled', 'equal', scales the XY drawing
+            min_incr: minimum increment in refractive index for detecting edges
+            reduce_matrix (int, int), 'standard' or False: when matrix is enormous, we can reduce it only for drawing purposes. If True, reduction factor
+            edge_matrix (numpy.array): positions of borders
+        """
+
+        colormap_kind= cm.Blues
+        edge_matrix = None
+        min_incr = 0.01
+        reduce_matrix = 'standard'
+
+        title: str = ''
+        filename: str = ''
+
+        kind = 'all'
+
+
+        plt.figure()
+        extension = [self.z[0], self.z[-1], self.x[0], self.x[-1]]
+
+ 
+
+        if kind == 'all':
+            n_draw = np.abs(self.n)
+        elif kind == 'real':
+            n_draw = np.real(self.n)
+            n_draw[np.abs(np.imag(self.n)) > 0] = self.n_background
+        elif kind == 'imag':
+            n_draw = np.imag(self.n)
+
+        if reduce_matrix is False:
+            h1 = plt.imshow(n_draw.transpose(),
+                            interpolation='bilinear',
+                            aspect='auto',
+                            origin='lower',
+                            extent=extension)
+        elif reduce_matrix == 'standard':
+            num_x = len(self.x)
+            num_z = len(self.z)
+            reduction_x = int(num_x/2000)
+            reduction_z = int(num_z/2000)
+
+            if reduction_x == 0:
+                reduction_x = 1
+            if reduction_z == 0:
+                reduction_z = 1
+            n_new = n_draw[::reduction_z, ::reduction_x]
+            h1 = plt.imshow(n_new.transpose(),
+
+                            # if self.borders is None or edge_matrix is None:
+                            #     self.surface_detection(1, min_incr, reduce_matrix)
+                            #     border0 = self.borders[0]
+                            #     border1 = self.borders[1]
+                            # if edge_matrix is not None:
+                            #     border0, border1 = edge_matrix          interpolation='bilinear',
+                            aspect='auto',
+                            origin='lower',
+                            extent=extension)
+        else:
+            n_new = n_draw[::reduce_matrix[0], ::reduce_matrix[1]]
+            h1 = plt.imshow(n_new.transpose(),
+                            interpolation='bilinear',
+
+                            # if self.borders is None or edge_matrix is None:
+                            #     self.surface_detection(1, min_incr, reduce_matrix)
+                            #     border0 = self.borders[0]
+                            #     border1 = self.borders[1]
+                            # if edge_matrix is not None:
+                            #     border0, border1 = edge_matrix          aspect='auto',
+                            origin='lower',
+                            extent=extension)
+
+        plt.xlabel(r'z ($\mu m$)')
+        plt.ylabel(r'x ($\mu m$)')
+        plt.title(title)
+        if n_draw.min() < 1:
+            if n_draw.max() > 100:
+                plt.clim(0, 100)
+            else:
+                plt.clim(0, n_draw.max())
+        elif n_draw.min() > 1:
+            if n_draw.max() > 100:
+                plt.clim(n_draw.min(), 100)
+            else:
+                plt.clim(n_draw.min(), n_draw.max())
+
+
+        plt.axis(extension)
+        h1.set_cmap(colormap_kind)  # flag OrRd # Reds_r gist_heat # gist_heat
+
+        if colorbar_kind not in (False, '', None):
+            plt.colorbar(orientation=colorbar_kind, shrink=0.66)
+
+        if scale != '':
+            plt.axis(scale)
+
+        if draw_borders is True:
+            if self.borders is None or edge_matrix is None:
+                self.surface_detection(1, min_incr, has_draw=False)
+                border0 = self.borders[0]
+                border1 = self.borders[1]
+            if edge_matrix is not None:
+                border0, border1 = edge_matrix
+            plt.plot(border1, border0, 'c.', ms=.25)
+
+        if filename != '':
+            plt.savefig(filename, dpi=100, bbox_inches='tight', pad_inches=0.1)
+
+        return h1
+    
+    
     def __draw1__(self, image, colormap, title: str = "", has_max=False):
         """_summary_
 
@@ -2184,7 +2329,7 @@ class Vector_field_XZ():
 
 
 
-def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz, has_H=True):
+def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     """Step for Plane wave decomposition (PWD) algorithm.
 
     Args:
@@ -2210,13 +2355,17 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz, has_H=True):
 
 
     kr = n1 * k0 # first layer
+    # print(n1, n2)
     ks = n2 * k0 # second layer
-            
-    ky = np.zeros_like(kx) # we are in XZ frame
-    k_perp2 = kx**2 + ky**2
+
+    ky = np.zeros_like(kx, dtype=np.complex128) # we are in XZ frame
+    k_perp2 = (kx**2 + ky**2).astype(np.complex128)
+    kr = kr.astype(np.complex128)
+    ks = ks.astype(np.complex128)
 
     kz_r = np.sqrt(kr**2 - k_perp2) # first layer
     kz_s = np.sqrt(ks**2 - k_perp2) # second layer
+    
 
     P = np.exp(1j * kz_s * dz)
     Gamma = kz_r*kz_s + kz_s * k_perp2 / kz_r
@@ -2224,70 +2373,69 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz, has_H=True):
 
     # Fresnel coefficients
     t_TM, t_TE, _, _ = fresnel_equations_kx(kx, wavelength, n1, n2, [1, 1, 0, 0], has_draw=False)
-        
-    T00 = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks) 
-    T01 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-    T10 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-    T11 = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
-    
-    # Simpler since ky = 0, but keep to translate to 3D 
+
+    T00 = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks+1e-40)
+    T01 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-40)
+    T10 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-40)
+    T11 = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks+1e-40)
+
+    # Simpler since ky = 0, but keep to translate to 3D
     
     # T00 = P * (t_TM*kx**2*Gamma) / (k_perp2*kr*ks) 
     # T01 = np.zeros_like(kx) 
     # T10 = np.zeros_like(kx)  
     # T11 = P * (t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
     
-    nan_indices = np.where(np.isnan(T00)) 
+
     
-    option = 1 # TODO: fix better
+    option = 2 # TODO: fix better
     
     if option == 1:
-
-        T00[nan_indices]=T00[nan_indices[0]-1]
-        T01[nan_indices]=T01[nan_indices[0]-1]
-        T10[nan_indices]=T10[nan_indices[0]-1]
-        T11[nan_indices]=T11[nan_indices[0]-1] 
+        pass
+        # T00[nan_indices]=T00[nan_indices[0]-1]
+        # T01[nan_indices]=T01[nan_indices[0]-1]
+        # T10[nan_indices]=T10[nan_indices[0]-1]
+        # T11[nan_indices]=T11[nan_indices[0]-1] 
         
     elif option == 2:
-    
-        if len(nan_indices)>0:
-            T00_b = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks+1e-10) 
-            T01_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-10) 
-            T10_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-10) 
-            T11_b = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks+1e-10) 
+        #if len(nan_indices)>0:
+        T00_b = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks) 
+        T01_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
+        T10_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
+        T11_b = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
         
-            T00[nan_indices]=T00_b[nan_indices]
-            T01[nan_indices]=T01_b[nan_indices]
-            T10[nan_indices]=T10_b[nan_indices]
-            T11[nan_indices]=T11_b[nan_indices] 
+            # T00[nan_indices]=T00_b[nan_indices]
+            # T01[nan_indices]=T01_b[nan_indices]
+            # T10[nan_indices]=T10_b[nan_indices]
+            # T11[nan_indices]=T11_b[nan_indices] 
+
+            # count_nan = np.isnan(nan_indices).sum()
+            # print('Number of NaN after fix:', count_nan)
     
-    ex0 = T00 * Exk + T01 * Eyk
-    ey0 = T10 * Exk + T11 * Eyk 
-    ez0 = - (kx*ex0+ky*ey0) / (kz_s)
-    
-    # ex0 = T00 * Exk 
-    # ey0 = T11 * Eyk 
+    # ex0 = T00 * Exk + T01 * Eyk
+    # ey0 = T10 * Exk + T11 * Eyk 
     # ez0 = - (kx*ex0+ky*ey0) / (kz_r)
     
+    ex0 = T00 * Exk 
+    ey0 = T11 * Eyk 
+    ez0 = - (kx*ex0+ky*ey0) / (kz_s)
+    
 
-    if has_H:
+    
+    TM00 = -kx*ky*Gamma 
+    TM01 = -(ky*ky*Gamma + kz_s**2)
+    TM10 = +(kx*kx*Gamma + kz_s**2)
+    TM11 = +kx*ky*Gamma
+    TM20 = -ky*kz_s
+    TM21 = +kx*kz_s
+    
+    Z0 = 376.82  # ohms (impedance of free space)
+    H_factor = n2 / (ks * kz_s * Z0)
+    
+    hx0 = (TM00*ex0+TM01*ey0) * H_factor
+    hy0 = (TM10*ex0+TM11*ey0) * H_factor
+    hz0 = (TM20*ex0+TM21*ey0) * H_factor
         
-        TM00 = -kx*ky*Gamma 
-        TM01 = -(ky*ky*Gamma + kz_s**2)
-        TM10 = +(kx*kx*Gamma + kz_s**2)
-        TM11 = +kx*ky*Gamma
-        TM20 = -ky*kz_s
-        TM21 = +kx*kz_s
-        
-        Z0 = 376.82  # ohms (impedance of free space)
-        H_factor = n2 / (ks * kz_s * Z0)
-        
-        hx0 = (TM00*ex0+TM01*ey0) * H_factor
-        hy0 = (TM10*ex0+TM11*ey0) * H_factor
-        hz0 = (TM20*ex0+TM21*ey0) * H_factor
-        
-    else:
-        Hx_final, Hy_final, Hz_final = 0.0, 0.0, 0.0
 
     Ex_final = ifft(ifftshift(ex0))
     Ey_final = ifft(ifftshift(ey0))
@@ -2302,7 +2450,7 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz, has_H=True):
 
 
 
-def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, wavelength, dz, has_H=True):
+def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     """
     Kernel for fast propagation of WPM method
 
@@ -2334,19 +2482,15 @@ def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, wavelength, dz, has_H=True):
     Ey_final = np.zeros_like(Ex, dtype=complex)
     Ez_final = np.zeros_like(Ex, dtype=complex)
 
-    if has_H:
-        Hx_final = np.zeros_like(Ex, dtype=complex)
-        Hy_final = np.zeros_like(Ex, dtype=complex)
-        Hz_final = np.zeros_like(Ex, dtype=complex)
-    else:
-        Hx_final = 0
-        Hy_final = 0
-        Hz_final = 0
+    Hx_final = np.zeros_like(Ex, dtype=complex)
+    Hy_final = np.zeros_like(Ex, dtype=complex)
+    Hz_final = np.zeros_like(Ex, dtype=complex)
+  
 
     for r, n_r in enumerate(Nr):
         for s, n_s in enumerate(Ns):
             Imz = np.array(np.logical_and(n1 == n_r, n2 == n_s))
-            E, H = FP_PWD_kernel_simple(Ex, Ey, n_r, n_s, k0, kx, wavelength, dz, has_H)
+            E, H = FP_PWD_kernel_simple(Ex, Ey, n_r, n_s, k0, kx, wavelength, dz)
 
             Ex_final = Ex_final + Imz * E[0]
             Ey_final = Ey_final + Imz * E[1]

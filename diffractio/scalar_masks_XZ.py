@@ -478,7 +478,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return self
 
     #@check_none('x', 'z', 'u', raise_exception=bool_raise_exception)
-    def repeat_structure(self,                 num_repetitions: tuple[int,int],                 position: str = 'center',                 new_field: bool = True):
+    def repeat_structure(self, num_repetitions: tuple[int,int], position: str = 'center',                 new_field: bool = True):
         """Repeat the structure (n x m) times.
 
         Args:

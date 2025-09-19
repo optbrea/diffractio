@@ -889,9 +889,12 @@ def fresnel_equations_kx(kx: NDArrayComplex, wavelength: float, n1: float, n2: f
 
     k0 = 2 * np.pi / wavelength
 
+    kx = kx.astype(complex)
+
     kz_1 = np.sqrt((n1 * k0) ** 2 - kx**2)
 
     alpha = (n2 * k0) ** 2 - kx**2
+    alpha = alpha.astype(complex)
     normal = alpha >= 0
     reflexion_total = alpha < 0
 

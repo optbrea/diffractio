@@ -118,14 +118,14 @@ class Scalar_source_X(Scalar_field_X):
 
 
     @check_none('x', raise_exception=bool_raise_exception)
-    def super_gauss_beam(self, x0: float, w0: float, z0: float,  pow: float = 2.,A: float = 1, theta: float = 0.):
-        """Supergaus beam. exp(-(|x-x0|/w0)**pow).
+    def super_gauss_beam(self, x0: float, w0: float, z0: float,  power: float = 2.,A: float = 1, theta: float = 0.):
+        """Supergaus beam. exp(-(|x-x0|/w0)**power).
 
         Args:
             x0 (float): x position of center
             w0 (float): minimum beam width
             z0 (float): position of beam width
-            pow (float): power of the super-Gaussian profile
+            power (float): power of the super-Gaussian profile
             A (float): maximum amplitude
             theta (float): angle in radians
         """
@@ -140,7 +140,7 @@ class Scalar_source_X(Scalar_field_X):
             R = 1e10
         else:
             R = -z0 * (1 + (z_rayleigh / z0)**2)
-        amplitude = A * w0 / w * np.exp(-np.abs((self.x - x0))**pow / (np.abs(w)**pow))
+        amplitude = A * w0 / w * np.exp(-np.abs((self.x - x0))**power / (np.abs(w)**power))
         phase1 = np.exp(1j * k * ((self.x - x0) * np.sin(theta)))  # rotation
         phase2 = np.exp(1j * (-k * z0 - phaseGouy + k * (self.x - x0)**2 /
                                 (2 * R)))

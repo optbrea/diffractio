@@ -469,6 +469,7 @@ def draw_edges(vector_field, plt, draw_borders: bool=True, color: str='w.', ms: 
     min_incr: float = 0.0005
     
     if draw_borders is True:
+        vector_field.borders = np.array(vector_field.borders)
         vector_field.surface_detection(1, min_incr)
         border0 = vector_field.borders[0]
         border1 = vector_field.borders[1]

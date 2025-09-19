@@ -1537,6 +1537,8 @@ class Scalar_field_XZ():
         ix, iz = (t > min_incr).nonzero()
 
         self.borders = x_new[iz], z_new[ix]
+        self.borders = np.array(self.borders)
+
 
         if has_draw:
             plt.figure()
@@ -1567,7 +1569,7 @@ class Scalar_field_XZ():
         """Draws  XZ field.
 
         Args:
-            kind (str): type of drawing: 'amplitude', 'intensity', 'phase', 'real'
+            kind (str): type of drawing: 'amplitude', 'intensity', 'phase', 'real', 'refractive_index'
             logarithm (float): If >0, intensity is scaled in logarithm
             normalize (bool): If True, max(intensity)=1
             draw_borders (bool): If True draw edges of objects

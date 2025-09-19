@@ -48,12 +48,14 @@ import scipy.ndimage as ndimage
 from scipy.interpolate import interp1d
 from scipy.signal import fftconvolve
 
+from diffractio.scalar_masks_XY import Scalar_mask_XY
+
 
 from .__init__ import degrees, np, plt, sp, um
 from .config import bool_raise_exception
 from .utils_typing import npt, Any, NDArray,  NDArrayFloat, NDArrayComplex
 from .utils_math import nearest, nearest2
-from .utils_optics import roughness_1D
+from .utils_optics import refractive_index, roughness_1D
 from .utils_dxf import load_dxf
 from .utils_common import check_none
 from .scalar_fields_XZ import Scalar_field_XZ
@@ -1313,6 +1315,56 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             rotation_point, refractive_index, Fs, angle, v_globals={}
         )
         return ipasa
+
+
+
+    def square_circle(self, r0: tuple, R1: float, R2: float, s: float, refractive_index: complex | float | str, angle: float = 0*degrees, rotation_point: tuple[float, float] | None = None):
+        """ Between circle and square, depending on fill factor s
+
+        s=0 circle, s=1 square
+
+        Args:
+            r0 (float, float): center of square_circle
+            R1 (float): radius of first axis
+            R2 (float): radius of first axis
+            s (float): [0-1] shape parameter: s=0 circle, s=1 square
+            refractive_index (float, str): refractive index , for example: 1.5 + 1.0j
+            angle (float): angle of rotation in radians
+
+        Reference:
+            M. Fernandez Guasti, M. De la Cruz Heredia "diffraction pattern of a circle/square aperture" J.Mod.Opt. 40(6) 1073-1080 (1993)
+
+        """
+
+        x0, z0 = r0
+        if rotation_point is None:
+            rotation_point = r0
+
+
+
+        cond = "(Xrot**2 / {R1}**2 + Zrot**2 / {R2}**2 - {s}**2 * Xrot**2 * Zrot**2 / ({R1}**2 * {R2}**2)) < 1".format(
+            R1=R1, R2=R2, s=s
+        )
+
+        Fs = [cond]
+
+  
+        ipasa1 = self.object_by_surfaces(
+            rotation_point, refractive_index, Fs, angle, v_globals={}
+        )
+
+        t1 = Scalar_mask_XZ(x=self.x, z=self.z, wavelength=self.wavelength)
+        t1.square(r0=(x0,z0), size=(3 * R1, 3 * R2), angle=angle, refractive_index=2)
+        ipasa2 = t1.n > self.n_background
+        ipasa2 = np.logical_not(ipasa2)
+
+        self.n[ipasa2] = self.n_background
+
+        ipasa = ipasa1 * ipasa2
+
+
+        return ipasa1
+
 
 
     def ronchi_grating(

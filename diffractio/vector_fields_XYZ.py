@@ -332,7 +332,7 @@ class Vector_field_XYZ():
         # return edges
 
 
-    def FP_WPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, has_H=True, verbose: bool = False):
+    def FP_WPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, verbose: bool = False):
         """
         WPM Method. 'schmidt methodTrue is very fast, only needs discrete number of refractive indexes'
 
@@ -341,7 +341,6 @@ class Vector_field_XYZ():
             has_edges (bool): If True absorbing edges are used.
             pow_edge (float): If has_edges, power of the supergaussian
             matrix (bool): if True returns a matrix else
-            has_H (bool): If True, it returns magnetic field H.
             verbose (bool): If True prints information
 
         References:
@@ -365,10 +364,9 @@ class Vector_field_XYZ():
         self.Ex[:,:,0] = self.Ex0
         self.Ey[:,:,0] = self.Ey0
 
-        if has_H:
-            self.Hx = np.zeros_like(self.Ex)
-            self.Hy = np.zeros_like(self.Ex)
-            self.Hz = np.zeros_like(self.Ex)
+        self.Hx = np.zeros_like(self.Ex)
+        self.Hy = np.zeros_like(self.Ex)
+        self.Hz = np.zeros_like(self.Ex)
 
         kx = get_k(x, flavour="+")
         ky = get_k(y, flavour="+")
@@ -426,18 +424,16 @@ class Vector_field_XYZ():
             self.Ey[:,:,j] = self.Ey[:,:,j] + E_step[1] * filter_edge
             self.Ez[:,:,j] = E_step[2] * filter_edge
 
-            if has_H:
-                self.Hx[:,:,j] = H_step[0] * filter_edge
-                self.Hy[:,:,j] = H_step[1] * filter_edge
-                self.Hz[:,:,j] = H_step[2] * filter_edge
+            self.Hx[:,:,j] = H_step[0] * filter_edge
+            self.Hy[:,:,j] = H_step[1] * filter_edge
+            self.Hz[:,:,j] = H_step[2] * filter_edge
 
         # at the initial point the Ez field is not computed.
         self.Ez[:,:,0] = self.Ez[:,:,1]
         
-        if has_H:
-            self.Hx[:,:,0] = self.Hx[:,:,1]
-            self.Hy[:,:,0] = self.Hy[:,:,1]
-            self.Hz[:,:,0] = self.Hz[:,:,1]
+        self.Hx[:,:,0] = self.Hx[:,:,1]
+        self.Hy[:,:,0] = self.Hy[:,:,1]
+        self.Hz[:,:,0] = self.Hz[:,:,1]
 
         t2 = time.time_ns()
         if verbose is True:
@@ -730,7 +726,7 @@ class Vector_field_XYZ():
 
 
 
-def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True):
+def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz):
     """
     Kernel for fast propagation of WPM method
 
@@ -743,7 +739,6 @@ def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True
         kx (np.array): transversal wavenumber
         wavelength (float): wavelength
         dz (float): increment in distances: z[1]-z[0]
-        has_H (bool, optional): If True computes magnetic field H. Defaults to True.
 
     Returns:
         E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.
@@ -762,19 +757,15 @@ def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True
     Ey_final = np.zeros_like(Ex, dtype=complex)
     Ez_final = np.zeros_like(Ex, dtype=complex)
 
-    if has_H:
-        Hx_final = np.zeros_like(Ex, dtype=complex)
-        Hy_final = np.zeros_like(Ex, dtype=complex)
-        Hz_final = np.zeros_like(Ex, dtype=complex)
-    else:
-        Hx_final = 0
-        Hy_final = 0
-        Hz_final = 0
+    Hx_final = np.zeros_like(Ex, dtype=complex)
+    Hy_final = np.zeros_like(Ex, dtype=complex)
+    Hz_final = np.zeros_like(Ex, dtype=complex)
+
 
     for r, n_r in enumerate(Nr):
         for s, n_s in enumerate(Ns):
             Imz = np.array(np.logical_and(n1 == n_r, n2 == n_s))
-            E, H = FP_PWD_kernel_simple(Ex, Ey, n_r, n_s, k0, kx, ky, wavelength, dz, has_H)
+            E, H = FP_PWD_kernel_simple(Ex, Ey, n_r, n_s, k0, kx, ky, wavelength, dz)
 
             Ex_final = Ex_final + Imz * E[0]
             Ey_final = Ey_final + Imz * E[1]
@@ -785,7 +776,7 @@ def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True
     return (Ex_final, Ey_final, Ez_final), (Hx_final, Hy_final, Hz_final)
 
 
-def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True):
+def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz):
     """Step for Plane wave decomposition (PWD) algorithm.
 
     Args:
@@ -797,7 +788,6 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True)
         kx (np.array): transversal wavenumber
         wavelength (float): wavelength
         dz (float): increment in distances: z[1]-z[0]
-        has_H (bool, optional): If True computes magnetic field H. Defaults to True.
 
     Returns:
         E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.
@@ -849,24 +839,21 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, ky, wavelength, dz, has_H=True)
     ey0 = T10 * Exk + T11 * Eyk 
     ez0 = - (KX*ex0+KY*ey0) / (kz_s)
     
-    if has_H:
-        # thesis Fertig 2011 (3.40) pág 66 I do not feel confident yet
-        TM00 = -KX*KY*Gamma 
-        TM01 = -(KY*KY*Gamma + kz_s**2)
-        TM10 = +(KX*KX*Gamma + kz_s**2)
-        TM11 = +KX*KY*Gamma
-        TM20 = -KY*kz_s
-        TM21 = +KX*kz_s
+    # thesis Fertig 2011 (3.40) pág 66 I do not feel confident yet
+    TM00 = -KX*KY*Gamma 
+    TM01 = -(KY*KY*Gamma + kz_s**2)
+    TM10 = +(KX*KX*Gamma + kz_s**2)
+    TM11 = +KX*KY*Gamma
+    TM20 = -KY*kz_s
+    TM21 = +KX*kz_s
         
-        Z0 = 376.82  # ohms (impedance of free space)
-        H_factor = n2 / (ks * kz_s * Z0)
+    Z0 = 376.82  # ohms (impedance of free space)
+    H_factor = n2 / (ks * kz_s * Z0)
+    
+    hx0 = (TM00*ex0+TM01*ey0) * H_factor
+    hy0 = (TM10*ex0+TM11*ey0) * H_factor
+    hz0 = (TM20*ex0+TM21*ey0) * H_factor
         
-        hx0 = (TM00*ex0+TM01*ey0) * H_factor
-        hy0 = (TM10*ex0+TM11*ey0) * H_factor
-        hz0 = (TM20*ex0+TM21*ey0) * H_factor
-        
-    else:
-        Hx_final, Hy_final, Hz_final = 0.0, 0.0, 0.0
 
     Ex_final = ifft2(ifftshift(ex0))
     Ey_final = ifft2(ifftshift(ey0))

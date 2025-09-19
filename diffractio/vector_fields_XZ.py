@@ -549,6 +549,9 @@ class Vector_field_XZ():
             kind (str): 'E', 'H', 'EH', 'fields', 'intensity', 'intensities', 'phases', 'poynting_vector', 
                         'poynting_vector_averaged',  'poynting_total',  'energy_density', 'irradiance', 
                         'stokes', 'params_ellipse'
+            mode (str): 'modulus', 'real', 'imag', 'phase', 'dB'
+            verbose (bool): If True prints information
+            **kwargs: additional arguments for get_vector
 
         Returns:
             Vector_field_X: (Ex, Ey, Ez),
@@ -581,7 +584,7 @@ class Vector_field_XZ():
 
     @check_none('x', 'z', raise_exception=bool_raise_exception)
     def FP_WPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, 
-               has_H=True, verbose: bool = False):
+                verbose: bool = False):
         """
         WPM Method. 'schmidt methodTrue is very fast, only needs discrete number of refractive indexes'
 
@@ -589,7 +592,6 @@ class Vector_field_XZ():
             has_edges (bool): If True absorbing edges are used.
             pow_edge (float): If has_edges, power of the supergaussian
             matrix (bool): if True returns a matrix else
-            has_H (bool): If True, it returns magnetic field H.
             verbose (bool): If True prints information
 
         References:
@@ -608,10 +610,9 @@ class Vector_field_XZ():
         self.Ex[0,:] = self.Ex0
         self.Ey[0,:] = self.Ey0
 
-        if has_H:
-            self.Hx = np.zeros_like(self.Ex)
-            self.Hy = np.zeros_like(self.Ex)
-            self.Hz = np.zeros_like(self.Ex)
+        self.Hx = np.zeros_like(self.Ex)
+        self.Hy = np.zeros_like(self.Ex)
+        self.Hz = np.zeros_like(self.Ex)
 
         kx = get_k(x, flavour="+")
 
@@ -657,20 +658,18 @@ class Vector_field_XZ():
             self.Ey[j, :] = self.Ey[j, :] + E_step[1] * filter_edge
             self.Ez[j, :] = E_step[2] * filter_edge
 
-            if has_H:
-                self.Hx[j, :] = H_step[0] * filter_edge
-                self.Hy[j, :] = H_step[1] * filter_edge
-                self.Hz[j, :] = H_step[2] * filter_edge
+            self.Hx[j, :] = H_step[0] * filter_edge
+            self.Hy[j, :] = H_step[1] * filter_edge
+            self.Hz[j, :] = H_step[2] * filter_edge
 
         # at the initial point the Ez field is not computed.
         self.Ex[0,:] = self.Ex[1,:]
         self.Ey[0,:] = self.Ey[1,:]
         self.Ez[0,:] = self.Ez[1,:]
         
-        if has_H:
-            self.Hx[0,:] = self.Hx[1,:]
-            self.Hy[0,:] = self.Hy[1,:]
-            self.Hz[0,:] = self.Hz[1,:]
+        self.Hx[0,:] = self.Hx[1,:]
+        self.Hy[0,:] = self.Hy[1,:]
+        self.Hz[0,:] = self.Hz[1,:]
 
         t2 = time.time_ns()
         if verbose is True:
@@ -691,266 +690,6 @@ class Vector_field_XZ():
 
         return intensity
 
-
-    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
-    # def Poynting_vector(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
-    #     "Poynting Vector"
-
-    #     Sx = np.real(self.Ey * self.Hz - self.Ez * self.Hy)
-    #     Sy = np.real(self.Ez * self.Hx - self.Ex * self.Hz)
-    #     Sz = np.real(self.Ex * self.Hy - self.Ey * self.Hx)
-
-    #     cmap=CONF_DRAWING["color_amplitude_sign"]
-
-
-    #     S_max = np.max((Sx, Sy, Sz))
-    #     S_min = np.min((Sx, Sy, Sz))
-    #     S_lim = np.max((abs(S_max), np.abs(S_min)))
-    #     z0 = self.z
-    #     x0 = self.x
-    #     if has_draw:
-    #         tx, ty = rcParams["figure.figsize"]
-
-    #         dims = np.shape(Sx)
-    #         num_dims = len(dims)
-    #         if num_dims == 1:
-    #             z0 = self.z
-    #             plt.figure(figsize=(3 * tx, 1 * ty))
-    #             plt.subplot(1, 3, 1)
-    #             plt.plot(self.z, Sx)
-    #             plt.ylim(-S_lim, S_lim)
-    #             plt.title(r"$S_x$")
-
-    #             plt.subplot(1, 3, 2)
-    #             plt.plot(self.z, Sy)
-    #             plt.title(r"$S_y$")
-    #             plt.ylim(-S_lim, S_lim)
-
-    #             plt.subplot(1, 3, 3)
-    #             plt.plot(self.z, Sz)
-    #             plt.title(r"$S_z$")
-    #             plt.ylim(-S_lim, S_lim)
-
-    #             plt.suptitle("Pointing vector")
-
-    #         elif num_dims == 2:
-    #             fig, axs = plt.subplots(nrows=1, ncols=3, sharex=True,  figsize=(2 * tx, 1 * ty))
-    #             plt.subplot(1, 3, 1)
-    #             plt.title("")
-    #             id_fig, ax, IDimage = draw2D_xz(Sx, z0, x0, axs[0], xlabel=r'z ($\mu$m)', ylabel=r'x ($\mu$m)', title=r"$S_x$", cmap=cmap)
-    #             plt.axis(scale)                
-    #             plt.axis(scale)
-    #             draw_edges(self, plt,  draw_borders,  **kwargs)
-    #             IDimage.set_clim(-S_lim, S_lim)
-    
-    #             plt.subplot(1, 3, 2)
-    #             plt.title(r"$S_y$")
-    #             id_fig, ax, IDimage = draw2D_xz(Sy, z0, x0, axs[1], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_y$", cmap=cmap)
-    #             plt.axis(scale)
-    #             draw_edges(self, plt,  draw_borders, **kwargs)
-    #             IDimage.set_clim(-S_lim, S_lim)
-    
-    #             plt.subplot(1, 3, 3)
-    #             id_fig, ax, IDimage = draw2D_xz(Sz, z0, x0,axs[2], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_z$", cmap=cmap)
-    #             plt.title(r"$S_z$")
-    #             plt.axis(scale)
-    #             draw_edges(self, plt,  draw_borders, **kwargs)
-    #             IDimage.set_clim(-S_lim, S_lim)
-    #             # axes[2].set_axis_off()
-
-    #             cb_ax = fig.add_axes([0.1, 0, 0.8, 0.05])
-    #             cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
-
-    #     plt.tight_layout()        
-    #     return Sx, Sy, Sz
-
-
-
-    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
-    # def Poynting_vector_averaged(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
-    #     "Averaged Poynting Vector"
-
-    #     Sx = np.real(self.Ey * self.Hz.conjugate() - self.Ez * self.Hy.conjugate()).squeeze()
-    #     Sy = np.real(self.Ez * self.Hx.conjugate() - self.Ex * self.Hz.conjugate()).squeeze()
-    #     Sz = np.real(self.Ex * self.Hy.conjugate() - self.Ey * self.Hx.conjugate()).squeeze()
-
-    #     cmap=CONF_DRAWING["color_amplitude_sign"]
-
-    #     # if possible elliminate
-    #     # Sz[0, :] = Sz[1, :]
-
-    #     S_max = np.max((Sx, Sy, Sz))
-    #     S_min = np.min((Sx, Sy, Sz))
-    #     S_lim = np.max((abs(S_max), np.abs(S_min)))
-        
-    #     if has_draw:
-    #         tx, ty = rcParams["figure.figsize"]
-
-    #         dims = np.shape(Sx)
-    #         num_dims = len(dims)
-    #         if num_dims == 1:
-    #             z0 = self.z
-    #             plt.figure(figsize=(3 * tx, 1 * ty))
-    #             plt.subplot(1, 3, 1)
-    #             plt.plot(self.z, Sx)
-    #             plt.ylim(-S_lim, S_lim)
-    #             plt.title(r"$S_x$")
-
-    #             plt.subplot(1, 3, 2)
-    #             plt.plot(self.z, Sy)
-    #             plt.title(r"$S_y$")
-    #             plt.ylim(-S_lim, S_lim)
-
-    #             plt.subplot(1, 3, 3)
-    #             plt.plot(self.z, Sz)
-    #             plt.title(r"$S_z$")
-    #             plt.ylim(-S_lim, S_lim)
-
-    #             plt.suptitle("Average Pointing vector")
-
-    #         elif num_dims == 2:
-    #             z0 = self.z
-    #             x0 = self.x
-
-    #             fig, axs = plt.subplots(nrows=1, ncols=3, sharex=True,
-    #                                      figsize=(2 * tx, 1 * ty))
-    #             plt.subplot(1, 3, 1)
-    #             plt.title("")
-    #             id_fig, ax, IDimage = draw2D_xz(Sx, z0, x0, axs[0], xlabel=r'z ($\mu$m)', ylabel=r'x ($\mu$m)', title=r"$S_x$", cmap=cmap)
-    #             plt.axis(scale)                
-    #             plt.axis(scale)
-    #             draw_edges(self, plt,  draw_borders,  **kwargs)
-    #             IDimage.set_clim(-S_lim, S_lim)
-    
-    #             plt.subplot(1, 3, 2)
-    #             plt.title(r"$S_y$")
-    #             id_fig, ax, IDimage = draw2D_xz(Sy, z0, x0, axs[1], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_y$", cmap=cmap)
-    #             plt.axis(scale)
-    #             draw_edges(self, plt,  draw_borders, **kwargs)
-    #             IDimage.set_clim(-S_lim, S_lim)
-    
-    #             plt.subplot(1, 3, 3)
-    #             id_fig, ax, IDimage = draw2D_xz(Sz, z0, x0,axs[2], xlabel=r'z ($\mu$m)', ylabel='', title=r"$S_z$", cmap=cmap)
-    #             plt.title(r"$S_z$")
-    #             plt.axis(scale)
-    #             draw_edges(self, plt,  draw_borders, **kwargs)
-    #             IDimage.set_clim(-S_lim, S_lim)
-    #             # axes[2].set_axis_off()
-
-    #             cb_ax = fig.add_axes([0.1, 0, 0.8, 0.05])
-    #             cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
-
-    #     plt.tight_layout()
-    #     return Sx, Sy, Sz
-
-
-    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
-    # def Poynting_total(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
-
-    #     Sx, Sy, Sz = self.Poynting_vector_averaged(has_draw=False)
-
-    #     S = np.sqrt(np.abs(Sx)**2 + np.abs(Sy)**2 + np.abs(Sz)**2)
-
-    #     if has_draw:
-    #         dims = np.shape(Sx)
-    #         num_dims = len(dims)
-    #         if num_dims == 1:
-    #             plt.figure()
-    #             plt.subplot(1, 1, 1)
-    #             plt.plot(self.z, S)
-
-    #             plt.suptitle(r"$S_{total}$")
-    #         elif num_dims == 2:
-
-    #             fig, axs = plt.subplots(nrows=1, ncols=1)
-                
-    #             id_fig, ax, IDimage = draw2D_xz(
-    #                 S, self.z, self.x, ax=axs, xlabel=r"z $(\mu m)$", ylabel=r"x $(\mu m)$", cmap=CONF_DRAWING["color_intensity"], title=r'$S_{total}$')
-    #             plt.axis(scale)
-    #             draw_edges(self, plt, draw_borders, **kwargs)
-                
-    #             IDimage.set_clim(vmin=0)                
-    #             cb_ax = fig.add_axes([0.2, 0, 0.6, 0.025])
-    #             cbar = fig.colorbar(id_fig, cmap=CONF_DRAWING["color_intensity"], cax=cb_ax, orientation='horizontal', shrink=0.5)
-    #             plt.tight_layout()
-                
-    #     plt.tight_layout()
-    #     return S
-
-
-    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
-    # def energy_density(self, has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):
-
-    #     epsilon = self.n**2
-    #     permeability = 4*np.pi*1e-7
-
-    #     U = epsilon * np.real(np.abs(self.Ex)**2 + np.abs(self.Ey)**2 + np.abs(self.Ez)**2) + permeability * (np.abs(self.Hx)**2 + np.abs(self.Hy)**2 + np.abs(self.Hz)**2)
-
-    #     if has_draw:
-    #         dims = np.shape(U)
-    #         num_dims = len(dims)
-    #         if num_dims == 1:
-    #             plt.figure()
-    #             plt.plot(self.z, np.real(U))
-
-    #         elif num_dims == 2:
-    #             id_fig, ax, IDimage = draw2D_xz(np.real(U), self.z, self.x, title='energy_density', cmap=CONF_DRAWING["color_intensity"])
-    #             plt.axis(scale)
-    #             draw_edges(self, plt, draw_borders, **kwargs)
-    #             IDimage.set_clim(0)
-
-    #     plt.tight_layout()
-    #     return U
-
-
-    # @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
-    # def irradiance(self, kind: str | tuple[float, float, float] = "modulus", has_draw: bool = False, draw_borders: bool = True,  scale: str = 'scaled', **kwargs):# -> Any | Any:
-    #     """Irradiance of the field.
-        
-        
-    #     The irradiance is defined as a scalar product between the Poynting vector and the normal vector to the surface.
-    #     However here we determine the irradiance as the modulus of the Poynting vector ("modulus") or the z component of the Poynting vector ("Sz")
-
-
-    #     Args:
-    #         kind (str | tuple[float, float, float], optional): "Sz" or "modulus". Defaults to 'Sz'.
-    #         has_draw (bool, optional): _description_. Defaults to False.
-    #         axis (str, optional): _description_. Defaults to 'scaled'.
-
-    #     Returns:
-    #         _type_: _description_
-    #     """
-
-    #     epsilon = self.n ** 2
-    #     permeability = 4 * np.pi * 1e-7
-
-    #     Sx, Sy, Sz = self.Poynting_vector_averaged(has_draw=False)
-        
-    #     if kind == 'modulus':
-    #         irradiance = np.sqrt(Sx**2 + Sy**2 + Sz**2)
-            
-    #     elif kind == 'Sz':
-    #         irradiance = Sz
-    #     elif isinstance(kind, (list, tuple, np.ndarray)):
-    #         kind = np.array(kind)
-    #         kind = kind/np.linalg.norm(kind)
-    #         irradiance = kind[0] * Sx + kind[1] * Sy + kind[2] * Sz 
-
-    #     if has_draw:
-    #         dims = np.shape(irradiance)
-    #         num_dims = len(dims)
-    #         if num_dims == 1:
-    #             plt.figure()
-    #             plt.plot(self.z, irradiance)
-
-    #         elif num_dims == 2:
-    #             id_fig, ax, IDimage = draw2D_xz(irradiance, self.z, self.x, title='irradiance', cmap=CONF_DRAWING["color_intensity"])
-    #             plt.axis(scale)
-    #             draw_edges(self, plt, draw_borders, **kwargs)
-    #             IDimage.set_clim(0, irradiance.max())
-
-    #     plt.tight_layout()
-    #     return irradiance
     
     def check_energy(self, kind = 'all', has_draw : bool = True):
         """
@@ -1053,13 +792,15 @@ class Vector_field_XZ():
         """Draws electromagnetic field
 
         Args:
-            kind (str):  'intensity', 'intensities', intensities_rz, 'phases', fields', 'stokes'
+            kind (str):  'intensity', 'intensities', intensities_rz, 'phases', fields', 'stokes', 'EH', 'E2H2', 'poynting_vector', 'poynting_vector_averaged',  'poynting_total',  'energy_density', 'irradiance', 'ellipses', 'param_ellipses', 'refractive_index', 'all'
             logarithm (float): If >0, intensity is scaled in logarithm
             normalize (bool): If True, max(intensity)=1
             cut_value (float): If not None, cuts the maximum intensity to this value
-            filename (str): if not '' stores drawing in file,
-            draw (bool): If True, it draws the field. Defaults to True.
+            draw_borders (bool): If True, draws the borders of the structure
+            filename (str): if not '' stores drawing in file
+            scale (str): 'scaled', 'physical'
             percentage_intensity (None or number): If None it takes from CONF_DRAWING['percentage_intensity'], else uses this value
+            draw (bool): If True, it draws the field. Defaults to True.
 
 
         """
@@ -2341,7 +2082,6 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
         kx (np.array): transversal wavenumber
         wavelength (float): wavelength
         dz (float): increment in distances: z[1]-z[0]
-        has_H (bool, optional): If True computes magnetic field H. Defaults to True.
 
     Returns:
         E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.
@@ -2368,60 +2108,41 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     
 
     P = np.exp(1j * kz_s * dz)
+    Pprima = P / (k_perp2*kr*ks+1e-40)
     Gamma = kz_r*kz_s + kz_s * k_perp2 / kz_r
     
 
     # Fresnel coefficients
     t_TM, t_TE, _, _ = fresnel_equations_kx(kx, wavelength, n1, n2, [1, 1, 0, 0], has_draw=False)
 
-    T00 = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks+1e-40)
-    T01 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-40)
-    T10 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks+1e-40)
-    T11 = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks+1e-40)
+    t_TM = t_TM.astype(np.complex128)
+    t_TE = t_TE.astype(np.complex128)
+ 
+    
+    T00 = Pprima * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) 
+    T01 = Pprima * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) 
+    T10 = Pprima * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks)
+    T11 = Pprima * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) 
 
     # Simpler since ky = 0, but keep to translate to 3D
     
-    # T00 = P * (t_TM*kx**2*Gamma) / (k_perp2*kr*ks) 
+    # T00 = Pprima * (t_TM*kx**2*Gamma) / (k_perp2*kr*ks) 
     # T01 = np.zeros_like(kx) 
     # T10 = np.zeros_like(kx)  
-    # T11 = P * (t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
+    # T11 = Pprima * (t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
+    
+   
+    
+    ex0 = T00 * Exk + T01 * Eyk
+    ey0 = T10 * Exk + T11 * Eyk 
+    ez0 = - (kx*ex0+ky*ey0) / kz_s
+    
+    # ex0 = T00 * Exk 
+    # ey0 = T11 * Eyk 
+    # ez0 = - (kx*ex0+ky*ey0) / kz_s
     
 
-    
-    option = 2 # TODO: fix better
-    
-    if option == 1:
-        pass
-        # T00[nan_indices]=T00[nan_indices[0]-1]
-        # T01[nan_indices]=T01[nan_indices[0]-1]
-        # T10[nan_indices]=T10[nan_indices[0]-1]
-        # T11[nan_indices]=T11[nan_indices[0]-1] 
-        
-    elif option == 2:
-        #if len(nan_indices)>0:
-        T00_b = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks) 
-        T01_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-        T10_b = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-        T11_b = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
-        
-            # T00[nan_indices]=T00_b[nan_indices]
-            # T01[nan_indices]=T01_b[nan_indices]
-            # T10[nan_indices]=T10_b[nan_indices]
-            # T11[nan_indices]=T11_b[nan_indices] 
-
-            # count_nan = np.isnan(nan_indices).sum()
-            # print('Number of NaN after fix:', count_nan)
-    
-    # ex0 = T00 * Exk + T01 * Eyk
-    # ey0 = T10 * Exk + T11 * Eyk 
-    # ez0 = - (kx*ex0+ky*ey0) / (kz_r)
-    
-    ex0 = T00 * Exk 
-    ey0 = T11 * Eyk 
-    ez0 = - (kx*ex0+ky*ey0) / (kz_s)
-    
-
-    
+    # thesis Fertig 2011 (3.40) pág 66 I do not feel confident yet
     TM00 = -kx*ky*Gamma 
     TM01 = -(ky*ky*Gamma + kz_s**2)
     TM10 = +(kx*kx*Gamma + kz_s**2)
@@ -2463,7 +2184,6 @@ def FP_WPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
         kx (np.array): transversal wavenumber
         wavelength (float): wavelength
         dz (float): increment in distances: z[1]-z[0]
-        has_H (bool, optional): If True computes magnetic field H. Defaults to True.
 
     Returns:
         E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.

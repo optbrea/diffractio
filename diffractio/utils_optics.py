@@ -984,6 +984,15 @@ def fresnel_equations_kx(kx: NDArrayComplex, wavelength: float, n1: float, n2: f
             axs[1].set_xlabel(r"$k_x$")
             axs[1].set_title(r"imag")
 
+    if t_TM is not None:
+        t_TM = t_TM.astype(np.complex128)
+    if t_TE is not None:  
+        t_TE = t_TE.astype(np.complex128)
+    if r_TE is not None:
+        r_TE = r_TE.astype(np.complex128)
+    if r_TM is not None:
+        r_TM = r_TM.astype(np.complex128)
+
     return t_TM, t_TE, r_TM, r_TE  # parallel, perpendicular
 
 

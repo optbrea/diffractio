@@ -275,6 +275,177 @@ class Vector_field_X():
         self.Ez = self.Ez / maximum
 
 
+    def VCZT(self, z, xout=None, yout=None, verbose: bool = False):
+        """Vector Z Chirped Transform algorithm (VCZT)
+
+        The code for this algoritm is based on "Hu, Yanlei, et al. "Efficient full-path optical calculation of scalar and 
+        vector diffraction using the Bluestein method." Light: Science & Applications 9.1 (2020): 119."
+        
+        However, the convolution Kernel has been changed to Rayleigh-Sommerfeld.
+
+        Args:
+            z (float): diffraction distance
+            xout (np.array): x array with positions of the output plane
+            yout (np.array): y array with positions of the output plane
+            verbose (bool): If True prints some information
+
+        Returns:
+            E_out (variable): Output field. It depends on the size of xout, yout, and z.
+
+        References:
+            - [Light: Science and Applications, 9(1), (2020)] 
+        """
+        if xout is None:
+            xout = self.x
+
+        if yout is None:
+            yout = 0
+
+
+
+        k = 2 * np.pi / self.wavelength
+
+        if isinstance(z, (float, int)):
+            num_z = 1
+            # print("z = 0 dim")
+        else:
+            num_z = len(z)
+            # print("z = 1 dim")
+
+        if isinstance(xout, (float, int)):
+            num_x = 1
+            # print("x = 0 dim")
+            xstart = xout
+            xend = xout
+        else:
+            num_x = len(xout)
+            # print("x = 1 dim")
+
+            xstart = xout[0]
+            xend = xout[-1]
+
+        if isinstance(yout, (float, int)):
+            num_y = 1
+            # print("y = 0 dim")
+            ystart = yout
+            yend = yout
+        else:
+            num_y = len(yout)
+            # print("y = 1 dim")
+
+            ystart = yout[0]
+            yend = yout[-1]
+
+        e0xm, e0ym, _ = self.get('E')
+        e0x = Scalar_field_X(self.x, self.wavelength)
+        e0x.u = e0xm
+        e0y = Scalar_field_X(self.x, self.wavelength)
+        e0y.u = e0ym
+        e0z = Scalar_field_X(self.x, self.wavelength)
+        e0z.u = np.zeros_like(e0x.u)
+
+        if num_z == 1:
+            r = np.sqrt(self.x**2 +  z**2)
+            e0z_u = e0x.u * self.x / r 
+            e0z_u = e0z_u * z / r
+            e0z.u = e0z_u
+
+            e0x = e0x.CZT(z, xout, yout)
+            e0y = e0y.CZT(z, xout, yout)
+            e0z = e0z.CZT(z, xout, yout)
+
+            if num_x == 1 and num_y == 1:
+                return e0x, e0y, e0z
+
+            elif num_x > 1 and num_y == 1:
+                from diffractio.vector_fields_X import Vector_field_X
+                E_out = Vector_field_X(xout, self.wavelength)
+                E_out.Ex = e0x.u
+                E_out.Ey = e0y.u
+                E_out.Ez = e0z.u
+                return E_out
+            elif num_x == 1 and num_y > 1:
+                from diffractio.vector_fields_X import Vector_field_X
+                E_out = Vector_field_X(xout, self.wavelength)
+                E_out.Ex = e0x.u
+                E_out.Ey = e0y.u
+                E_out.Ez = e0z.u
+                return E_out
+            elif num_x > 1 and num_y > 1:
+                from diffractio.vector_fields_XY import Vector_field_XY
+                E_out = Vector_field_XY(xout, yout, self.wavelength)
+                E_out.Ex = e0x.u
+                E_out.Ey = e0y.u
+                E_out.Ez = e0z.u
+                return E_out
+
+        elif num_z > 1:
+            if verbose is True:
+                print("1/3", end='\r')
+            e0x_zs = e0x.CZT(z, xout, yout)
+            if verbose is True:
+                print("2/3", end='\r')
+            e0y_zs = e0y.CZT(z, xout, yout)
+            if verbose is True:
+                print("3/3", end='\r')
+            e0z_zs = e0x_zs.duplicate()
+
+            u_zs = np.zeros_like(e0x_zs.u)
+
+            for i, z_now in enumerate(z):
+                if verbose:
+                    print("{}/{}".format(i, num_z), end='\r')
+
+                r = np.sqrt(self.x**2 +  z_now**2)
+                e0z_u = e0x.u * self.x / r 
+                e0z_u = e0z_u * z_now / r
+                e0z.u = e0z_u
+
+                e0z_u = e0z.CZT(z_now, xout, yout)
+
+                if num_x == 1 and num_y == 1:
+                    e0z_zs.u[i] = e0z_u
+
+                elif num_x > 1 and num_y == 1:
+                    e0z_zs.u[i, :] = e0z_u.u
+                elif num_x > 1 and num_y > 1:
+                    e0z_zs.u[:, :, i] = e0z_u.u
+
+            if num_x == 1 and num_y == 1:
+                from diffractio.vector_fields_Z import Vector_field_Z
+                E_out = Vector_field_Z(z, self.wavelength)
+                E_out.Ex = e0x_zs.u
+                E_out.Ey = e0y_zs.u
+                E_out.Ez = e0z_zs.u
+                return E_out
+
+            elif num_x > 1 and num_y == 1:
+                from diffractio.vector_fields_XZ import Vector_field_XZ
+                E_out = Vector_field_XZ(xout, z, self.wavelength)
+                E_out.Ex = e0x_zs.u
+                E_out.Ey = e0y_zs.u
+                E_out.Ez = e0z_zs.u
+                return E_out
+
+            elif num_x == 1 and num_y > 1:
+                from diffractio.vector_fields_XZ import Vector_field_XZ
+                E_out = Vector_field_XZ(yout, z, self.wavelength)
+                E_out.Ex = e0x_zs.u
+                E_out.Ey = e0y_zs.u
+                E_out.Ez = e0z_zs.u
+                return E_out
+
+            elif num_x > 1 and num_y > 1:
+                from diffractio.vector_fields_XYZ import Vector_field_XYZ
+                E_out = Vector_field_XYZ(xout, yout, z, self.wavelength)
+                E_out.Ex = e0x_zs.u
+                E_out.Ey = e0y_zs.u
+                E_out.Ez = e0z_zs.u
+                return E_out
+            
+
+
+
     @check_none('x', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def draw(self,
              kind: Draw_Vector_X_Options = 'intensity',

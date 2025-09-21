@@ -49,7 +49,7 @@ def get_vector(cls, kind: get_vector_options, mode='modulus', **kwargs):
 
     Args:
         kind (str): 'fields', 'intensity', 'intensities', 'phases', 'poynting_vector', 'poynting_vector_averaged', 
-        'poynting_total', 'energy_density', 'irradiance', 'stokes', 'params_ellipse', 
+        'poynting_total', 'energy_density', 'irradiance', 'stokes', 'params_ellipse', 'directions'
 
     Returns:
         Vector_field_X: (Ex, Ey, Ez),
@@ -148,7 +148,12 @@ def get_vector(cls, kind: get_vector_options, mode='modulus', **kwargs):
         theta = 0.5 * np.angle(L)
         h = np.sign(S3)
         return A, B, theta, h
-
+    
+    elif kind == 'directions':
+        Sx, Sy, Sz = cls.get('poynting_vector_averaged')
+        direction = np.arctan2(Sx, Sz)
+        return direction
+    
     else:
         print("The parameter '{}'' in .get(kind='') is wrong. Use one of this: {}".format(kind, get_vector_options))
 

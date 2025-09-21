@@ -7,10 +7,8 @@ The algorithms implemented for vector propagation are:
 * Vector Rayleigh-Sommerfeld (VRS).
 * Vector Chirped z-transform (VCZT).
 * Fast Polarized Wave Propagation Method (FPWPM).
+*
 
-**Vector Fast Fourier Transform (VFFT)**
-
-- todo
 
 
 **Vector Rayleigh-Sommerfeld (VRS)**
@@ -29,8 +27,14 @@ The VRS method propagates (Ex,Ey,Ez) fields offering the advantage of significan
 
 * M.Wende, J. Drozella, A. Toulouse, A.M. Herkommer (2022).   Fast algorithm for the simulation of 3D-printed microoptics based on the vector wave propagation method," Opt. Express 30(22), 40161-40173 https://doi.org/10.1364/OE.469178
 
- It is an efficient method for vector wave optical simulations of microoptics. The FPWPM is capable of handling comparably large simulation volumes while maintaining quick runtime.  By considering polarization in simulations, the FPWPM facilitates the analysis of optical elements which employ this property of electromagnetic waves as a feature in their optical design, e.g., diffractive elements, gratings, or optics with high angle of incidence like high numerical aperture lenses.
+    It is an efficient method for vector wave optical simulations of microoptics. The FPWPM is capable of handling comparably large simulation volumes while maintaining quick runtime.  By considering polarization in simulations, the FPWPM facilitates the analysis of optical elements which employ this property of electromagnetic waves as a feature in their optical design, e.g., diffractive elements, gratings, or optics with high angle of incidence like high numerical aperture lenses.
 
+
+**Fast bidirectional vector wave propagation method (BWPM)** 
+
+* M. Wende, J. Drozella, and A. Herkommer, "Fast bidirectional vector wave propagation method showcased on targeted noise reduction in imaging fiber bundles using 3D-printed micro optics," Opt. Express  31, 28874-28890 (2023). https://doi.org/10.1364/OE.497244
+
+   BWPM allows for the additional consideration of reflected and backwards propagating electric and magnetic fields.
 
 .. toctree::
    :maxdepth: 2
@@ -42,4 +46,5 @@ The VRS method propagates (Ex,Ey,Ez) fields offering the advantage of significan
    VRS.ipynb
    VCZT.ipynb
    FPWPM.ipynb
+   BWPM.ipynb
    comparison/VCZT_vs_VRS.ipynb

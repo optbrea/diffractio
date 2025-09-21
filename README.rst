@@ -233,6 +233,8 @@ The main algorithms for Vector propagation are:
 
 * **Fast Polarized Wave Propagation Method (FP_WPM)**  [Opt Express. 30(22) 40161-40173 (2022)]  Wave Propagation Method for vector fields. It is an efficient method for vector wave optical simulations of microoptics. The FPWPM is capable of handling comparably large simulation volumes while maintaining quick runtime.  By considering polarization in simulations, the FPWPM facilitates the analysis of optical elements which employ this property of electromagnetic waves as a feature in their optical design, e.g., diffractive elements, gratings, or optics with high angle of incidence like high numerical aperture lenses.
 
+* **Fast bidirectional vector wave propagation method (BWPM)** [Opt. Express  31, 28874-28890 (2023)] Wave Propagation method with backwards propagation. 
+
 
 Other features
 =========================

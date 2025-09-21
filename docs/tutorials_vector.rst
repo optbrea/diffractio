@@ -11,6 +11,3 @@ Tutorials for vector propagation
    source/tutorial_vector/vector_XZ/tutorial.rst
    source/tutorial_vector/vector_XYZ/tutorial.rst
    source/tutorial_vector/drawing/tutorial.rst
-
-
-

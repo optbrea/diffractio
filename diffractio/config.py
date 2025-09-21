@@ -30,10 +30,10 @@ CONF_DRAWING['color_phase'] = cm.twilight  #twilight .twilight_shifted hsv
 CONF_DRAWING['color_real'] = cm.seismic
 CONF_DRAWING['color_stokes'] = cm.seismic
 CONF_DRAWING['color_n'] = cm.Blues
+CONF_DRAWING['color_directions'] = cm.twilight_shifted
+CONF_DRAWING['color_arrows'] = cm.hsv
 CONF_DRAWING['percentage_intensity'] = 0.0  #percentage of intensity not shown in phase
 CONF_DRAWING['percentage_Ez'] = 0.0  #percentage of intensity to show Ez
-
-
 
 number_types = (int, float, complex, np.int32, np.float64)
 empty_types = ([], '', None)
@@ -47,7 +47,7 @@ Draw_XY_Options = Literal['amplitude', 'intensity', 'phase', 'field', 'real_fiel
 Draw_XYZ_Options = Literal['intensity', 'refractive_index']
 Draw_Vector_X_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'stokes']
 Draw_Vector_XY_Options = Literal['intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'stokes', ' param_ellipse', 'ellipses']
-Draw_Vector_XZ_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'EH', 'E2H2', 'poynting_vector', 'poynting_vector_averaged', 'poynting_total', 'energy_density', 'irradiance', 'stokes', 'param_ellipses']
+Draw_Vector_XZ_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'EH', 'E2H2', 'poynting_vector', 'poynting_vector_averaged', 'poynting_total', 'energy_density', 'irradiance', 'stokes', 'param_ellipses', 'directions', 'arrows']
 Draw_pyvista_Options = Literal['volume', 'clip', 'slices', 'projections']
 Draw_interactive_Options = Literal['intensity', 'amplitude', 'phase']
 
@@ -69,5 +69,5 @@ video_isovalue_Options = Literal['intensity', 'refractive_index']
 get_scalar_options = Literal['intensity', 'phase', 'field']
 get_vector_options = Literal['E', 'H', 'EH', 'fields', 'intensity', 'intensities', 'phases', 'poynting_vector', 
                              'poynting_vector_averaged',  'poynting_total',  'energy_density', 'irradiance', 
-                             'stokes', 'params_ellipse']
+                             'stokes', 'params_ellipse', 'directions']
 

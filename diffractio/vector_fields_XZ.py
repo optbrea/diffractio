@@ -51,19 +51,23 @@ from scipy.interpolate import RectBivariateSpline
 import cmath
 
 
+
 from .__init__ import degrees, eps, mm, np, plt
 from .config import (Draw_refractive_index_Options, bool_raise_exception, CONF_DRAWING, 
                      get_vector_options, Draw_Vector_XZ_Options)
 from .utils_typing import npt, Any, NDArray, NDArrayFloat, NDArrayComplex
 from .utils_common import get_date, load_data_common, save_data_common, check_none, get_vector
 from .utils_common import get_instance_size_MB
-from .utils_drawing import normalize_draw, reduce_matrix_size, draw_edges
+from .utils_drawing import normalize_draw, reduce_matrix_size, draw_edges, draw2D
 from .utils_math import get_k, nearest
 from .utils_optics import normalize_field, fresnel_equations_kx
 from .scalar_fields_X import Scalar_field_X
 from .scalar_fields_XZ import Scalar_field_XZ
 from .scalar_masks_XZ import Scalar_mask_XZ
 from .vector_fields_X import Vector_field_X
+
+from .utils_common import get_vector_options
+import diffractio
 
 from py_pol.jones_vector import Jones_vector
 
@@ -315,39 +319,39 @@ class Vector_field_XZ():
                                                  self.x,
                                                  np.abs(self.Ex),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_Ex = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.Ex),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
 
             f_interp_abs_Ey = RectBivariateSpline(self.z,
                                                  self.x,
                                                  np.abs(self.Ey),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_Ey = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.Ey),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
 
             f_interp_abs_Ez = RectBivariateSpline(self.z,
                                                  self.x,
                                                  np.abs(self.Ez),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_Ez = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.Ez),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
             
             
@@ -355,39 +359,39 @@ class Vector_field_XZ():
                                                  self.x,
                                                  np.abs(self.Hx),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_Hx = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.Hx),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
 
             f_interp_abs_Hy = RectBivariateSpline(self.z,
                                                  self.x,
                                                  np.abs(self.Hy),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_Hy = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.Hy),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
 
             f_interp_abs_Hz = RectBivariateSpline(self.z,
                                                  self.x,
                                                  np.abs(self.Hz),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_Hz = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.Hz),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
             
             
@@ -396,13 +400,13 @@ class Vector_field_XZ():
                                                  self.x,
                                                  np.abs(self.n),
                                                  kx=kxu,
-                                                 kz=kxu,
+                                                 ky=kxu,
                                                  s=0)
             f_interp_phase_n = RectBivariateSpline(self.z,
                                                    self.x,
                                                    np.angle(self.n),
                                                    kx=kxu,
-                                                   kz=kxu,
+                                                   ky=kxu,
                                                    s=0)
 
             Ex_new_abs = f_interp_abs_Ex(x_new, z_new)
@@ -542,7 +546,7 @@ class Vector_field_XZ():
         
 
     @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
-    def get(self, kind: get_vector_options, mode: str = 'modulus', verbose: bool = False, **kwargs):
+    def get(self, kind: get_vector_options, mode: str = 'modulus', is_matrix: bool = True, verbose: bool = False, **kwargs):
         """Takes the vector field and divide in Scalar_field_X.
 
         Args:
@@ -550,8 +554,16 @@ class Vector_field_XZ():
                         'poynting_vector_averaged',  'poynting_total',  'energy_density', 'irradiance', 
                         'stokes', 'params_ellipse'
             mode (str): 'modulus', 'real', 'imag', 'phase', 'dB'
+            is_matrix (bool): If True returns a matrix or a list of matrices. If False returns a list of diffractio instances.
             verbose (bool): If True prints information
             **kwargs: additional arguments for get_vector
+
+        Note:
+            You can draw all the clases with: 
+                for i, vector in enumerate(self):
+                    vector.draw(kind='intensity', scale=scale, logarithm=logarithm)
+
+                del vector
 
         Returns:
             Vector_field_X: (Ex, Ey, Ez),
@@ -560,8 +572,60 @@ class Vector_field_XZ():
         if verbose is True:
             print("get_vector_options:", get_vector_options)
 
-        data = get_vector(self, kind, mode, **kwargs)
-        return data
+        if is_matrix is True:
+            data = get_vector(self, kind, mode, **kwargs)
+            return data
+        else:
+
+            matrices = get_vector(self, kind=kind, mode=mode, **kwargs)
+
+            if isinstance(self, diffractio.vector_fields_X.Vector_field_X):
+                class_scalar = diffractio.scalar_fields_X.Scalar_field_X
+                type_scalar = 'Scalar_field_X'
+            elif isinstance(self, diffractio.vector_fields_XY.Vector_field_XY):
+                class_scalar = diffractio.scalar_fields_XY.Scalar_field_XY
+                type_scalar = 'Scalar_field_XY'
+            elif isinstance(self, diffractio.vector_fields_XYZ.Vector_field_XYZ):
+                class_scalar = diffractio.scalar_fields_XYZ.Scalar_field_XYZ
+                type_scalar = 'Scalar_field_XYZ'
+            elif isinstance(self, diffractio.vector_fields_XZ.Vector_field_XZ):
+                class_scalar = diffractio.scalar_fields_XZ.Scalar_field_XZ
+                type_scalar = 'Scalar_field_XZ'
+            elif isinstance(self, diffractio.vector_fields_Z.Vector_field_Z):
+                class_scalar = diffractio.scalar_fields_Z.Scalar_field_Z
+                type_scalar = 'Scalar_field_Z'
+            elif isinstance(self, diffractio.vector_masks_XY.Vector_mask_XY):
+                class_scalar = diffractio.scalar_masks_XY.Scalar_mask_XY
+                type_scalar = 'Scalar_mask_XY'
+            elif isinstance(self, diffractio.vector_sources_XY.Vector_source_XY):
+                class_scalar = diffractio.scalar_sources_XY.Scalar_source_XY
+                type_scalar = 'Scalar_source_XY'
+            else:
+                raise ValueError(f"Class {self.__class__} not recognized")   
+
+
+            list_fields = []
+            if isinstance(matrices, np.ndarray):
+                field = self.duplicate(clear=True)
+                field.type = type_scalar
+                field.__class__ = class_scalar
+                field.u = matrices.astype(np.complex128)
+                list_fields.append(field)    
+            else:
+                if kind in ['EH', 'E2H2']:
+                    matrices = [item for sublist in matrices for item in sublist]
+            
+                for i, matrix in enumerate(matrices):
+
+                    field = self.duplicate(clear=True)
+                    field.type = type_scalar
+                    field.__class__ = class_scalar
+                    field.u = matrix.astype(np.complex128)
+                    del field.Ex, field.Ey, field.Ez, field.Hx, field.Hy, field.Hz
+                    list_fields.append(field)
+                return list_fields
+    
+
 
     @check_none('x', 'z', 'Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
     def apply_mask(self, u, new_field: bool = False):
@@ -680,6 +744,219 @@ class Vector_field_XZ():
 
         if matrix is True:
             return (self.Ex, self.Ey, self.Ez), (self.Hx, self.Hy, self.Hz)
+
+
+
+
+
+    def BWPM(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False,  verbose: bool = False):
+        """Algorithm for Backward Wave Propagation Method (BWPM)
+
+        Args:
+            has_edges (bool, optional): If True absorbing edges are used. Defaults to True.
+            pow_edge (int, optional): Power of the supergaussian. Defaults to 80.
+            matrix (bool, optional): If True returns a matrix else returns a list. Defaults to False.
+            has_draw (bool, optional): If True draws the fields. Defaults to False.
+            verbose (bool, optional): If True prints information. Defaults to False.
+        """
+
+        #self.clear_field()
+
+        # Creo que propagación hacia adelante y obtención de campos reflejados
+        field_back=self.bwpm_kernel(has_edges=has_edges, pow_edge=pow_edge, matrix=matrix, verbose=verbose)
+        # estas son las fuentes reflejadas que se propagan hacia atraás, pero hay que darlas la vuelta
+
+        # Recojo los campos reflejados y los paso a Ex, Ey Ez para luego propagar hacia atrás
+        EH_xz_back = self.duplicate(clear=True)
+
+        # Inicializo los campos de la fuente para que no se propaguen, los campos son internos.
+        EH_xz_back.Ex0 = np.zeros_like(EH_xz_back.Ex0)
+        EH_xz_back.Ey0 = np.zeros_like(EH_xz_back.Ey0)
+
+        # Propagación de campos reflejados (pero se hace hacia adelante)
+
+        # Aquí se invierte el sentido de la propagación, para propagar hacia adelante
+        EH_xz_back.Ex = np.flipud(field_back.Ex_back)
+        EH_xz_back.Ey = np.flipud(field_back.Ey_back)
+        EH_xz_back.Ez = np.flipud(field_back.Ez_back)
+        EH_xz_back.Hx = np.flipud(field_back.Hx_back)
+        EH_xz_back.Hy = np.flipud(field_back.Hy_back)
+        EH_xz_back.Hz = np.flipud(field_back.Hz_back)
+        EH_xz_back.n  = np.flipud(field_back.n)
+
+        EH_xz_back.FP_WPM(has_edges = has_edges)
+    
+        EH_xz_back.Ex = np.flipud(EH_xz_back.Ex)
+        EH_xz_back.Ey = -np.flipud(EH_xz_back.Ey)
+        EH_xz_back.Ez = -np.flipud(EH_xz_back.Ez)
+        EH_xz_back.Hx = np.flipud(EH_xz_back.Hx)
+        EH_xz_back.Hy = -np.flipud(EH_xz_back.Hy)
+        EH_xz_back.Hz = -np.flipud(EH_xz_back.Hz)
+        EH_xz_back.n  = np.flipud(EH_xz_back.n)      
+
+
+        # Se suman los campos incidentes y reflejados, que se da la vuelta porque va hacia atrás
+        self.Ex = self.Ex + EH_xz_back.Ex 
+        self.Ey = self.Ey + EH_xz_back.Ey 
+        self.Ez = self.Ez + EH_xz_back.Ez 
+        self.Hx = self.Hx + EH_xz_back.Hx 
+        self.Hy = self.Hy + EH_xz_back.Hy 
+        self.Hz = self.Hz + EH_xz_back.Hz 
+        self.n  = self.n
+
+
+        return EH_xz_back
+
+
+    def bwpm_kernel(self, has_edges: bool = True, pow_edge: int = 80, matrix: bool = False, verbose: bool = False):
+        """
+        WPM Method. 'schmidt method' is very fast, only needs discrete number of refractive indexes
+
+        Args:
+            has_edges (bool): If True absorbing edges are used.
+            pow_edge (float): If has_edges, power of the supergaussian
+            matrix (bool): if True returns a matrix else
+            verbose (bool): If True prints information
+
+        References:
+            - 1. M. W. Fertig and K.-H. Brenner, “Vector wave propagation method,” J. Opt. Soc. Am. A, vol. 27, no. 4, p. 709, 2010.
+            - 2. S. Schmidt et al., “Wave-optical modeling beyond the thin-element-approximation,” Opt. Express, vol. 24, no. 26, p. 30188, 2016.
+        """
+
+        k0 = 2 * np.pi / self.wavelength
+
+
+
+        dx = self.x[1] - self.x[0]
+        dz = self.z[1] - self.z[0]
+
+        self.Ex[0,:] = self.Ex0
+        self.Ey[0,:] = self.Ey0
+
+        self.Hx = np.zeros_like(self.Ex)
+        self.Hy = np.zeros_like(self.Ex)
+        self.Hz = np.zeros_like(self.Ex)
+
+
+        Ex_back = np.zeros_like(self.Ex)
+        Ey_back = np.zeros_like(self.Ex)
+        Ez_back = np.zeros_like(self.Ex)    
+        Hx_back = np.zeros_like(self.Ex)
+        Hy_back = np.zeros_like(self.Ex)
+        Hz_back = np.zeros_like(self.Ex)
+
+
+        kx = get_k(self.x, flavour="+")
+
+        if has_edges is False:
+            has_filter = np.zeros_like(self.z)
+        elif has_edges is True:
+            has_filter = np.ones_like(self.z)
+        elif isinstance(has_edges, (int, float)):
+            has_filter = np.zeros_like(self.z)
+            iz, _, _ = nearest(self.z, has_edges)
+            has_filter[iz:] = 1
+        else:
+            has_filter = has_edges
+
+        width_edge = 0.95*(self.x[-1]-self.x[0])/2
+        x_center = (self.x[-1] + self.x[0])/2
+
+        filter_function = np.exp(-((np.abs(self.x - x_center) / width_edge) ** pow_edge))
+
+        t1 = time.time_ns()
+
+        num_steps = len(self.z)
+
+        for j in range(1, num_steps):
+
+            if has_filter[j] == 0:
+                filter_edge = 1
+            else:
+                filter_edge = filter_function
+
+
+            E_step, H_step = FP_WPM_schmidt_kernel(
+                self.Ex[j - 1, :],
+                self.Ey[j - 1, :],
+                self.n[j - 1, :],
+                self.n[j, :],
+                k0,
+                kx,
+                self.wavelength,
+                dz,
+            ) * filter_edge
+
+            E_step_back, H_step_back = BWPM_schmidt_kernel(
+                self.Ex[j - 1, :],
+                self.Ey[j - 1, :],
+                self.n[j - 1, :],
+                self.n[j, :],
+                k0,
+                kx,
+                self.wavelength,
+                dz,
+            ) * filter_edge
+
+
+            self.Ex[j, :] = self.Ex[j, :] + E_step[0] * filter_edge
+            self.Ey[j, :] = self.Ey[j, :] + E_step[1] * filter_edge
+            self.Ez[j, :] = E_step[2] * filter_edge
+
+            self.Hx[j, :] = H_step[0] * filter_edge
+            self.Hy[j, :] = H_step[1] * filter_edge
+            self.Hz[j, :] = H_step[2] * filter_edge
+
+            Ex_back[j, :] = E_step_back[0] * filter_edge
+            Ey_back[j, :] = E_step_back[1] * filter_edge
+            Ez_back[j, :] = E_step_back[2] * filter_edge
+
+            Hx_back[j, :] = H_step_back[0] * filter_edge
+            Hy_back[j, :] = H_step_back[1] * filter_edge
+            Hz_back[j, :] = H_step_back[2] * filter_edge
+
+        # at the initial point the Ez field is not computed.
+    
+        self.Ex[0,:] = self.Ex[1,:]
+        self.Ey[0,:] = self.Ey[1,:]
+        self.Ez[0,:] = self.Ez[1,:]
+
+        self.Hx[0,:] = self.Hx[1,:]
+        self.Hy[0,:] = self.Hy[1,:]
+        self.Hz[0,:] = self.Hz[1,:]
+
+        Ex_back[0,:] = Ex_back[1,:]
+        Ey_back[0,:] = Ey_back[1,:]
+        Ez_back[0,:] = Ez_back[1,:]
+
+        Hx_back[0,:] = Hx_back[1,:]
+        Hy_back[0,:] = Hy_back[1,:]
+        Hz_back[0,:] = Hz_back[1,:]
+
+        t2 = time.time_ns()
+        if verbose is True:
+            print(
+                "Time = {:2.2f} s, time/loop = {:2.4} ms".format(
+                    (t2 - t1) / 1e9, (t2 - t1) / len(self.z) / 1e6
+                )
+            )
+
+        if matrix is True:
+            E = (self.Ex, self.Ey, self.Ez)
+            H = (self.Hx, self.Hy, self.Hz)
+            E_back = (Ex_back, Ey_back, Ez_back)
+            H_back = (Hx_back, Hy_back, Hz_back)
+            return E, H, E_back, H_back
+        else:
+
+            self.Ex_back = Ex_back
+            self.Ey_back = Ey_back
+            self.Ez_back = Ez_back
+            self.Hx_back = Hx_back
+            self.Hy_back = Hy_back
+            self.Hz_back = Hz_back
+        
+        return self
 
 
     @check_none('Ex', 'Ey', 'Ez', raise_exception=bool_raise_exception)
@@ -856,6 +1133,12 @@ class Vector_field_XZ():
 
             elif kind == "refractive_index":
                 id_fig = self.__draw_refractive_index__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
+
+            elif kind == "directions":
+                id_fig = self.__draw_directions__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
+
+            elif kind == "arrows":
+                id_fig = self.__draw_arrows__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
 
             elif kind == "all":
                 self.__draw_all__(params_black=params_black, params_white=params_white)
@@ -1887,6 +2170,111 @@ class Vector_field_XZ():
                         )
 
 
+    def __draw_directions__( self,  logarithm: bool = False,
+                                  normalize: bool = False,
+                                  cut_value: float = 0,
+                                  draw_borders: bool = True,
+                                  scale: str = 'scaled',
+                                  cmap=CONF_DRAWING["color_directions"],
+                                  colorbar_kind= 'vertical',
+                                  percentage_intensity: float = 0.01,
+                                  **kwargs
+                              ):
+        """Draws directions of the fields.
+        Args:
+            logarithm (float): If >0, intensity is scaled in logarithm
+            normalize (bool): If True, max(intensity)=1
+            cut_value (float): If not None, cuts the maximum intensity to this value
+            draw_borders (bool): If True draw edges of objects
+            scale (str): '', 'scaled', 'equal', scales the XY drawing
+            percentage_intensity (float): minimum intensity to draw directions, relative to maximum intensity
+        """
+
+        Sx, Sy, Sz = self.get('poynting_vector_averaged')
+
+        direction = np.arctan2(Sx, Sz)
+
+        irradiance = self.get('irradiance')
+
+
+        drawing = direction/degrees
+        drawing[irradiance <percentage_intensity * (irradiance.max())] = 0
+
+
+        z0 = self.z
+        x0 = self.x
+        
+        tx, ty = rcParams["figure.figsize"]
+
+        
+        S = self.get('irradiance', matrix=True)
+        S = np.real(S)
+        S = normalize_draw(S, logarithm, normalize, cut_value)
+
+
+        id_fig, IDax, IDimage = draw2D(drawing.transpose(), x = self.z, y = self.x, color=CONF_DRAWING["color_directions"], scale=scale)
+        plt.title('Direction of Poynting vector')
+        ax_bar =plt.colorbar(orientation='vertical')
+        plt.clim(-180,180)
+        ax_bar.set_ticks(np.arange(-180, 181, 45))
+        draw_edges(self, plt, draw_borders, **kwargs)
+
+        plt.tight_layout() 
+
+
+    def __draw_arrows__( self,  logarithm: bool = False,
+                                  normalize: bool = False,
+                                  cut_value: float = 0,
+                                  draw_borders: bool = True,
+                                  scale: str = 'scaled',
+                                  cmap=CONF_DRAWING["color_arrows"],
+                                  colorbar_kind= 'vertical',
+                                  sep_x: int = 1,
+                                  sep_z: int = 1,
+                                  size_arrow: float = 10,
+                                  **kwargs
+                              ):
+        """Draws directions of the fields.
+        Args:
+            logarithm (float): If >0, intensity is scaled in logarithm
+            normalize (bool): If True, max(intensity)=1
+            cut_value (float): If not None, cuts the maximum intensity to this value
+            draw_borders (bool): If True draw edges of objects
+            scale (str): '', 'scaled', 'equal', scales the XY drawing
+            percentage_intensity (float): minimum intensity to draw directions, relative to maximum intensity
+        """
+
+        Sx, Sy, Sz = self.get('poynting_vector_averaged')
+
+        direction = np.arctan2(Sx, Sz)
+
+
+
+        fig1, ax1 = plt.subplots()
+
+        SZ_final = Sz * size_arrow
+        SX_final = Sx * size_arrow
+
+        ax1.set_title('Arrows')
+        Q = ax1.quiver(self.Z[::sep_z, ::sep_x], self.X[::sep_z, ::sep_x],
+                        SZ_final[::sep_z, ::sep_x], SX_final[::sep_z, ::sep_x], 
+                        direction[::sep_z, ::sep_x], cmap=cmap, scale=.5)
+
+        factor = 180 / np.pi  # Example: convert radians to degrees
+        cbar = plt.colorbar(Q, ax=ax1, orientation=colorbar_kind)
+        tick_vals = np.array([-np.pi, -np.pi/2, 0, np.pi/2, np.pi])  # in radians
+        cbar.set_ticks(tick_vals)
+        cbar.set_ticklabels([f"{tick * factor:.1f}" for tick in tick_vals])
+
+        if scale not in ("", None, []):
+            plt.axis(scale)
+
+        draw_edges(self, plt, draw_borders, **kwargs)
+        plt.xlabel(r'z ($\mu m$)')
+        plt.ylabel(r'x ($\mu m$)')
+
+
+
     @check_none('x', 'z', 'n')
     def __draw_refractive_index__(self,
                                   logarithm: bool = False,
@@ -2105,6 +2493,7 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     ks = ks.astype(np.complex128)
 
     P = np.exp(1j * kz_s * dz)
+    P_factor = P / (k_perp2*kr*ks)
     Gamma = kz_r*kz_s + kz_s * k_perp2 / kz_r
     
 
@@ -2114,10 +2503,10 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     t_TM = t_TM.astype(np.complex128)
     t_TE = t_TE.astype(np.complex128)
         
-    T00 = P * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks) / (k_perp2*kr*ks) 
-    T01 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-    T10 = P * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks) / (k_perp2*kr*ks) 
-    T11 = P * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks) / (k_perp2*kr*ks) 
+    T00 = P_factor * (t_TM*kx**2*Gamma + t_TE*ky**2*kr*ks)
+    T01 = P_factor * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks)  
+    T10 = P_factor * (t_TM*kx*ky*Gamma - t_TE*kx*ky*kr*ks)  
+    T11 = P_factor * (t_TM*ky**2*Gamma + t_TE*kx**2*kr*ks)  
     
     # Simpler since ky = 0, but keep to translate to 3D 
     
@@ -2158,7 +2547,6 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     # ey0 = T11 * Eyk 
     # ez0 = - (kx*ex0+ky*ey0) / (kz_r)
     
-
     
     TM00 = -kx*ky*Gamma 
     TM01 = -(ky*ky*Gamma + kz_s**2)
@@ -2174,7 +2562,6 @@ def FP_PWD_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
     hy0 = (TM10*ex0+TM11*ey0) * H_factor
     hz0 = (TM20*ex0+TM21*ey0) * H_factor
         
-
 
     Ex_final = ifft(ifftshift(ex0))
     Ey_final = ifft(ifftshift(ey0))
@@ -2429,4 +2816,160 @@ def draw2D_xz(
     return id_fig, ax, IDimage
 
 
+
+
+
+def BWPM_kernel_simple(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
+    """Step for Plane wave decomposition (PWD) algorithm.
+
+    Args:
+        Ex (np.array): field Ex
+        Ey (np.array): field Ey
+        n1 (np.array): refractive index at the first layer
+        n2 (np.array): refractive index at the second layer
+        k0 (float): wavenumber
+        kx (np.array): transversal wavenumber
+        wavelength (float): wavelength
+        dz (float): increment in distances: z[1]-z[0]
+
+    Returns:
+        E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.
+        H  list(Ex, Ey, Ez): Field H(z+dz) at at distance dz from the incident field.
+        
+    """
+
+    # amplitude of waveplanes
+    Exk = fftshift(fft(Ex))
+    Eyk = fftshift(fft(Ey))
+
+
+    kr = n1 * k0 # first layer
+    ks = n2 * k0 # second layer
+
+    kr = kr.astype(np.complex128)
+    ks = ks.astype(np.complex128)
+            
+    ky = np.zeros_like(kx) # we are in XZ frame
+    k_perp2 = kx**2 + ky**2
+
+    kz_r = np.sqrt(kr**2 - k_perp2) # first layer
+    kz_s = np.sqrt(ks**2 - k_perp2) # second layer
+
+    P = np.exp(1j * kz_s * dz)
+    P_factor = P/(k_perp2*kr**2) 
+    Gamma = kz_r*kz_s + kz_s * k_perp2 / kz_r
+    
+
+    # Fresnel coefficients
+    _,_, r_TM, r_TE = fresnel_equations_kx(kx, wavelength, n1, n2, [0,0,1,1], has_draw=False)
+    
+
+    R00 = P_factor * (-r_TM*kx**2*Gamma + r_TE*ky**2*kr**2) 
+    R01 = P_factor * (-r_TM*kx*ky*Gamma - r_TE*kx*ky*kr**2)
+    R10 = P_factor * (-r_TM*kx*ky*Gamma - r_TE*kx*ky*kr**2)
+    R11 = P_factor * (-r_TM*ky**2*Gamma + r_TE*kx**2*kr**2)
+
+    # Simpler since ky = 0, but keep to translate to 3D
+    
+    # R00 = P * (r_TM*kx**2*Gamma) / (k_perp2*kr**2) 
+    # R01 = np.zeros_like(kx) 
+    # R10 = np.zeros_like(kx)  
+    # R11 = P * (r_TE*kx**2*kr**2) / (k_perp2*kr**2) 
+    
+    nan_indices = np.where(np.isnan(R00)) 
+    
+        
+    if len(nan_indices)>0:
+        R00_b = P * (-r_TM*kx**2*Gamma + r_TE*ky**2*kr**2) / (k_perp2*kr**2+1e-10) 
+        R01_b = P * (-r_TM*kx*ky*Gamma - r_TE*kx*ky*kr**2) / (k_perp2*kr**2+1e-10) 
+        R10_b = P * (-r_TM*kx*ky*Gamma - r_TE*kx*ky*kr**2) / (k_perp2*kr**2+1e-10) 
+        R11_b = P * (-r_TM*ky**2*Gamma + r_TE*kx**2*kr**2) / (k_perp2*kr**2+1e-10) 
+    
+        R00[nan_indices]=R00_b[nan_indices]
+        R01[nan_indices]=R01_b[nan_indices]
+        R10[nan_indices]=R10_b[nan_indices]
+        R11[nan_indices]=R11_b[nan_indices] 
+    
+    ex0 = R00 * Exk + R01 * Eyk
+    ey0 = R10 * Exk + R11 * Eyk 
+    ez0 = - (kx*ex0+ky*ey0) / (kz_s)
+        
+    
+    TM00 = -kx*ky*Gamma 
+    TM01 = -(ky*ky*Gamma + kz_s**2)
+    TM10 = +(kx*kx*Gamma + kz_s**2)
+    TM11 = +kx*ky*Gamma
+    TM20 = -ky*kz_s
+    TM21 = +kx*kz_s
+    
+    Z0 = 376.82  # ohms (impedance of free space)
+    H_factor = n2 / (ks * kz_s * Z0)
+    
+    hx0 = (TM00*ex0+TM01*ey0) * H_factor
+    hy0 = (TM10*ex0+TM11*ey0) * H_factor
+    hz0 = (TM20*ex0+TM21*ey0) * H_factor
+        
+    Ex_final = ifft(ifftshift(ex0))
+    Ey_final = ifft(ifftshift(ey0))
+    Ez_final = ifft(ifftshift(ez0))
+
+
+    Hx_final = ifft(ifftshift(hx0))
+    Hy_final = ifft(ifftshift(hy0))
+    Hz_final = ifft(ifftshift(hz0))
+
+    return (Ex_final, Ey_final, Ez_final), (Hx_final, Hy_final, Hz_final)
+
+
+
+
+def BWPM_schmidt_kernel(Ex, Ey, n1, n2, k0, kx, wavelength, dz):
+    """
+    Kernel for fast propagation of WPM method
+
+    Args:
+        Ex (np.array): field Ex
+        Ey (np.array): field Ey
+        n1 (np.array): refractive index at the first layer
+        n2 (np.array): refractive index at the second layer
+        k0 (float): wavenumber
+        kx (np.array): transversal wavenumber
+        wavelength (float): wavelength
+        dz (float): increment in distances: z[1]-z[0]
+
+    Returns:
+        E  list(Ex, Ey, Ez): Field E(z+dz) at at distance dz from the incident field.
+        H  list(Hx, Hy, Hz): Field H(z+dz) at at distance dz from the incident field.
+
+    References:
+
+        1. M. W. Fertig and K.-H. Brenner, “Vector wave propagation method,” J. Opt. Soc. Am. A, vol. 27, no. 4, p. 709, 2010.
+
+        2. S. Schmidt et al., “Wave-optical modeling beyond the thin-element-approximation,” Opt. Express, vol. 24, no. 26, p. 30188, 2016.
+    """
+    Nr = np.unique(n1)
+    Ns = np.unique(n2)
+
+    Ex_final = np.zeros_like(Ex, dtype=complex)
+    Ey_final = np.zeros_like(Ex, dtype=complex)
+    Ez_final = np.zeros_like(Ex, dtype=complex)
+
+    Hx_final = np.zeros_like(Ex, dtype=complex)
+    Hy_final = np.zeros_like(Ex, dtype=complex)
+    Hz_final = np.zeros_like(Ex, dtype=complex)
+
+
+    for r, n_r in enumerate(Nr):
+        for s, n_s in enumerate(Ns):
+            Imz = np.array(np.logical_and(n1 == n_r, n2 == n_s))
+            E, H = BWPM_kernel_simple(Ex, Ey, n_r, n_s, k0, kx, wavelength, dz)
+
+            Ex_final = Ex_final + Imz * E[0]
+            Ey_final = Ey_final + Imz * E[1]
+            Ez_final = Ez_final + Imz * E[2]
+            Hx_final = Hx_final + Imz * H[0]
+            Hy_final = Hy_final + Imz * H[1]
+            Hz_final = Hz_final + Imz * H[2]
+            
+    return (Ex_final, Ey_final, Ez_final), (Hx_final, Hy_final, Hz_final)
 

@@ -309,11 +309,16 @@ class Vector_field_XZ():
 
         kxu, kxn = interp_kind
 
+
+
         if num_points not in ([], '', 0, None):
             num_points_x, num_points_z = num_points
             x_new = np.linspace(x0, x1, num_points_x)
             z_new = np.linspace(z0, z1, num_points_z)
-            X_new, z_new = np.meshgrid(x_new, z_new)
+            X_new, Z_new = np.meshgrid(x_new, z_new)
+
+            print(" size z_new, x_new", z_new.shape, x_new.shape)
+
 
             f_interp_abs_Ex = RectBivariateSpline(self.z,
                                                  self.x,
@@ -409,33 +414,33 @@ class Vector_field_XZ():
                                                    ky=kxu,
                                                    s=0)
 
-            Ex_new_abs = f_interp_abs_Ex(x_new, z_new)
-            Ex_new_phase = f_interp_phase_Ex(x_new, z_new)
+            Ex_new_abs = f_interp_abs_Ex(z_new, x_new)
+            Ex_new_phase = f_interp_phase_Ex(z_new, x_new)
             Ex_new = Ex_new_abs * np.exp(1j * Ex_new_phase)
 
-            Ey_new_abs = f_interp_abs_Ey(x_new, z_new)
-            Ey_new_phase = f_interp_phase_Ey(x_new, z_new)
+            Ey_new_abs = f_interp_abs_Ey(z_new, x_new)
+            Ey_new_phase = f_interp_phase_Ey(z_new, x_new)
             Ey_new = Ey_new_abs * np.exp(1j * Ey_new_phase)
 
-            Ez_new_abs = f_interp_abs_Ez(x_new, z_new)
-            Ez_new_phase = f_interp_phase_Ez(x_new, z_new)
+            Ez_new_abs = f_interp_abs_Ez(z_new, x_new)
+            Ez_new_phase = f_interp_phase_Ez(z_new, x_new)
             Ez_new = Ez_new_abs * np.exp(1j * Ez_new_phase)
 
-            Hx_new_abs = f_interp_abs_Hx(x_new, z_new)
-            Hx_new_phase = f_interp_phase_Hx(x_new, z_new)
+            Hx_new_abs = f_interp_abs_Hx(z_new, x_new)
+            Hx_new_phase = f_interp_phase_Hx(z_new, x_new)
             Hx_new = Hx_new_abs * np.exp(1j * Hx_new_phase)
 
-            Hy_new_abs = f_interp_abs_Hy(x_new, z_new)
-            Hy_new_phase = f_interp_phase_Hy(x_new, z_new)
+            Hy_new_abs = f_interp_abs_Hy(z_new, x_new)
+            Hy_new_phase = f_interp_phase_Hy(z_new, x_new)
             Hy_new = Hy_new_abs * np.exp(1j * Hy_new_phase)
 
-            Hz_new_abs = f_interp_abs_Hz(x_new, z_new)
-            Hz_new_phase = f_interp_phase_Hz(x_new, z_new)
+            Hz_new_abs = f_interp_abs_Hz(z_new, x_new)
+            Hz_new_phase = f_interp_phase_Hz(z_new, x_new)
             Hz_new = Hz_new_abs * np.exp(1j * Hz_new_phase)
 
 
-            n_new_abs = f_interp_abs_n(x_new, z_new)
-            n_new_phase = f_interp_phase_n(x_new, z_new)
+            n_new_abs = f_interp_abs_n(z_new, x_new)
+            n_new_phase = f_interp_phase_n(z_new, x_new)
             n_new = n_new_abs * np.exp(1j * n_new_phase)
 
         else:
@@ -1144,6 +1149,10 @@ class Vector_field_XZ():
                 self.__draw_all__(params_black=params_black, params_white=params_white)
                 id_fig = None
 
+            elif kind.isdigit():
+                pass
+
+
             else:
                 print("not good kind parameter in vector_fields_XZ.draw()")
                 id_fig = None
@@ -1180,6 +1189,7 @@ class Vector_field_XZ():
                 color='w.',
                 ms=.75)
         
+        self.draw('refractive_index'); plt.show()
         self.draw('intensities', **params_white); plt.show()
         self.draw('phases', **params_white); plt.show()
         self.draw('EH', **params_black); plt.show()
@@ -1192,6 +1202,8 @@ class Vector_field_XZ():
         self.draw('energy_density', **params_white); plt.show()
         self.draw('irradiance', **params_white); plt.show()
         self.draw('ellipses', draw_arrow=False, **params_white); plt.show()
+        self.draw('directions'); plt.show()
+        self.draw('arrows', size_arrow=2, sep_x=4, sep_z=2); plt.show()
         #self.draw('param_ellipses', **params_black); plt.show()
 
         self.check_energy('U')

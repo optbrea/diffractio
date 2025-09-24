@@ -12,6 +12,7 @@ Examples for scalar propagation
    source/examples_scalar/reflection_refraction.ipynb
    source/examples_scalar/arago_point.ipynb
    source/examples_scalar/diffraction_slit.ipynb
+   source/examples_scalar/angular_far_field.ipynb
    source/examples_scalar/diffraction_objects.ipynb
    source/examples_scalar/scattering_small_cylinders.ipynb
    source/examples_scalar/fresnel_biprism.ipynb

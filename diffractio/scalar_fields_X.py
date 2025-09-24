@@ -1098,6 +1098,163 @@ class Scalar_field_X():
         return u_out
 
 
+    def CZT_points(self, z: NDArrayFloat, x: NDArrayFloat,  verbose: float = False, has_draw: bool = False) -> NDArrayFloat:
+        """Chirped z-transform for arrays of points z = f(x)
+        
+        The code for this algoritm is based on "Hu, Yanlei, et al. "Efficient full-path optical calculation of scalar and 
+        vector diffraction using the Bluestein method." Light: Science & Applications 9.1 (2020): 119."
+        
+        However, the convolution Kernel has been changed to Rayleigh-Sommerfeld.
+
+        Args:
+            z (float or np.array): diffraction distance
+            x (float or np.array): x array with positions of the output plane
+            verbose (bool): If True it prints information.
+            has_draw (bool): If True it draws the far field pattern.
+
+        Returns:
+            u_out: Complex amplitude of the outgoing light beam
+
+        References:
+            [Light: Science and Applications, 9(1), (2020)]
+        """
+
+        if len(z) != len(x):
+            raise ValueError(f"z and x arrays must have the same length. Got z: {len(z)}, x: {len(x)}")
+    
+        
+        k = 2 * np.pi / self.wavelength
+
+        num_z = len(z)
+
+        u_out = np.zeros_like(x, dtype=complex)
+
+        dx = self.x[1] - self.x[0]
+
+        for i in range(num_z):
+            if verbose is True:
+                print("{}/{}".format(i, num_z), sep="\r", end="\r")
+                
+            x_now = x[i]
+            z_now = z[i]
+
+            xstart = x_now
+            xend = x_now
+
+            # calculating scalar diffraction below
+            R = np.sqrt(x_now**2 + z_now**2)
+            if z_now>=0:
+                F0 = (0.5j * k * z_now / R) * hankel1(1, k * R)
+            else:
+                F0 = (-0.5j * k * z_now / R) * hankel1(1, k * R).conjugate()
+
+
+            R = np.sqrt(self.x**2 + z_now**2)
+            if z_now>=0:
+                F = (0.5j * k * z_now / R) * hankel1(1, k * R)
+            else:
+                F = (-0.5j * k * z_now / R) * hankel1(1, k * R).conjugate()
+                
+            u0 = self.u * F
+
+            fs = self.wavelength * z_now / dx
+            fx1 = xstart + fs/2
+            fx2 = xend + fs/2
+
+            u0 = Bluestein_dft_x(u0, fx1, fx2, fs, 1)
+            k_factor = np.sqrt(np.abs(z_now) * self.wavelength) * dx
+            u0 = F0 * u0 * k_factor
+
+            u_out[i] = 1j * u0 
+
+        if has_draw:
+
+            I_far = np.abs(u_out)**2
+            I_far /= np.max(I_far)
+
+            plt.figure()
+            plt.semilogy(x/mm, I_far, 'b')
+            plt.grid('on')
+            plt.xlabel(r' $x (mm)$')
+            plt.ylabel(r'$\log_{10}(I/I_{max})$')
+            plt.title('Far field pattern')
+
+        return u_out
+
+
+
+    def CZT_angular(self, radius_obs: float, theta: NDArrayFloat | None,  verbose: float = False, has_draw: bool | int = False):
+        """Chirped z-transform for arrays of points R = f(theta)
+        
+        The code for this algoritm is based on "Hu, Yanlei, et al. "Efficient full-path optical calculation of scalar and 
+        vector diffraction using the Bluestein method." Light: Science & Applications 9.1 (2020)."
+        
+
+        Args:
+            radius_obs (float): radius of the observation circle
+            theta (float or np.array): theta array with observation angles
+            verbose (bool): If True it prints information.
+            has_draw (bool or int): If True it draws the intensity in polar and cartesian coordinates. If 1, only cartesian. If 2, only polar.
+        Returns:
+            u_out: Complex amplitude of the outgoing light beam
+        """
+
+        x = radius_obs * np.sin(theta)
+        z = radius_obs * np.cos(theta)
+
+        u_theta = self.CZT_points(z, x, verbose=verbose)
+
+        # Calculate intensity for drawing
+        I_far = np.abs(u_theta)**2
+        I_far /= I_far.max()
+
+        if has_draw in (True, 1, 'all'):
+            plt.figure()
+            plt.semilogy(theta/degrees, I_far, 'b')
+            plt.grid('on')
+            plt.xlabel(r' $\theta (^\circ)$')
+            plt.ylabel(r'$\log_{10}(I/I_{max})$')
+            plt.title('Far field pattern')
+            plt.xlim(-80, 80)
+            plt.ylim(1e-6, 1)
+
+
+            
+        if has_draw in (2, 'all'):
+
+            
+            # Enhanced polar plot
+            fig, ax = plt.subplots( subplot_kw=dict(projection='polar'))
+            
+            # Plot the data
+            ax.plot(theta, np.log10(I_far + 1e-8), 'b-', linewidth=1, label='$\log_{10}(I/I_{max})$')
+            
+            # Grid settings
+            ax.grid(True, alpha=0.3)
+            ax.set_rgrids(np.arange(-8, 1, 2), 
+                        labels=[f'{i} dB' for i in range(-8, 1, 2)], 
+                        angle=45, fontsize=10)
+            
+            # # Angular grid with degree labels
+            # theta_deg_ticks = np.arange(-theta[0], theta[-1]+1, 20)
+            # ax.set_thetagrids(theta_deg_ticks + 90, 
+            #                 labels=[f'{int(t)}°' for t in theta_deg_ticks], 
+            #                 fontsize=10)
+            
+            # # Set limits
+            # ax.set_ylim(-8, 0)
+            ax.set_xlim(-90*degrees, 90*degrees)
+            
+            # Title and labels
+            ax.set_title('Far field pattern - Polar View', fontsize=10)
+            
+            
+            plt.tight_layout()
+            plt.show()
+
+        return u_theta   
+
+
     @check_none('x')
     def WPM(self, fn, zs: NDArrayFloat, num_sampling: tuple[int] | None = None,
             ROI: tuple[NDArray] | None = None, x_pos: float | None = None,

@@ -1012,6 +1012,59 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             rotation_point, refractive_index, Fs, angle, v_globals={}
         )
         return ipasa
+    
+    def super_ellipse(self, r0: tuple[float, float], radius: float, 
+                      refractive_index: complex, n: tuple[int, int] = (2, 2), 
+                      angle: float = 0*degrees):
+        
+        """Super_ellipse. Abs((Xrot - x0) / radiusx)^n1 + Abs((Zrot - z0)) / radiusz )^n2
+
+        Args:
+            r0 (float, float): center of super_ellipse
+            radius (float, float): radius of the super_ellipse
+            refractive_index (complex): refractive index of the suèr_ellipse
+            n (float, float) =  degrees of freedom of the next equation, n = (n1, n2)
+            angle (float): angle of rotation in radians
+
+        Note:
+            n1 = n2 = 1: for a square
+            n1 = n2 = 2: for a circle
+            n1 = n2 = 0.5: for a superellipse
+
+        References:
+            https://en.wikipedia.org/wiki/Superellipse
+
+
+        Example:
+            super_ellipse(r0=(0*um, 0*um), radius=(250*um, 125*um), angle=0*degrees)
+        """
+
+        if isinstance(r0, (float, int)): 
+            x0, z0 = (r0, r0)
+        else:
+            x0, z0 = r0
+
+        if isinstance(n, (int, float)): 
+            nx, nz = (n, n)
+        else:
+            nx, nz = n
+
+        assert nx > 0 and nz > 0 
+
+        if isinstance(radius, (float, int)):
+            radiusx, radiusz = (radius, radius)
+        else:
+            radiusx, radiusz = radius
+
+        # Rotation of the super-ellipse
+        Xrot, Zrot = self.__rotate__(angle, (x0, z0))
+
+        # Definition of transmittance
+        ipasa = (np.abs((Xrot - x0)/ radiusx) ** nx + np.abs((Zrot - z0)/ radiusz) ** nz) < 1
+        
+        self.n[ipasa] = refractive_index
+    
+        return ipasa
 
 
     def aspheric_surface_z(self, r0: tuple[float, float], refractive_index: complex | float | str,

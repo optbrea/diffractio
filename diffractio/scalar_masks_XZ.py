@@ -944,6 +944,46 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             ipasa = self.object_by_surfaces(r0, 1, Fs2, angle, v_globals={})
             self.n[ipasa] = n_back[ipasa]
         return ipasa_slit != ipasa
+    
+    def shaped_slit(self, location: float, depth: float, aperture: float, refractive_index: complex, n: tuple[int, int] = (2, 2), vertex: float = None):
+
+        """ 
+        Creates a mask with differently shaped edges, based on a superellipse.
+
+        Args:
+            location (float): position of the slit along the z axes.
+            depth (float): depth of the slit (z axis).
+            vertex (float): length of the slit's tip (x axis).
+            aperture (float): slit separation (x axis).
+            refractive_index (complex): refractive index of the slit material.
+            n (float, float) =  degrees of freedom of the next equation, n = (n1, n2)
+
+        Note:
+                n1 = n2 = 1: for a square
+                n1 = n2 = 2: for a circle
+                n1 = n2 = 0.5: for a superellipse
+
+        Warning:
+            for n values below than 1, the slit aperture exceeds the specified value.
+
+        Returns:
+            t0 : slit mask with triangular edges.
+        """
+
+        if vertex == None:
+            vertex = depth/2
+        
+        frame_xz = dict(x=self.x, z=self.z, wavelength=self.wavelength) 
+
+        t0 = Scalar_mask_XZ(**frame_xz)
+
+        t0.super_ellipse(r0=((-(aperture/2)- vertex), (location+(depth/2))), radius=(depth/2, vertex), refractive_index=refractive_index, n=n, angle=-90*degrees)
+        t0.super_ellipse(r0=(((aperture/2)+ vertex), (location+(depth/2))), radius=(depth/2, vertex), refractive_index=refractive_index, n=n, angle=90*degrees)
+        t0.slit(r0=(0*um, location), aperture=aperture + (vertex*2), depth=depth, refractive_index=refractive_index)
+
+        self.n = t0.n
+        
+        return self
 
     def cylinder(self, r0: tuple[float, float], radius: tuple[float, float],
                refractive_index: complex | float | str, angle: float = 0*degrees,

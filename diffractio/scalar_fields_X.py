@@ -1183,7 +1183,7 @@ class Scalar_field_X():
 
 
 
-    def CZT_angular(self, radius_obs: float, theta: NDArrayFloat | None,  verbose: float = False, has_draw: bool | int = False):
+    def CZT_angular(self,  theta: NDArrayFloat | None, radius_obs: float, verbose: float = False, has_draw: bool | int = False):
         """Chirped z-transform for arrays of points R = f(theta)
         
         The code for this algoritm is based on "Hu, Yanlei, et al. "Efficient full-path optical calculation of scalar and 
@@ -1215,7 +1215,7 @@ class Scalar_field_X():
             plt.xlabel(r' $\theta (^\circ)$')
             plt.ylabel(r'$\log_{10}(I/I_{max})$')
             plt.title('Far field pattern')
-            plt.xlim(-80, 80)
+            plt.xlim(theta[0]/degrees, theta[-1]/degrees)
             plt.ylim(1e-6, 1)
 
 

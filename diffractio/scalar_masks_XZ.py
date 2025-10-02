@@ -963,8 +963,8 @@ class Scalar_mask_XZ(Scalar_field_XZ):
                 n1 = n2 = 2: for a circle
                 n1 = n2 = 0.5: for a superellipse
 
-        Warning:
-            for n values below than 1, the slit aperture exceeds the specified value.
+        To do:
+            Add the posibility to rotate the slit and modify the location of the aperture in x axis. 
 
         Returns:
             t0 : slit mask with triangular edges.
@@ -982,6 +982,57 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         t0.slit(r0=(0*um, z0), aperture=aperture + (vertex*2), depth=depth, refractive_index=refractive_index)
 
         self.n = t0.n
+
+    def slit_vertex(self, z0: float, depth: float, vertex: float, aperture: float, vertex_percentage: float, refractive_index: complex):
+
+        """ 
+            Generates a slit mask with a sharp tip whose position can be adjusted.
+
+            Args:
+                z0 (float): position of the slit along the z axes.
+                depth (float): depth of the slit (z axis).
+                vertex (float): length of the slit's tip (x axis).
+                aperture (float): slit separation (x axis).
+                vertex_percentage (float): Ranges from 0 to 100, where 0 represents the beginning of the slit and 100 represents the end.
+                refractive_index (complex): refractive index of the slit material.
+
+            To do:
+                Add the posibility to rotate the slit and modify the location of the aperture in x axis. 
+
+            Returns:
+                t0 : slit mask with triangular edges.
+            """
+
+        half_slit = depth / 2
+        half_separation = aperture / 2
+        value = (vertex_percentage * depth) / 100
+
+        # Definition of the coordenates (top part):
+        
+        p1 = ((z0 - half_slit), (self.x[-1]))
+        p2 = ((z0 - half_slit), (half_separation + vertex))
+        p3 = (((z0 - half_slit) + value), half_separation)
+        p4 = ((z0 + half_slit), (half_separation + vertex))
+        p5 = ((z0 + half_slit), (self.x[-1]))
+
+        top_vertex_position = np.array([p1, p2, p3, p4, p5])
+
+        # Definition of the coordenates (bottom part):
+
+        q1 = ((z0 - half_slit), (self.x[-0]))
+        q2 = ((z0 - half_slit), (-half_separation - vertex))
+        q3 = (((z0 - half_slit) + value), -half_separation)
+        q4 = ((z0 + half_slit), (-half_separation - vertex))
+        q5 = ((z0 + half_slit), (self.x[-0]))
+
+        bottom_vertex_position = np.array([q1, q2, q3, q4, q5])
+
+        t0 = Scalar_mask_XZ(self.x, self.z, self.wavelength)
+        t0.polygon(vertices=top_vertex_position, refractive_index=refractive_index)
+        t0.polygon(vertices=bottom_vertex_position, refractive_index=refractive_index)
+
+        self.n = t0.n
+
         
 
     def cylinder(self, r0: tuple[float, float], radius: tuple[float, float],

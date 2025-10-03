@@ -1003,27 +1003,26 @@ class Scalar_mask_XZ(Scalar_field_XZ):
                 t0 : slit mask with triangular edges.
             """
 
-        half_slit = depth / 2
         half_separation = aperture / 2
         value = (vertex_percentage * depth) / 100
 
         # Definition of the coordenates (top part):
         
-        p1 = ((z0 - half_slit), (self.x[-1]))
-        p2 = ((z0 - half_slit), (half_separation + vertex))
-        p3 = (((z0 - half_slit) + value), half_separation)
-        p4 = ((z0 + half_slit), (half_separation + vertex))
-        p5 = ((z0 + half_slit), (self.x[-1]))
+        p1 = (z0, (self.x[-1]))
+        p2 = (z0, (half_separation + vertex))
+        p3 = ((z0 + value), half_separation)
+        p4 = ((z0 + depth), (half_separation + vertex))
+        p5 = ((z0 + depth), (self.x[-1]))
 
         top_vertex_position = np.array([p1, p2, p3, p4, p5])
 
         # Definition of the coordenates (bottom part):
 
-        q1 = ((z0 - half_slit), (self.x[-0]))
-        q2 = ((z0 - half_slit), (-half_separation - vertex))
-        q3 = (((z0 - half_slit) + value), -half_separation)
-        q4 = ((z0 + half_slit), (-half_separation - vertex))
-        q5 = ((z0 + half_slit), (self.x[-0]))
+        q1 = (z0, (self.x[-0]))
+        q2 = (z0, (-half_separation - vertex))
+        q3 = ((z0 + value), -half_separation)
+        q4 = ((z0 + depth), (-half_separation - vertex))
+        q5 = ((z0 + depth), (self.x[-0]))
 
         bottom_vertex_position = np.array([q1, q2, q3, q4, q5])
 

@@ -1214,9 +1214,9 @@ class Scalar_field_X():
             plt.grid('on')
             plt.xlabel(r' $\theta (^\circ)$')
             plt.ylabel(r'$\log_{10}(I/I_{max})$')
-            plt.title('Far field pattern')
             plt.xlim(theta[0]/degrees, theta[-1]/degrees)
             plt.ylim(1e-6, 1)
+            plt.tight_layout()
 
 
             
@@ -1227,30 +1227,28 @@ class Scalar_field_X():
             fig, ax = plt.subplots( subplot_kw=dict(projection='polar'))
             
             # Plot the data
-            ax.plot(theta, np.log10(I_far + 1e-8), 'b-', linewidth=1, label='$\log_{10}(I/I_{max})$')
+            ax.plot(theta, np.log10(I_far), 'b-', linewidth=1, label='$\log_{10}(I/I_{max})$')
             
             # Grid settings
-            ax.grid(True, alpha=0.3)
-            ax.set_rgrids(np.arange(-8, 1, 2), 
-                        labels=[f'{i} dB' for i in range(-8, 1, 2)], 
+            ax.grid(True, alpha=1)
+            ax.set_rgrids(np.arange(-6, 1, 2), 
+                        labels=[f'{i} dB' for i in range(-6, 1, 2)], 
                         angle=45, fontsize=10)
             
             # # Angular grid with degree labels
-            # theta_deg_ticks = np.arange(-theta[0], theta[-1]+1, 20)
-            # ax.set_thetagrids(theta_deg_ticks + 90, 
+            # theta_deg_ticks = np.arange(theta[0]/degrees, theta[-1]/degrees+0.1, 15/degrees)
+            # ax.set_thetagrids(theta_deg_ticks, 
             #                 labels=[f'{int(t)}°' for t in theta_deg_ticks], 
             #                 fontsize=10)
             
             # # Set limits
-            # ax.set_ylim(-8, 0)
+            ax.set_ylim(-6, 0)
             ax.set_xlim(-90*degrees, 90*degrees)
             
             # Title and labels
-            ax.set_title('Far field pattern - Polar View', fontsize=10)
-            
-            
+            # ax.set_title('Far field pattern - Polar View', fontsize=10)
+                        
             plt.tight_layout()
-            plt.show()
 
         return u_theta   
 

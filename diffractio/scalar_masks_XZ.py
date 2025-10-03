@@ -43,6 +43,7 @@ The magnitude is related to microns: `micron = 1.`
 from copy import deepcopy
 
 import matplotlib.image as mpimg
+import matplotlib.path as mpath
 import numexpr as ne
 import scipy.ndimage as ndimage
 from scipy.interpolate import interp1d
@@ -333,7 +334,6 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
             self.n[ipasa1 * ipasa2 * ipasa3] = refractive_index
             return ipasa1 * ipasa2 * ipasa3
-
 
 
     # @check_none('x', 'z', raise_exception=bool_raise_exception)
@@ -945,13 +945,13 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             self.n[ipasa] = n_back[ipasa]
         return ipasa_slit != ipasa
     
-    def shaped_slit(self, location: float, depth: float, aperture: float, refractive_index: complex, n: tuple[int, int] = (2, 2), vertex: float = None):
+    def shaped_slit(self, z0: float, depth: float, aperture: float, refractive_index: complex, n: tuple[int, int] = (2, 2), vertex: float = None):
 
         """ 
         Creates a mask with differently shaped edges, based on a superellipse.
 
         Args:
-            location (float): position of the slit along the z axes.
+            z0 (float): position of the slit along the z axes.
             depth (float): depth of the slit (z axis).
             vertex (float): length of the slit's tip (x axis).
             aperture (float): slit separation (x axis).
@@ -963,8 +963,8 @@ class Scalar_mask_XZ(Scalar_field_XZ):
                 n1 = n2 = 2: for a circle
                 n1 = n2 = 0.5: for a superellipse
 
-        Warning:
-            for n values below than 1, the slit aperture exceeds the specified value.
+        To do:
+            Add the posibility to rotate the slit and modify the location of the aperture in x axis. 
 
         Returns:
             t0 : slit mask with triangular edges.
@@ -977,13 +977,63 @@ class Scalar_mask_XZ(Scalar_field_XZ):
 
         t0 = Scalar_mask_XZ(**frame_xz)
 
-        t0.super_ellipse(r0=((-(aperture/2)- vertex), (location+(depth/2))), radius=(depth/2, vertex), refractive_index=refractive_index, n=n, angle=-90*degrees)
-        t0.super_ellipse(r0=(((aperture/2)+ vertex), (location+(depth/2))), radius=(depth/2, vertex), refractive_index=refractive_index, n=n, angle=90*degrees)
-        t0.slit(r0=(0*um, location), aperture=aperture + (vertex*2), depth=depth, refractive_index=refractive_index)
+        t0.super_ellipse(r0=((-(aperture/2)- vertex), (z0+(depth/2))), radius=(depth/2, vertex), refractive_index=refractive_index, n=n, angle=-90*degrees)
+        t0.super_ellipse(r0=(((aperture/2)+ vertex), (z0+(depth/2))), radius=(depth/2, vertex), refractive_index=refractive_index, n=n, angle=90*degrees)
+        t0.slit(r0=(0*um, z0), aperture=aperture + (vertex*2), depth=depth, refractive_index=refractive_index)
 
         self.n = t0.n
+
+    def slit_vertex(self, z0: float, depth: float, vertex: float, aperture: float, vertex_percentage: float, refractive_index: complex):
+
+        """ 
+            Generates a slit mask with a sharp tip whose position can be adjusted.
+
+            Args:
+                z0 (float): position of the slit along the z axes.
+                depth (float): depth of the slit (z axis).
+                vertex (float): length of the slit's tip (x axis).
+                aperture (float): slit separation (x axis).
+                vertex_percentage (float): Ranges from 0 to 100, where 0 represents the beginning of the slit and 100 represents the end.
+                refractive_index (complex): refractive index of the slit material.
+
+            To do:
+                Add the posibility to rotate the slit and modify the location of the aperture in x axis. 
+
+            Returns:
+                t0 : slit mask with triangular edges.
+            """
+
+        half_slit = depth / 2
+        half_separation = aperture / 2
+        value = (vertex_percentage * depth) / 100
+
+        # Definition of the coordenates (top part):
         
-        return self
+        p1 = ((z0 - half_slit), (self.x[-1]))
+        p2 = ((z0 - half_slit), (half_separation + vertex))
+        p3 = (((z0 - half_slit) + value), half_separation)
+        p4 = ((z0 + half_slit), (half_separation + vertex))
+        p5 = ((z0 + half_slit), (self.x[-1]))
+
+        top_vertex_position = np.array([p1, p2, p3, p4, p5])
+
+        # Definition of the coordenates (bottom part):
+
+        q1 = ((z0 - half_slit), (self.x[-0]))
+        q2 = ((z0 - half_slit), (-half_separation - vertex))
+        q3 = (((z0 - half_slit) + value), -half_separation)
+        q4 = ((z0 + half_slit), (-half_separation - vertex))
+        q5 = ((z0 + half_slit), (self.x[-0]))
+
+        bottom_vertex_position = np.array([q1, q2, q3, q4, q5])
+
+        t0 = Scalar_mask_XZ(self.x, self.z, self.wavelength)
+        t0.polygon(vertices=top_vertex_position, refractive_index=refractive_index)
+        t0.polygon(vertices=bottom_vertex_position, refractive_index=refractive_index)
+
+        self.n = t0.n
+
+        
 
     def cylinder(self, r0: tuple[float, float], radius: tuple[float, float],
                refractive_index: complex | float | str, angle: float = 0*degrees,
@@ -1408,6 +1458,39 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             rotation_point, refractive_index, Fs, angle, v_globals={}
         )
         return ipasa
+    
+    def polygon(self, vertices: np.ndarray, refractive_index: complex):
+        
+        """
+        Draws a polygon with the vertices given in a Nx2 numpy array.
+
+        Args:
+            vertices (np.array): mask refractive indexNx2 array with the z,x positions of the vertices.
+            refractive_index (complex) : refractive index of the material
+
+        """
+
+        num_z, num_x = self.n.shape
+
+        verticesz, _, _ = nearest2(self.x, vertices[:, 1]) 
+        verticesx, _, _ = nearest2(self.z, vertices[:, 0]) 
+        
+
+        i_vertices = np.column_stack((verticesx, verticesz)) 
+
+        # Create the coordinates of the matrix
+        coordinates = np.column_stack(
+            (np.repeat(np.arange(num_z),
+                       num_x), np.tile(np.arange(num_x), num_z))) 
+        
+        # Create the Path object of the polygon
+        path = mpath.Path(i_vertices)
+
+        # Verifies if each matrix's point is inside the polygon
+        in_polygon = path.contains_points(coordinates)
+
+        # Determines whether each matrix point lies within the polygon
+        self.n[in_polygon.reshape((num_z, num_x))] = refractive_index
 
 
 

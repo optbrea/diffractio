@@ -47,7 +47,7 @@ Draw_XY_Options = Literal['amplitude', 'intensity', 'phase', 'field', 'real_fiel
 Draw_XYZ_Options = Literal['intensity', 'refractive_index']
 Draw_Vector_X_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'stokes']
 Draw_Vector_XY_Options = Literal['intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'stokes', ' param_ellipse', 'ellipses']
-Draw_Vector_XZ_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'EH', 'E2H2', 'poynting_vector', 'poynting_vector_averaged', 'poynting_total', 'energy_density', 'irradiance', 'stokes', 'param_ellipses', 'directions', 'arrows']
+Draw_Vector_XZ_Options = Literal[ 'intensity', 'intensities', 'intensities_rz', 'phases', 'fields', 'E', 'EH', 'E2H2', 'poynting_vector', 'poynting_vector_averaged', 'poynting_total', 'energy_density', 'irradiance', 'stokes', 'param_ellipses', 'directions', 'arrows']
 Draw_pyvista_Options = Literal['volume', 'clip', 'slices', 'projections']
 Draw_interactive_Options = Literal['intensity', 'amplitude', 'phase']
 

@@ -1106,6 +1106,9 @@ class Vector_field_XZ():
             elif kind == "fields":
                 id_fig = self.__draw_fields__(logarithm, normalize, cut_value, draw_borders, scale,  percentage_intensity, **kwargs)
 
+            elif kind == "E":
+                id_fig = self.__draw_E__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
+
             elif kind == "EH":
                 id_fig = self.__draw_EH__(logarithm, normalize, cut_value, draw_borders, scale, **kwargs)
 
@@ -1477,6 +1480,88 @@ class Vector_field_XZ():
         return h1, h2, h3, h4
 
 
+
+
+    @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
+    def __draw_E__(self,  logarithm: float,  normalize: bool,  cut_value: float,
+        draw_borders=False,
+        scale = 'scaled',
+        cmap=CONF_DRAWING["color_amplitude_sign"],
+        edge=None,
+        draw_z = True,
+        **kwargs
+    ):
+        """__internal__: draws amplitude and phase in 2x2 drawing
+
+        Args:
+            logarithm (float): If >0, intensity is scaled in logarithm
+            normalize (bool): If True, max(intensity)=1
+            title (str): title of figure
+            cut_value (float): If not None, cuts the maximum intensity to this value
+
+        """
+
+        E_x = np.real(self.Ex)
+        E_x = normalize_draw(E_x, logarithm, normalize, cut_value)
+
+        E_y = np.real(self.Ey)
+        E_y = normalize_draw(E_y, logarithm, normalize, cut_value)
+
+        E_z = np.real(self.Ez)      
+        E_z = normalize_draw(E_z, logarithm, normalize, cut_value)
+
+
+        tx, ty = rcParams["figure.figsize"]
+
+        E_max = np.max((E_x.max(), E_y.max(), E_z.max()))
+
+
+        if draw_z is True:
+
+            fig, axs = plt.subplots(
+                nrows=1, ncols=3, sharex=True, sharey=True, figsize=(2 * tx, 1 * ty)
+            )
+
+            id_fig, ax, IDimage = draw2D_xz(
+                E_x, self.z, self.x, ax=axs[0], scale=scale, xlabel="", ylabel=r"x $(\mu m)$", cmap=cmap, title=r'E$_x$')
+            draw_edges(self, axs[0], draw_borders, **kwargs)
+            IDimage.set_clim(-E_max,E_max)
+            id_fig, ax, IDimage = draw2D_xz(
+                E_y, self.z, self.x, ax=axs[1], scale=scale, xlabel="", ylabel="", cmap=cmap, title=r'E$_y$')
+            draw_edges(self, axs[1], draw_borders, **kwargs)
+            IDimage.set_clim(-E_max,E_max)
+            id_fig, ax, IDimage = draw2D_xz(
+                E_z, self.z, self.x, ax=axs[2], scale=scale, xlabel="", ylabel="", cmap=cmap, title=r'E$_z$')
+            draw_edges(self, axs[2], draw_borders, **kwargs)
+            IDimage.set_clim(-E_max,E_max)
+
+
+        else: 
+            fig, axs = plt.subplots(
+                nrows=1, ncols=2, sharex=True, sharey=True, figsize=(1.5 * tx, 1 * ty)
+            )
+
+            id_fig, ax, IDimage = draw2D_xz(
+                E_x, self.z, self.x, ax=axs[0], scale=scale, xlabel="", ylabel=r"x $(\mu m)$", cmap=cmap, title=r'E$_x$')
+            draw_edges(self, axs[0], draw_borders, **kwargs)
+            IDimage.set_clim(-E_max,E_max)
+            
+            id_fig, ax, IDimage = draw2D_xz(
+                E_y, self.z, self.x, ax=axs[1], scale=scale, xlabel="", ylabel="", cmap=cmap, title=r'E$_y$')
+            draw_edges(self, axs[1], draw_borders, **kwargs)
+            IDimage.set_clim(-E_max,E_max)
+
+
+
+
+        cb_ax = fig.add_axes([0.1, 0, 0.8, 0.05])
+        cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
+
+        plt.tight_layout()   
+        return fig, axs
+
+
+
     @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_EH__(self,  logarithm: float,  normalize: bool,  cut_value: float,
         draw_borders=False,
@@ -1586,7 +1671,7 @@ class Vector_field_XZ():
 
         plt.tight_layout()
 
-        return self
+        return fig, axs
 
     @check_none('x', 'z', 'Ex', 'Ey', 'Ez', 'Hx', 'Hy', 'Hz', raise_exception=bool_raise_exception)
     def __draw_E2H2__(self,  logarithm: float,  normalize: bool,  cut_value: float,
@@ -1694,7 +1779,7 @@ class Vector_field_XZ():
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
         plt.tight_layout()
 
-        return self
+        return fig, axs
 
     def __draw_poynting_vector_averaged__(self,
         logarithm,
@@ -1753,6 +1838,7 @@ class Vector_field_XZ():
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
 
         plt.tight_layout()   
+        return fig, axs
 
     def __draw_poynting_vector__(self, logarithm, normalize, cut_value, draw_borders=False,
         scale = 'scaled', cmap=CONF_DRAWING["color_amplitude_sign"], edge=None, **kwargs ):
@@ -1813,6 +1899,7 @@ class Vector_field_XZ():
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
 
         plt.tight_layout()   
+        return fig, axs
 
     def __draw_poynting_total__(self,
         logarithm,
@@ -1845,6 +1932,7 @@ class Vector_field_XZ():
         cb_ax = fig.add_axes([0.2, 0, 0.6, 0.025])
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
         plt.tight_layout() 
+        return fig, axs
 
 
 
@@ -1880,6 +1968,7 @@ class Vector_field_XZ():
         cb_ax = fig.add_axes([0.2, 0, 0.6, 0.025])
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
         plt.tight_layout() 
+        return fig, axs
 
 
 
@@ -1918,6 +2007,7 @@ class Vector_field_XZ():
         cb_ax = fig.add_axes([0.2, 0, 0.6, 0.025])
         cbar = fig.colorbar(id_fig, cmap=cmap, cax=cb_ax, orientation='horizontal', shrink=0.5)
         plt.tight_layout() 
+        return fig, axs
 
 
     def __draw_stokes__(self,  logarithm: float,  normalize: bool,  cut_value: float,
@@ -2066,26 +2156,9 @@ class Vector_field_XZ():
         cb_ax = fig.add_axes([0.2, 0, 0.6, 0.025])
         cbar = fig.colorbar(id_fig, cmap=cmap_intensity, cax=cb_ax, orientation='horizontal', shrink=0.5)
         plt.tight_layout()
+        return fig, axs
 
 
-        # plt.figure(figsize=(2 * tx, 2 * ty))
-
-        # max_intensity = max(A.max(), B.max())
-
-        # h1 = plt.subplot(2, 2, 1)
-        # self.__draw1__(A, color_intensity, "$A$")
-        # plt.clim(0, max_intensity)
-        # h2 = plt.subplot(2, 2, 2)
-        # self.__draw1__(B, color_intensity, "$B$")
-        # plt.clim(0, max_intensity)
-
-        # h3 = plt.subplot(2, 2, 3)
-        # self.__draw1__(theta/degrees, color_phase, r"$\phi$")
-        # plt.clim(-180, 180)
-        # h4 = plt.subplot(2, 2, 4)
-        # self.__draw1__(h, "gist_heat", "$h$")
-        # plt.tight_layout()
-        # return (h1, h2, h3, h4)
 
     def __draw_ellipses__(
         self,
@@ -2180,7 +2253,7 @@ class Vector_field_XZ():
                             width=0, head_width=head_width, fc=color_line,
                             ec=color_line, length_includes_head=False,
                         )
-
+        return id_fig, ax, IDimage
 
     def __draw_directions__( self,  logarithm: bool = False,
                                   normalize: bool = False,
@@ -2232,6 +2305,7 @@ class Vector_field_XZ():
         draw_edges(self, plt, draw_borders, **kwargs)
 
         plt.tight_layout() 
+        return id_fig, IDax, IDimage
 
 
     def __draw_arrows__( self,  logarithm: bool = False,
@@ -2267,7 +2341,6 @@ class Vector_field_XZ():
         SZ_final = Sz * size_arrow
         SX_final = Sx * size_arrow
 
-        ax1.set_title('Arrows')
         Q = ax1.quiver(self.Z[::sep_z, ::sep_x], self.X[::sep_z, ::sep_x],
                         SZ_final[::sep_z, ::sep_x], SX_final[::sep_z, ::sep_x], 
                         direction[::sep_z, ::sep_x], cmap=cmap, scale=.5)
@@ -2285,6 +2358,7 @@ class Vector_field_XZ():
         plt.xlabel(r'z ($\mu m$)')
         plt.ylabel(r'x ($\mu m$)')
 
+        return fig1, ax1
 
 
     @check_none('x', 'z', 'n')
@@ -2309,7 +2383,7 @@ class Vector_field_XZ():
             edge_matrix (numpy.array): positions of borders
         """
 
-        colormap_kind= cm.Blues
+        colormap_kind= CONF_DRAWING['color_n']
         edge_matrix = None
         min_incr = 0.01
         reduce_matrix = 'standard'

@@ -1373,9 +1373,9 @@ class Scalar_mask_XY(Scalar_field_XY):
         self.type = 'Scalar_mask_XY'
         
         
-    def super_gauss(self, r0: tuple[float, float], radius: tuple[float] | float,
-                    power: float = 2, angle: float = 0*degrees):
 
+    def super_gauss_circular(self, r0: tuple[float, float], radius: tuple[float] | float,
+                    power: float = 2, angle: float = 0*degrees):
         """Supergauss mask.
 
         Args:
@@ -1391,7 +1391,6 @@ class Scalar_mask_XY(Scalar_field_XY):
         else:
             radiusx, radiusy = radius
 
-        # Radios mayor y menor
         x0, y0 = r0
 
         Xrot, Yrot = self.__rotate__(angle, (x0, y0))
@@ -1399,6 +1398,45 @@ class Scalar_mask_XY(Scalar_field_XY):
         self.u = np.exp(-R**power)
 
 
+    def super_gauss_square(self,
+                   r0: tuple[float, float],
+                   size: tuple[float, float] | float,
+                   power: float = 2.,
+                   angle: float = 0.,
+                   ):
+        """Gauss Beam.
+
+        Args:
+            r0 (float, float): (x,y) position of center
+            w0 (float, float): (wx,wy) minimum beam width
+            z0 (float): (z0x, z0y) position of beam width for each axis (could be different)
+            power (float): power of the super-Gaussian profile
+            angle (float): rotation angle of the axis of the elliptical gaussian amplitude
+
+
+        """
+
+        if isinstance(size, (float, int, complex)):
+            size = (size, size)
+
+        if isinstance(power, (float, int, complex)):
+            power = (power, power)
+
+        sizex, sizey = size
+        x0, y0 = r0
+        powx, powy = power
+
+
+      
+
+        amplitude = ( np.exp(
+            -np.abs((self.X * np.cos(angle) + self.Y * np.sin(angle) - x0))**powx /
+            ((sizex/2)**powx)) * np.exp(
+                -np.abs((-self.X * np.sin(angle) + self.Y * np.cos(angle) - y0))**powy /
+                (sizey/2)**powy))
+       
+        self.u = amplitude 
+        return self
 
 
     @check_none('x', 'y', raise_exception=bool_raise_exception)

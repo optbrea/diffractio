@@ -1978,11 +1978,12 @@ class Scalar_field_XY():
             return u_mtf
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
-    def beam_width_4s(self, has_draw: bool = True):
+    def beam_width_4s(self, has_draw: bool = True, verbose: bool = False):
         """Returns the beam width parameters according to ISO11146.
 
         Args:
             has_draw (bool): If True, it draws
+            verbose (bool): If True, it prints data
 
         Returns:
             (float): dx width x
@@ -1997,7 +1998,7 @@ class Scalar_field_XY():
         """
             
         dx, dy, principal_axis, (x_mean, y_mean, x2_mean, y2_mean,
-                                 xy_mean) = beam_width_2D(self.x,           self.y,           np.abs(self.u)**2,           has_draw=False)
+                                 xy_mean) = beam_width_2D(self.x, self.y, np.abs(self.u)**2, has_draw=False)
 
         if has_draw is True:
             from matplotlib.patches import Ellipse
@@ -2045,6 +2046,15 @@ class Scalar_field_XY():
             plt.plot(x0, y0, 'red', label=r'2$\sigma$')
             plt.plot(x0, y0, 'black', label=r'1$\sigma$')
             plt.legend()
+
+        if verbose is True:
+            print(f"Beam waist (1s): dx = {dx/um:.2f} um, dy = {dy/um:.2f} um")
+            print(f"Principal axis angle: {principal_axis/degrees:.2f} degrees")
+            print(("x_mean = {:2.3f} um, y_mean = {:2.3f} um").format(
+                x_mean, y_mean))
+            print(("x2_mean = {:2.3f} um^2, y2_mean = {:2.3f} um^2, "
+                   "xy_mean = {:2.3f} um^2").format(
+                       x2_mean, y2_mean, xy_mean))
 
         return dx, dy, principal_axis, (x_mean, y_mean, x2_mean, y2_mean,
                                         xy_mean)

@@ -217,6 +217,22 @@ class Scalar_mask_X(Scalar_field_X):
         self.u = u
 
 
+    def super_gauss(self, x0: float, size: float, power: float = 2.):
+        """super gaussian mask.
+
+        Args:
+            x0 (float): x position of center
+            w0 (float): mask width
+            power (float): power of the super-Gaussian profile
+        """
+
+
+        amplitude = ( np.exp(
+            -np.abs((self.x - x0))**power /  ((size/2)**power)) )
+       
+        self.u = amplitude 
+
+
     def double_slit(self, x0: float, size: float, separation: float):
         """double slit: 1 inside, 0 outside
 

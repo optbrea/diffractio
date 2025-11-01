@@ -178,7 +178,7 @@ class Scalar_source_XY(Scalar_field_XY):
                    r0: tuple[float, float],
                    w0: tuple[float, float] | float,
                    z0: tuple[float, float] | float,
-                   pow: tuple[float, float] | float = 2.,
+                   power: tuple[float, float] | float  = 2.,
                    alpha: float = 0.,
                    beta: float = 0.,
                    A: float = 1,
@@ -190,13 +190,11 @@ class Scalar_source_XY(Scalar_field_XY):
             r0 (float, float): (x,y) position of center
             w0 (float, float): (wx,wy) minimum beam width
             z0 (float): (z0x, z0y) position of beam width for each axis (could be different)
-            pow (float): power of the super-Gaussian profile
+            power (float): power of the super-Gaussian profile
             alpha (float): rotation angle of the axis of the elliptical gaussian amplitude
             beta (float): rotation angle of the axis of the main directions of the wavefront (it can be different from alpha)
             A (float): maximum amplitude
             theta (float): angle in radians (angle of k with respect to z))
-
-        TODO: Change function to similar to Scalar_mask_XY.super_gauss
 
         """
 
@@ -206,14 +204,14 @@ class Scalar_source_XY(Scalar_field_XY):
         if isinstance(z0, (float, int, complex)):
             z0 = (z0, z0)
 
-        if isinstance(pow, (float, int, complex)):
-            pow = (pow, pow)
+        if isinstance(power, (float, int, complex)):
+            power = (power, power)
 
         w0x, w0y = w0
         # w0 = np.sqrt(w0x * w0y)
         x0, y0 = r0
         z0x, z0y = z0
-        powx, powy = pow
+        powx, powy = power
         k = 2 * np.pi / self.wavelength
 
         z_rayleigh_x = k * w0x**2/2
@@ -247,7 +245,7 @@ class Scalar_source_XY(Scalar_field_XY):
 
         self.u = amplitude * phase1 * phase2
 
-        return self
+
 
     @check_none('X', 'Y', raise_exception=bool_raise_exception)
     def spherical_wave(self, r0: tuple[float, float], z0: tuple[float, float] | float, A: float = 1, 

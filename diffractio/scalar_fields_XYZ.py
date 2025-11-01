@@ -1531,7 +1531,7 @@ class Scalar_field_XYZ():
         
         amplitude, I_drawing, phase = field_parameters(ufield.u, True)
 
-        I_drawing = np.abs(ufield.u)**2
+        I_drawing = (np.abs(ufield.u)**2).transpose()
 
 
         if kind == 'intensity':

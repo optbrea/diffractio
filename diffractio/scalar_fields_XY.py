@@ -1499,8 +1499,9 @@ class Scalar_field_XY():
 
 
         References:
-             [Light: Science and Applications, 9(1), (2020)] 
+                [Light: Science and Applications, 9(1), (2020)] 
         """
+
 
         if xout is None:
             xout = self.x
@@ -1689,20 +1690,30 @@ class Scalar_field_XY():
                 fsx = self.wavelength * z_now / dx
                 fsy = self.wavelength * z_now / dy
 
+                # if num_x > 1 and num_y == 1:
+                #     fx1 = xstart + fsx/2
+                #     fx2 = xend + fsx/2
+                #     u0 = Bluestein_dft_xy(u0, fx1, fx2, fsx, num_x)
+
+                #     fy1 = ystart + fsy/2
+                #     fy2 = yend + fsy/2
+                #     u0 = Bluestein_dft_xy(u0, fy1, fy2, fsy, num_y)
+
                 if num_x > 1 and num_y == 1:
+                    fy1 = ystart + fsy/2
+                    fy2 = yend + fsy/2
+                    u0 = Bluestein_dft_xy(u0, fy1, fy2, fsy, num_y)
+                    u0=u0.transpose()
+
                     fx1 = xstart + fsx/2
                     fx2 = xend + fsx/2
                     u0 = Bluestein_dft_xy(u0, fx1, fx2, fsx, num_x)
 
-                    fy1 = ystart + fsy/2
-                    fy2 = yend + fsy/2
-                    u0 = Bluestein_dft_xy(u0, fy1, fy2, fsy, num_y)
 
                 elif num_x == 1 and num_y > 1:
                     fy1 = ystart + fsy/2
                     fy2 = yend + fsy/2
                     u0 = Bluestein_dft_xy(u0, fy1, fy2, fsy, num_y)
-
                     fx1 = xstart + fsx/2
                     fx2 = xend + fsx/2
                     u0 = Bluestein_dft_xy(u0, fx1, fx2, fsx, num_x)
@@ -1725,16 +1736,16 @@ class Scalar_field_XY():
                     fx1 = xstart + fsx/2
                     fx2 = xend + fsx/2
                     u0 = Bluestein_dft_xy(u0, fx1, fx2, fsx, num_x)
+                
                 u0 = F0 * u0
-
                 k_factor = z_now * dx * dy * self.wavelength
 
                 if num_x == 1 and num_y == 1:
                     u_zs[i] = u0.mean() * k_factor
                 elif num_x > 1 and num_y == 1:
-                    u_zs[:, i] = u0[0, :] * k_factor
+                    u_zs[:, i] = u0[0,:] * k_factor
                 elif num_x == 1 and num_y > 1:
-                    u_zs[:, i] = u0[0, :] * k_factor
+                    u_zs[:, i] = u0[:,0] * k_factor # cambiado
                 elif num_x > 1 and num_y > 1:
                     u_zs[:, :, i] = u0 * k_factor
 

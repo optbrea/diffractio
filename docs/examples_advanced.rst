@@ -11,11 +11,12 @@ Scalar propagation
    :glob:
 
    source/examples_advanced/scalar/lenses.ipynb
-   source/examples_advanced/scalar/ammann.ipynb
+   source/examples_advanced/scalar/dammann.ipynb
    source/examples_advanced/scalar/image_formation.ipynb
    source/examples_advanced/scalar/ifta_CZT.ipynb
-   
-   
+   source/examples_advanced/scalar/lens_astigmatic.ipynb
+
+
 Vector propagation
 --------------------
 

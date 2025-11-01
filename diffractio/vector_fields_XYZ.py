@@ -495,9 +495,14 @@ class Vector_field_XYZ():
         field_output.Ex = np.squeeze(self.Ex[:, :, iz])
         field_output.Ey = np.squeeze(self.Ey[:, :, iz])
         field_output.Ez = np.squeeze(self.Ez[:, :, iz])
-        field_output.Hx = np.squeeze(self.Hx[:, :, iz])
-        field_output.Hy = np.squeeze(self.Hy[:, :, iz])
-        field_output.Hz = np.squeeze(self.Hz[:, :, iz])
+        if self.Hx is not None:
+            field_output.Hx = np.squeeze(self.Hx[:, :, iz])
+            field_output.Hy = np.squeeze(self.Hy[:, :, iz])
+            field_output.Hz = np.squeeze(self.Hz[:, :, iz])
+        else:
+            field_output.Hx = None
+            field_output.Hy = None
+            field_output.Hz = None
         field_output.n = np.squeeze(self.n[:, :, iz])
 
         return field_output

@@ -522,7 +522,7 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         return t_new
 
     
-    @check_none('x', 'z', raise_exception=bool_raise_exception)
+    #@check_none('x', 'z', 'u', raise_exception=bool_raise_exception)
     def add_surfaces(
         self, fx, x_sides: tuple[float, float],
         refractive_index: complex | float | str, min_incr: float = 0.1, angle: float = 0*degrees):
@@ -577,10 +577,10 @@ class Scalar_mask_XZ(Scalar_field_XZ):
             h_lens_r = h_lens_r + h_2_new
 
         len_z1 = len(x_lens_l)
-        fx1_n = np.concatenate((x_lens_l, h_lens_l)).reshape(2, len_z1).T
+        fx1_n = np.concatenate((x_lens_l, h_lens_l)).reshape(2, len_z1)
 
         len_z2 = len(x_lens_r)
-        fx2_n = np.concatenate((x_lens_r, h_lens_r)).reshape(2, len_z2).T
+        fx2_n = np.concatenate((x_lens_r, h_lens_r)).reshape(2, len_z2)
             
         # plt.figure()
         # plt.plot(fx1_n[:,0], fx1_n[:,1], 'g.')

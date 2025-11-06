@@ -440,7 +440,7 @@ def amplitude2phase(u: NDArrayComplex):
     """
 
     amplitude = np.abs(u)
-    u_phase = np.exp(1.j * amplitude)
+    u_phase = np.exp(1.j * 2 * np.pi * amplitude)
 
     return u_phase
 

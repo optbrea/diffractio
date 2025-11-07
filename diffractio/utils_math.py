@@ -369,7 +369,7 @@ def find_extrema(array2D: NDArrayFloat, x: NDArrayFloat, y: NDArrayFloat, kind: 
     """
 
     if kind == 'max':
-        result = np.where(array2D == np.a_max(array2D))
+        result = np.where(array2D == np.max(array2D))
     elif kind == 'min':
         result = np.where(array2D == np.min(array2D))
 

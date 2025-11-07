@@ -196,13 +196,16 @@ def width_percentage(x: NDArrayFloat, y: NDArrayFloat, percentage: float = 0.5, 
 
 
 def beam_width_2D(x: NDArrayFloat, y: NDArrayFloat, intensity: NDArrayFloat,
-                  remove_background: bool = False, has_draw: bool = False):
+                  remove_background: bool = False, has_draw: bool = False, verbose: bool = False):
     """2D beam width, ISO11146 width
 
     Args:
         x (np.array): 1d x
         y (np.array): 1d y
         intensity (np.array):  intensity
+        remove_background (bool): if True removes background
+        has_draw (bool): if True draws the ellipse
+        verbose (bool): if True prints data
 
     Returns:
         (float): dx width x
@@ -220,7 +223,7 @@ def beam_width_2D(x: NDArrayFloat, y: NDArrayFloat, intensity: NDArrayFloat,
     """
     X, Y = np.meshgrid(x, y)
     if remove_background is True:
-        intensity = intensity - intensity - min()
+        intensity = intensity - intensity.min()
 
     P = intensity.sum()
     x_mean = (intensity * X).sum() / P
@@ -239,6 +242,19 @@ def beam_width_2D(x: NDArrayFloat, y: NDArrayFloat, intensity: NDArrayFloat,
     # print(x2_mean, y2_mean, rt, dx, dy)
 
     principal_axis = 0.5 * np.arctan2(2 * xy_mean, x2_mean - y2_mean)
+
+    if verbose is True:
+        print("dx: {:4.2f} um".format(dx / um))
+        print("dy: {:4.2f} um".format(dy / um))
+        print("principal_axis: {:4.2f} degrees".format(principal_axis / degrees))
+        print(
+            "x_mean: {:4.2f} um, y_mean: {:4.2f} um".format(x_mean / um, y_mean / um)
+        )
+        print(
+            "x2_mean: {:4.2f} um^2, y2_mean: {:4.2f} um^2, xy_mean: {:4.2f} um^2".format(
+                x2_mean / um**2, y2_mean / um**2, xy_mean / um**2
+            )
+        )
 
     if has_draw is True:
         from matplotlib.patches import Ellipse

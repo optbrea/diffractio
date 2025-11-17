@@ -580,10 +580,6 @@ def get_MTF_frequency(freqs, MTF, level: float = 0.5, has_draw: bool = True, ver
     """Get frequency at which MTF crosses specified level (e.g., 0.5 for cutoff).
     Uses linear interpolation between points.
     Returns frequency or None if level not crossed."""
-
-    freqs = np.asarray(freqs).ravel()
-    MTF = np.asarray(MTF).ravel()
-
     
     nearest_idx = np.argmin(np.abs(MTF - level))
 

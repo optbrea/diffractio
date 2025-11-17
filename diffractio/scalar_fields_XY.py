@@ -1928,8 +1928,8 @@ class Scalar_field_XY():
         """Compute 2D MTF using CZT for arbitrary frequency grids.
         
         Args:
-            fx: 1D array of desired fx frequency samples (fx_k = fx0 + k*dfx).
-            fy: 1D array of desired fy frequency samples (fy_k = fy0 + k*dfy).
+            fx: 1D array of desired fx frequency samples.  The frequencies are in cycles/mm.
+            fy: 1D array of desired fy frequency samples. The frequencies are in cycles/mm.
             incoherent: If True, compute MTF from intensity; else from complex field.
             has_draw: If True, plot the resulting 2D MTF as an image.
             Returns:
@@ -2015,7 +2015,7 @@ class Scalar_field_XY():
 
         if has_draw:
             """Plot 2D MTF as image with fx horizontal axis (cycles/unit) and fy vertical."""
-            extent = (fx[0], fx[-1], fy[0], fy[-1])
+            extent = (fx[0]*1000, fx[-1]*1000, fy[0]*1000, fy[-1]*1000)
             plt.figure(figsize=(6,5))
             plt.imshow(mtf2d, origin='lower', extent=extent, aspect='equal', cmap='hot', vmin=0, vmax=1)
             plt.xlabel('fx (cycles / mm)')

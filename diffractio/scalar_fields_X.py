@@ -1486,7 +1486,7 @@ class Scalar_field_X():
         """Direct DFT evaluation at arbitrary frequencies. Exact but O(N*M).
         
         Args:
-            frequencies (np.ndarray): frequencies where MTF is evaluated (in cycles/m)
+            frequencies (np.ndarray): frequencies where MTF is evaluated (in cycles/mm)
             incoherent (bool): If True, MTF is computed for incoherent light (using intensity). If False, coherent light (using field).
             has_draw (bool): If True, draws the MTF.
 
@@ -1495,18 +1495,15 @@ class Scalar_field_X():
             mtf (np.ndarray): MTF values
 
         """
-        
-        frequencies = frequencies/1000 # convert to cycles/mm
-    
+            
         if incoherent:
             s = np.abs(self.u)**2
         else:
             s = self.u
 
-        fd = np.asarray(frequencies)
         
         # exponent matrix: shape (n_freqs, N)
-        ex = np.exp(-2j * np.pi * np.outer(fd, self.x))
+        ex = np.exp(-2j * np.pi * np.outer(frequencies/1000, self.x))
         Svals = ex.dot(s)  
         norm = np.abs(Svals).max() if np.abs(Svals).max() > 0 else 1.0
         otf = Svals / norm
@@ -1516,15 +1513,15 @@ class Scalar_field_X():
         if has_draw:
             plt.figure(); 
 
-            plt.plot(fd*1000, mtf, 'b', label='MTF')
+            plt.plot(frequencies, mtf, 'b', label='MTF')
             plt.ylabel('MTF')
             plt.xlabel('Frequency (cycles/mm)')
-            plt.xlim(0, frequencies[-1]*1000)
+            plt.xlim(0, frequencies[-1])
             plt.ylim(-0.01, 1.01)
             plt.grid()
             plt.legend()
         
-        return fd, mtf
+        return mtf
 
 
     @check_none('u', raise_exception=bool_raise_exception)

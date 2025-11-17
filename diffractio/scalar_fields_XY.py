@@ -66,6 +66,7 @@ The magnitude is related to microns: `micron = 1.`
 import copy
 import datetime
 import time
+from typing import Tuple
 
 import matplotlib.animation as animation
 import scipy.ndimage
@@ -74,6 +75,7 @@ from numpy import gradient
 from numpy.lib.scimath import sqrt as csqrt
 from scipy.fftpack import fft2, fftshift, ifft2
 from scipy.interpolate import RectBivariateSpline
+from scipy.signal import czt
 
 from .__init__ import np, plt
 from .__init__ import degrees, mm, seconds, um
@@ -1921,72 +1923,176 @@ class Scalar_field_XY():
 
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
-    def MTF(self, kind: str = 'mm', has_draw: bool = True, is_matrix: bool = True):
-        """Computes the MTF of a field, If this field is near to focal point, the MTF will be wide
-
+    def MTF(self, fx: np.ndarray, fy: np.ndarray, incoherent: bool = False, has_draw: bool = False) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        
+        """Compute 2D MTF using CZT for arbitrary frequency grids.
+        
         Args:
-            kind (str): 'mm', 'degrees'
-            has_draw (bool): If True draws the MTF
-
-        Returns:
-            (numpy.np.array) fx: frequencies in lines/mm
-            (numpy.np.array) mtf_norm: normalizd MTF
+            fx: 1D array of desired fx frequency samples (fx_k = fx0 + k*dfx).
+            fy: 1D array of desired fy frequency samples (fy_k = fy0 + k*dfy).
+            incoherent: If True, compute MTF from intensity; else from complex field.
+            has_draw: If True, plot the resulting 2D MTF as an image.
+            Returns:
+                mtf2d: 2D array of MTF values (My x Mx).
         """
- 
-        tmp_field = self.u
-        x = self.x
-        y = self.y
-        self.u = np.abs(self.u)**2
-        MTF_field = self.fft(new_field=True, shift=True, remove0=False)
 
-        num_data_x, num_data_y = MTF_field.u.shape
+        fx = fx/1000  # convert from cycles/um to cycles/mm
+        fy = fy/1000  # convert from cycles/um to cycles/mm
 
-        mtf_norm = np.abs(MTF_field.u) / np.abs(
-            MTF_field.u[int(num_data_x/2),
-                        int(num_data_y/2)])
+        Nx = len(self.x)
+        Ny = len(self.y)
 
-        delta_x = x[1] - x[0]
-        delta_y = y[1] - y[0]
-
-        frec_nyquist_x = 0.5 / delta_x
-        frec_nyquist_y = 0.5 / delta_y
-
-        fx = 1000 * np.linspace(-frec_nyquist_x, frec_nyquist_x, len(x))
-        fy = 1000 * np.linspace(-frec_nyquist_y, frec_nyquist_y, len(y))
-
-        if kind == 'mm':
-            # frec_x = fx
-            # frec_y = fy
-            text_x = r"$f_x (cycles/mm)$"
-            text_y = r"$f_y (cycles/mm)$"
-        elif kind == 'degrees':
-            print("not implemented yet")
-            # frec_x = fx
-            # frec_y = fy
-            text_x = r"$f_x (cycles/deg - not yet)$"
-            text_y = r"$f_x (cycles/deg - not yet)$"
-
-        if has_draw is True:
-            draw2D(
-                mtf_norm,
-                x,
-                y,
-                xlabel=text_x,
-                ylabel=text_y,
-                title="",
-                color="gist_heat",  # YlGnBu  seismic
-                interpolation='bilinear',  # 'bilinear', 'nearest'
-                scale='scaled')
-            plt.colorbar(orientation='vertical', shrink=0.66)
-
-        self.u = tmp_field
-
-        if is_matrix is True:
-            return fx, fy, mtf_norm
+        # prepare intensity (incoherent) or complex field (coherent)
+        if incoherent:
+            s = np.abs(self.u)**2
         else:
-            u_mtf = Scalar_field_XY(fx, fy, self.wavelength)
-            u_mtf.u = mtf_norm
-            return u_mtf
+            s = self.u.astype(np.complex128)
+
+        # check uniform grids and compute spacing and origins
+        x = self.x 
+        y = self.y
+        if x.size != Nx or y.size != Ny:
+            raise ValueError('x and y lengths must match field shape (Nx, Ny)')
+        dxs = np.diff(x)
+        dys = np.diff(y)
+        dx = dxs.mean()
+        dy = dys.mean()
+        if not np.allclose(dxs, dx, rtol=1e-6, atol=1e-12):
+            raise ValueError('x must be (approximately) uniformly sampled')
+        if not np.allclose(dys, dy, rtol=1e-6, atol=1e-12):
+            raise ValueError('y must be (approximately) uniformly sampled')
+        x0 = x[0]
+        y0 = y[0]
+
+        dfx = fx[1] - fx[0]
+        dfy = fy[1] - fy[0]
+        Mx = fx.size
+        My = fy.size
+        fx0 = fx[0]
+        fy0 = fy[0]
+
+        # CZT parameters for x-axis: w_x = exp(-2j*pi*dfx*dx) ; a_x = 1 (we handle x0 prefactor separately)
+        w_x = np.exp(-2j * np.pi * dfx * dx)
+        a_x = 1.0
+        # CZT along x for each row: compute Mx freq samples per row
+        # precompute phase factor for x0: pref_x[k] = exp(-2j*pi*(fx0 + k*dfx)*x0)
+        pref_x = np.exp(-2j * np.pi * (fx0 + np.arange(Mx) * dfx) * x0)
+
+        # Allocate intermediate array (Ny x Mx)
+        Sx = np.zeros((Ny, Mx), dtype=complex)
+        # For each row, compute CZT of sequence s[row, :] * exp(-2j*pi*fx0 * n * dx) with w = w_x and m = Mx
+        n = np.arange(Nx)
+        phase_f0_x = np.exp(-2j * np.pi * fx0 * n * dx)
+        for iy in range(Ny):
+            row = s[iy, :] * phase_f0_x
+            Srow = czt(row, Mx, w=w_x, a=1.0)  # returns length Mx array
+            Sx[iy, :] = pref_x * Srow  # apply x0 prefactor across k
+
+        # Now for each fx index k we have a column Sx[:, k] as function of y; apply CZT along y to get fy samples
+        w_y = np.exp(-2j * np.pi * dfy * dy)
+        pref_y = np.exp(-2j * np.pi * (fy0 + np.arange(My) * dfy) * y0)
+        mtf2d = np.zeros((My, Mx), dtype=float)
+        m = np.arange(Ny)
+        phase_f0_y = np.exp(-2j * np.pi * fy0 * m * dy)
+        for kx in range(Mx):
+            col = Sx[:, kx] * phase_f0_y  # length Ny complex
+            # czt along y produces My samples for this kx
+            Sy = czt(col, My, w=w_y, a=1.0)
+            # apply y0 prefactor and store magnitude later
+            Sy = pref_y * Sy
+            mtf2d[:, kx] = np.abs(Sy)
+
+        # normalize so OTF at (0,0) = 1 if (0,0) is inside sampled grid
+        # find index of fx=0 and fy=0 if present (within tolerance) to normalize; otherwise normalize to max
+        ix0 = np.argmin(np.abs(fx - 0.0)) if np.any(np.isclose(fx, 0.0, atol=1e-12)) else None
+        iy0 = np.argmin(np.abs(fy - 0.0)) if np.any(np.isclose(fy, 0.0, atol=1e-12)) else None
+        if ix0 is not None and iy0 is not None:
+            norm = mtf2d[iy0, ix0] if mtf2d[iy0, ix0] != 0 else mtf2d.max()
+        else:
+            norm = mtf2d.max() if mtf2d.max() != 0 else 1.0
+        mtf2d = mtf2d / norm
+
+
+        if has_draw:
+            """Plot 2D MTF as image with fx horizontal axis (cycles/unit) and fy vertical."""
+            extent = (fx[0], fx[-1], fy[0], fy[-1])
+            plt.figure(figsize=(6,5))
+            plt.imshow(mtf2d, origin='lower', extent=extent, aspect='equal', cmap='hot', vmin=0, vmax=1)
+            plt.xlabel('fx (cycles / mm)')
+            plt.ylabel('fy (cycles / mm)')
+            plt.title('MTF')
+            plt.show()
+
+        return mtf2d
+
+
+
+    def MTF_profiles(self, fx: np.ndarray, fy: np.ndarray, incoherent: bool = False, has_draw: bool = True, mtf_ideal: Tuple[np.ndarray, np.ndarray] = None) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
+        """Return central horizontal and vertical cuts through the 2D MTF and a radial average."""
+       
+        mtf2d = self.MTF(fx, fy, incoherent=incoherent, has_draw=False)
+       
+       
+        # find central indices (closest to zero freq) if 0 included; else central index
+        ix0 = np.argmin(np.abs(fx - 0.0)) if np.any(np.isclose(fx, 0.0, atol=1e-12)) else fx.size // 2
+        iy0 = np.argmin(np.abs(fy - 0.0)) if np.any(np.isclose(fy, 0.0, atol=1e-12)) else fy.size // 2
+        horiz = mtf2d[iy0, :]  # MTF vs fx at fy ~ 0
+        vert = mtf2d[:, ix0]   # MTF vs fy at fx ~ 0
+        # radial average
+        FX, FY = np.meshgrid(fx, fy)
+        FR = np.sqrt(FX**2 + FY**2)
+        fr_flat = FR.ravel()
+        mtf_flat = mtf2d.ravel()
+        fmax = fr_flat.max()
+        nbins = max(200, int(min(fx.size, fy.size)))
+        bins = np.linspace(0, fmax, nbins+1)
+        frad = 0.5*(bins[:-1] + bins[1:])
+        mtf_rad = np.empty(nbins)
+        for i in range(nbins):
+            sel = (fr_flat >= bins[i]) & (fr_flat < bins[i+1])
+            if np.any(sel):
+                mtf_rad[i] = mtf_flat[sel].mean()
+            else:
+                mtf_rad[i] = np.nan
+        
+        if np.isnan(mtf_rad[0]):
+            mtf_rad[0] = mtf_rad[1]
+
+        mtf_rad = np.nan_to_num(mtf_rad)
+
+
+        if has_draw:
+            plt.figure()
+            plt.plot(fx, horiz, 'r', label='Horizontal cut (fy=0)')
+            plt.plot(fy, vert, 'b', label='Vertical cut (fx=0)')
+            if mtf_ideal is not None:
+                freqs_ideal, mtf_ideal_vals = mtf_ideal
+                plt.plot(freqs_ideal, mtf_ideal_vals, 'k--', label='MTF ideal')
+            plt.xlabel('Frequency (cycles/mm)')
+            plt.ylabel('MTF')
+            plt.title('1D MTF Profiles')
+            plt.xlim(0, max(fx[-1], fy[-1]))
+            plt.ylim(-0.01, 1.01)
+            plt.grid()
+            plt.legend()
+
+
+            plt.figure()
+            plt.plot(frad, mtf_rad, 'b-', label='radial average')
+            if mtf_ideal is not None:
+                freqs_ideal, mtf_ideal_vals = mtf_ideal
+                plt.plot(freqs_ideal, mtf_ideal_vals, 'k--', label='MTF ideal')
+            plt.xlabel('Spatial Frequency (cycles/mm)')
+            plt.ylabel('Radial Average MTF')
+            plt.xlim(0, frad[-1])
+            plt.ylim(-0.01, 1.01)
+            plt.grid()
+            plt.legend()
+
+
+        return (fx, horiz), (fy, vert), (frad, mtf_rad)
+
+
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
     def beam_width_4s(self, has_draw: bool = True, verbose: bool = False):

@@ -1227,7 +1227,7 @@ class Scalar_field_X():
             fig, ax = plt.subplots( subplot_kw=dict(projection='polar'))
             
             # Plot the data
-            ax.plot(theta, np.log10(I_far), 'b-', linewidth=1, label='$\log_{10}(I/I_{max})$')
+            ax.plot(theta, np.log10(I_far), 'b-', linewidth=1, label=r'$\log_{10}(I/I_{max})$')
             
             # Grid settings
             ax.grid(True, alpha=1)
@@ -1481,51 +1481,50 @@ class Scalar_field_X():
 
 
     @check_none('x', 'u', raise_exception=bool_raise_exception)
-    def MTF(self, kind: str = "mm", has_draw: bool = True):
-        """Computes the MTF of a field,.
-
+    def MTF(self,  frequencies: np.ndarray, incoherent: bool = True, has_draw: bool = False) -> tuple[np.ndarray, np.ndarray]:
+        
+        """Direct DFT evaluation at arbitrary frequencies. Exact but O(N*M).
+        
         Args:
-            kind (str): 'mm', 'degrees'
-            has_draw (bool): If True draws the MTF
+            frequencies (np.ndarray): frequencies where MTF is evaluated (in cycles/m)
+            incoherent (bool): If True, MTF is computed for incoherent light (using intensity). If False, coherent light (using field).
+            has_draw (bool): If True, draws the MTF.
 
         Returns:
-            (numpy.array) fx: frequencies in lines/mm
-            (numpy.array) mtf_norm: normalizd MTF
+            fd (np.ndarray): frequencies (cycles/mm)
+            mtf (np.ndarray): MTF values
+
         """
         
-        tmp_field = self.u
-        x = self.x
-        self.u = np.abs(self.u) ** 2
-        MTF_field = self.fft(new_field=True, shift=True)
+        frequencies = frequencies/1000 # convert to cycles/mm
+    
+        if incoherent:
+            s = np.abs(self.u)**2
+        else:
+            s = self.u
 
-        i_center = int(len(MTF_field.x)/2)
+        fd = np.asarray(frequencies)
+        
+        # exponent matrix: shape (n_freqs, N)
+        ex = np.exp(-2j * np.pi * np.outer(fd, self.x))
+        Svals = ex.dot(s)  
+        norm = np.abs(Svals).max() if np.abs(Svals).max() > 0 else 1.0
+        otf = Svals / norm
+        mtf = np.abs(otf)
 
-        mtf_norm = np.abs(MTF_field.u) / np.abs(MTF_field.u[i_center])
 
-        # Image plane spacing
-        delta_x = x[1] - x[0]
-        # Nyquist frequencies on x and y direction
-        frec_nyquist = 0.5 / delta_x
-        # Defining spatial frequencies, 1000 passes um to mm
-        fx = 1000 * np.linspace(-frec_nyquist, frec_nyquist, len(x))
+        if has_draw:
+            plt.figure(); 
 
-        if kind == "mm":
-            frec = fx
-            text_x = r"$f_x (cycles/mm)$"
-        elif kind == "degrees":
-            print("not implemented yet")
-            frec = fx
-            text_x = r"$f_x (cycles/deg - not yet)$"
-
-        if has_draw is True:
-            plt.figure()
-            plt.plot(frec, mtf_norm, "k")
-            plt.xlabel(text_x, fontsize=18)
-            plt.ylabel("MTF", fontsize=18)
-
-        self.u = tmp_field
-
-        return fx, mtf_norm
+            plt.plot(fd*1000, mtf, 'b', label='MTF')
+            plt.ylabel('MTF')
+            plt.xlabel('Frequency (cycles/mm)')
+            plt.xlim(0, frequencies[-1]*1000)
+            plt.ylim(-0.01, 1.01)
+            plt.grid()
+            plt.legend()
+        
+        return fd, mtf
 
 
     @check_none('u', raise_exception=bool_raise_exception)

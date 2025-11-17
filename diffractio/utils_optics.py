@@ -575,8 +575,56 @@ def detect_intensity_range(x: NDArrayFloat, intensity: NDArrayFloat, percentage:
     return x_min, x_max
 
 
-def MTF_ideal(frequencies: NDArrayFloat, wavelength: float, diameter: float, focal: float,
-              kind: str, verbose: bool = False, has_draw: bool = False):
+
+def get_MTF_frequency(freqs, MTF, level: float = 0.5, has_draw: bool = True, verbose: bool =   True) -> float:
+    """Get frequency at which MTF crosses specified level (e.g., 0.5 for cutoff).
+    Uses linear interpolation between points.
+    Returns frequency or None if level not crossed."""
+
+    freqs = np.asarray(freqs).ravel()
+    MTF = np.asarray(MTF).ravel()
+
+    
+    nearest_idx = np.argmin(np.abs(MTF - level))
+
+    freq_MTF = freqs[nearest_idx]  # in cycles/mm
+
+    if verbose:
+        print(r"frequency at MTF = {}: {:2.4f} cycles/mm".format(level, freq_MTF))
+
+
+    if has_draw:
+        plt.figure()
+        plt.plot(freqs, MTF, 'b', label='MTF')
+        plt.axhline(level, color='r', linestyle='--', label=f'Level {level}')
+        plt.axvline(freq_MTF, color='k', linestyle='--', label=f'Freq at level: {freq_MTF:.2f} cycles/mm')
+        plt.xlabel('Frequency (cycles/mm)')
+        plt.ylabel('MTF')
+        plt.xlim(0, freqs[-1])
+        plt.ylim(-0.01, 1.01)
+        plt.grid()
+        plt.legend()
+    return freq_MTF
+
+
+def get_cut_frequency(focal: float, diameter: float, wavelength: float):
+    """Determines the cut frequency of a lens.
+    Args:
+        wavelength (float): wavelength of incoming light beam
+        diameter (float): diameter of lens
+        focal (float): focal distance of lens
+    Returns:
+        (float) freq_cut: maximum frequency of the lens
+    """
+
+    F_number = focal / diameter
+    freq_cut = 1000.0 / (wavelength * F_number)  # in mm
+
+    return freq_cut
+
+def MTF_ideal(wavelength: float, diameter: float, focal: float,
+              frequencies: NDArrayFloat | None = None, kind: str = '1D', 
+              verbose: bool = False, has_draw: bool = False):
     """Determines the ideal MTF of a lens.
 
     References:
@@ -594,12 +642,20 @@ def MTF_ideal(frequencies: NDArrayFloat, wavelength: float, diameter: float, foc
 
     Returns:
         (numpy.array) MTF: Normalized MTF of ideal lens
-        (float) frequency_max: maximum frequency of the lens
+        (float) freq_cut: maximum frequency of the lens
     """
 
+
+    
+
     F_number = focal / diameter
-    frequency_max = 1000.0 / (wavelength * F_number)  # porque mido en micras
-    fx_norm = np.abs(frequencies / frequency_max)
+    freq_cut = 1000.0 / (wavelength * F_number)  # porque mido en micras
+
+    if frequencies is None:
+        frequencies = np.linspace(0, 1.25*freq_cut, 1000)
+
+    fx_norm = np.abs(frequencies / freq_cut)
+
 
     if kind == "1D":
         MTF = 1 - np.abs(fx_norm)
@@ -607,24 +663,31 @@ def MTF_ideal(frequencies: NDArrayFloat, wavelength: float, diameter: float, foc
 
     elif kind == "2D":
         fx2 = np.arccos(fx_norm)
-        MTF = np.real(2 / np.pi * (fx2 - np.cos(fx2) * np.sin(fx2)))
+        MTF = np.abs(2 / np.pi * (fx2 - np.cos(fx2) * np.sin(fx2)))
+        MTF[fx_norm > 1] = 0
 
-        # Another definition: https://www.optikos.com/wp-content/uploads/2015/10/How-to-Measure-MTF-and-other-Properties-of-Lenses.pdf
+        # # Another definition: https://www.optikos.com/wp-content/uploads/2015/10/How-to-Measure-MTF-and-other-Properties-of-Lenses.pdf
         # MTF = np.real(2/np.pi*(np.arccos(fx_norm)-fx_norm*np.sqrt(1-fx_norm**2)))
 
         # isH1 = MTF > 1
         # MTF[isH1] = 2 - MTF[isH1]
+    else:
+        print("kind = '1D' or '2D'")
 
     if verbose is True:
-        print("frquency = {:4.2f} lines/mm".format(frequency_max))
+        print("frequency cut = {:4.2f} lines/mm".format(freq_cut))
 
     if has_draw is True:
         plt.figure()
         plt.plot(frequencies, MTF, "k")
         plt.xlabel(r"$f_x (mm^{-1})$", fontsize=18)
         plt.ylabel("MTF", fontsize=18)
+        plt.xlim(left=frequencies[0], right=frequencies[-1])
+        plt.ylim(bottom=-0.01, top=1.01)
+        plt.title("$frec_c$ = {:2.1f} (lines/mm)".format(freq_cut), fontsize=18)
+        plt.grid()
 
-    return MTF, frequency_max
+    return MTF, freq_cut
 
 
 def lines_mm_2_cycles_degree(lines_mm: NDArrayFloat, focal: float):

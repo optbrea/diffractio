@@ -16,6 +16,7 @@ Beta state
 
   - 'scalar_source_X' and scalar_source_XY: wavelets function has been implemented to generate a field with spherical waves or gaussian beams.
   
+  - MTF function in scalar_XY and scalar_X fields has been improved to include incoherent and coherent cases.
 
 1.0.0 (2025-01-14)
 --------------------------------

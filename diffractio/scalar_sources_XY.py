@@ -561,7 +561,7 @@ class Scalar_source_XY(Scalar_field_XY):
             c_nm (tuple): list of coefficients, in radians
 
         Example:
-             zernike_beam(A: float = 1, r0=(0*um, 0*um), radius=5*mm, n=[1, 3, 3, 5, 5, 5], m=[1, 1, 3, 1, 3, 5], c_nm=[.25, 1, 1, 1, 1, 1])
+             zernike_beam(A= 1, r0=(0*um, 0*um), radius=5*mm, n=[1, 3, 3, 5, 5, 5], m=[1, 1, 3, 1, 3, 5], c_nm=[.25, 1, 1, 1, 1, 1])
         """
 
         # normalizing to radius 1

@@ -18,6 +18,8 @@ Beta state
   
   - MTF function in scalar_XY and scalar_X fields has been improved to include incoherent and coherent cases.
 
+  - profile_angle function in scalar_XY has been implemented to get 1D profile at any angle.
+
 1.0.0 (2025-01-14)
 --------------------------------
 Beta state

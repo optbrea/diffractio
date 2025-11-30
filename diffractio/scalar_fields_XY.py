@@ -1781,7 +1781,8 @@ class Scalar_field_XY():
                 point2: tuple[float, float] | str = '',
                 npixels: int | None = None,
                 kind: str = 'intensity',
-                order: int = 2):
+                order: int = 2, 
+                has_draw: bool = False):
         """Determine profile in image. If points are not given, then image is shown and points are obtained clicking.
 
         Args:
@@ -1831,7 +1832,106 @@ class Scalar_field_XY():
         z_profile = scipy.ndimage.map_coordinates(image.transpose(),   np.vstack((x, y)),   order=order)
         z_profile[-1] = z_profile[-2]
 
+        if has_draw is True:
+            plt.figure()
+            plt.plot(h, z_profile, 'k', lw=2)
+            plt.xlabel('h (profile)')
+            plt.ylabel(kind)
+            plt.axis([h.min(), h.max(), z_profile.min(), z_profile.max()])
+            plt.show()
+
         return h, z_profile, point1, point2
+
+
+
+    def profile_angle(self, r0: tuple[float, float], angle: float=0.,  kind: str ='intensity', length: float | None=None, npixels: int=500, 
+                    fill_value=np.nan, has_draw: bool | int = False):
+        """
+        Extract a 1D profile from a 2D image along a line.
+        image: 2D numpy array with shape (ny, nx)
+        x: 1D array of x coordinates (len nx)
+        y: 1D array of y coordinates (len ny)
+        r0: tuple (x0, y0) starting point (center of profile)
+        angle: line angle w.r.t x axis (degrees by default)
+        length: total length of profile (if None, set to max(image extent))
+        num: number of sample points along the line
+        degrees: whether `angle` is in degrees (True) or radians (False)
+        fill_value: value used when sample point is outside the image bounds
+        has_draw: if True, draws the profile and the line on the image
+
+        Returns:
+            x_coords, y_coords, t, vals
+            - x_coords, y_coords: arrays of sample coordinates
+            - t: distances along the line (centered, from -length/2 .. +length/2)
+            - vals: interpolated image values at the sample coords
+        """
+
+        x0, y0 = r0
+
+        if kind == 'phase':
+            image = np.angle(self.u)
+        elif kind == 'intensity':
+            image = self.intensity()
+        elif kind == 'amplitude':
+            image = np.real(self.u)
+        elif kind == 'field':
+            image = self.u
+        else:
+            raise ValueError(f"Unknown kind: {kind}")
+        
+        rango = image.max() - image.min()
+
+        # default length: cover full image diagonal if not provided
+        if length is None:
+            lx = self.x.max() - self.x.min()
+            ly = self.y.max() - self.y.min()
+            length = np.hypot(lx, ly)
+
+        s_line = np.linspace(-length / 2.0, length / 2.0, npixels)
+        dx = np.cos(angle)
+        dy = np.sin(angle)
+        x_coords = x0 + s_line * dx
+        y_coords = y0 + s_line * dy
+
+        vals = _bilinear_interpolate(image, x_coords, y_coords, self.x, self.y, fill_value=fill_value)
+
+        from scipy import ndimage
+        mask = ~np.isnan(vals)
+        nearest_indices = ndimage.distance_transform_edt(~mask, return_distances=False, return_indices=True)[0]
+        vals = vals[nearest_indices]
+
+        if has_draw == True or has_draw == 1:
+            plt.figure(figsize=(8,4))
+            plt.subplot(1,2,1)
+            plt.imshow(image, extent=[self.x.min(), self.x.max(), self.y.min(), self.y.max()], origin='lower', cmap='gray')
+            plt.plot(x_coords, y_coords, '-r', lw=1)
+            plt.scatter([x_coords[0], x_coords[-1]], [y_coords[0], y_coords[-1]], c='r')
+            plt.xlim(self.x.min(), self.x.max())
+            plt.ylim(self.y.min(), self.y.max())
+            plt.xlabel(r'x ($\mu$m)')
+            plt.ylabel(r'y ($\mu$m)')
+
+            plt.subplot(1,2,2)
+            plt.plot(s_line, vals)
+            plt.xlabel(r's $(\mu m)$')
+            plt.ylabel('profile ({})'.format(kind))
+            plt.tight_layout()
+            plt.xlim(s_line.min(), s_line.max())
+            plt.ylim(image.min()-0.01*rango, image.max()+0.01*rango)
+            plt.grid('on')
+            plt.show()
+
+        elif has_draw == 2:
+            plt.figure()
+            plt.plot(s_line, vals)
+            plt.xlabel(r's $(\mu m)$')
+            plt.ylabel('profile ({})'.format(kind))
+            plt.xlim(s_line.min(), s_line.max())
+            plt.ylim(image.min()-0.01*rango, image.max()+0.01*rango)
+            plt.grid('on')
+            plt.show()
+
+        return x_coords, y_coords, s_line, vals
 
     @check_none('x', raise_exception=bool_raise_exception)
     def draw_profile(self,
@@ -1840,7 +1940,11 @@ class Scalar_field_XY():
                      npixels: int | None = None,
                      kind: str = 'intensity',
                      order: int = 2):
-        """Draws profile in image. If points are not given, then image is shown and points are obtained clicking.
+        """Draws profile in image. 
+        
+        **Deprecated:** use profile with has_draw=True instead.
+        
+        If points are not given, then image is shown and points are obtained clicking.
 
         Args:
             point1 (float): initial point. if '' get from click
@@ -1859,13 +1963,9 @@ class Scalar_field_XY():
         if npixels is None:
             npixels = len(self.x)
 
-        h, z_profile, point1, point2 = self.profile(point1, point2, npixels, kind, order)
+        h, z_profile, point1, point2 = self.profile(point1, point2, npixels, kind, order, True)
 
-        plt.figure()
-        plt.plot(h, z_profile, 'k', lw=2)
-        plt.xlabel('h (profile)')
-        plt.ylabel(kind)
-        plt.axis([h.min(), h.max(), z_profile.min(), z_profile.max()])
+
         return h, z_profile, point1, point2
 
 
@@ -2026,10 +2126,76 @@ class Scalar_field_XY():
         return mtf2d
 
 
+    def MTF_profile(self, fx: np.ndarray, fy: np.ndarray, angle: float = 0.0, length: float | None = None, npixels: int = 1024,
+                    incoherent: bool = False, has_draw: bool | list  = False, mtf_ideal: Tuple[np.ndarray, np.ndarray] = None) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
+        """MTF profile at a given angle.
 
-    def MTF_profiles(self, fx: np.ndarray, fy: np.ndarray, incoherent: bool = False, has_draw: bool = True, mtf_ideal: Tuple[np.ndarray, np.ndarray] = None) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
-        """Return central horizontal and vertical cuts through the 2D MTF and a radial average."""
+        Args:
+            fx (np.ndarray): Frequency coordinates in x (cycles/mm).
+            fy (np.ndarray): Frequency coordinates in y (cycles/mm).
+            angle (float, optional): Angle in radians for the profile direction. Defaults to 0.0.
+            length (float | None, optional): Length of the profile in cycles/mm. If None, uses full range. Defaults to None.
+            npixels (int, optional): Number of pixels in the profile. Defaults to 1024.
+            incoherent (bool, optional): Whether to compute incoherent MTF. Defaults to False.
+            has_draw (bool | list, optional): Whether to plot the profile. Defaults to False.
+            mtf_ideal (Tuple[np.ndarray, np.ndarray], optional): Ideal MTF for comparison. Defaults to None.    
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: Frequencies and MTF profile values.
+                freqs_profile (np.ndarray): 1D array of spatial frequencies along the profile (cycles/mm).
+                mtf_profile (np.ndarray): 1D array of MTF values along the profile (0 to 1).
+        
+        """
+
+        from diffractio.diffractio import Diffractio
+
+        mtf2d = self.MTF(fx, fy, incoherent=incoherent, has_draw=False)
        
+        u_mtf = Diffractio('scalar', 'field', x=fx, y=fy, wavelength=self.wavelength)
+        u_mtf.u = mtf2d
+        
+        if length is not None:
+            length = length * 2
+       
+        x_coords, y_coords, freqs_profile, mtf_profile = u_mtf.profile_angle(r0=(0,0), angle=angle, kind='amplitude', 
+                                                                             length=length, npixels=npixels, has_draw=False)
+
+ 
+        if has_draw:
+            plt.figure()
+            plt.plot(freqs_profile, mtf_profile, 'r', label='MTF profile')
+            if mtf_ideal is not None:
+                freqs_ideal, mtf_ideal_vals = mtf_ideal
+                plt.plot(freqs_ideal, mtf_ideal_vals, 'k--', label='MTF ideal')
+            plt.xlabel('Frequency (cycles/mm)')
+            plt.ylabel('MTF')
+            plt.title('1D MTF Profiles')
+            plt.xlim(0,freqs_profile.max())
+            plt.ylim(-0.01, 1.01)
+            plt.grid()
+            plt.legend()
+ 
+        return freqs_profile, mtf_profile
+
+
+    def MTF_radial(self, fx: np.ndarray, fy: np.ndarray, incoherent: bool = False,
+                    has_draw: bool | list  = False, mtf_ideal: Tuple[np.ndarray, np.ndarray] = None) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
+        
+        """Calculates the radial average of the Modulation Transfer Function (MTF) from a 2D MTF.
+
+        Args:
+            fx (np.ndarray): 1D array of spatial frequencies in the x-direction (cycles/mm).
+            fy (np.ndarray): 1D array of spatial frequencies in the y-direction (cycles/mm).
+            incoherent (bool, optional): If True, calculates the incoherent MTF. Defaults to False.
+            has_draw (bool | list, optional): If True, plots the radial average MTF. Defaults to False.
+            mtf_ideal (Tuple[np.ndarray, np.ndarray], optional): Tuple containing ideal MTF frequencies and values for comparison. Defaults to None.    
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: A tuple containing:
+                - frad (np.ndarray): 1D array of radial spatial frequencies (cycles/mm).
+                - mtf_rad (np.ndarray): 1D array of radial average MTF values 
+
+        """
+
         mtf2d = self.MTF(fx, fy, incoherent=incoherent, has_draw=False)
        
        
@@ -2038,6 +2204,7 @@ class Scalar_field_XY():
         iy0 = np.argmin(np.abs(fy - 0.0)) if np.any(np.isclose(fy, 0.0, atol=1e-12)) else fy.size // 2
         horiz = mtf2d[iy0, :]  # MTF vs fx at fy ~ 0
         vert = mtf2d[:, ix0]   # MTF vs fy at fx ~ 0
+        
         # radial average
         FX, FY = np.meshgrid(fx, fy)
         FR = np.sqrt(FX**2 + FY**2)
@@ -2060,23 +2227,7 @@ class Scalar_field_XY():
 
         mtf_rad = np.nan_to_num(mtf_rad)
 
-
-        if has_draw:
-            plt.figure()
-            plt.plot(fx, horiz, 'r', label='Horizontal cut (fy=0)')
-            plt.plot(fy, vert, 'b', label='Vertical cut (fx=0)')
-            if mtf_ideal is not None:
-                freqs_ideal, mtf_ideal_vals = mtf_ideal
-                plt.plot(freqs_ideal, mtf_ideal_vals, 'k--', label='MTF ideal')
-            plt.xlabel('Frequency (cycles/mm)')
-            plt.ylabel('MTF')
-            plt.title('1D MTF Profiles')
-            plt.xlim(0, max(fx[-1], fy[-1]))
-            plt.ylim(-0.01, 1.01)
-            plt.grid()
-            plt.legend()
-
-
+        if has_draw is not None:
             plt.figure()
             plt.plot(frad, mtf_rad, 'b-', label='radial average')
             if mtf_ideal is not None:
@@ -2090,8 +2241,58 @@ class Scalar_field_XY():
             plt.legend()
 
 
-        return (fx, horiz), (fy, vert), (frad, mtf_rad)
+        return (frad, mtf_rad)
 
+
+    def MTF_profiles(self, fx: np.ndarray, fy: np.ndarray, angles: list | np.ndarray, length: float | None = None, npixels: int = 1024,
+                        incoherent: bool = False,
+                        has_draw: bool | list  = False, mtf_ideal: Tuple[np.ndarray, np.ndarray] = None) -> Tuple[Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray]]:
+
+        """Return central horizontal and vertical cuts through the 2D MTF and a radial average.
+
+        Args:
+            fx (np.ndarray): 1D array of spatial frequencies in x (cycles/mm).
+            fy (np.ndarray): 1D array of spatial frequencies in y (cycles/mm).
+            angles (list | np.ndarray): List or array of angles (in radians) at which to compute MTF profiles.
+            length (float | None, optional): Length of the profile line (in cycles/mm). If None, uses full range. Defaults to None.
+            npixels (int, optional): Number of pixels in the profile. Defaults to 1024.
+            incoherent (bool, optional): Whether to compute incoherent MTF. Defaults to False.
+            has_draw (bool | list, optional): Whether to plot the MTF profiles. Defaults to False.
+            mtf_ideal (Tuple[np.ndarray, np.ndarray], optional): Tuple of (frequencies, MTF values) for ideal MTF to plot for comparison. Defaults to None. 
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: 2D arrays of frequencies and MTF profiles for each angle.
+                all_freqs (np.ndarray): 2D array where each row corresponds to frequencies for a profile at a given angle.
+                all_mtf_profiles (np.ndarray): 2D array where each row corresponds to MTF values for a profile at a given angle.
+        """
+
+        for i, angle in enumerate(angles):
+            freqs_profile, mtf_profile = self.MTF_profile(fx, fy, angle=angle, length=length, npixels=npixels,
+                                                        incoherent=incoherent, has_draw=False,
+                                                        mtf_ideal=mtf_ideal)
+            if i == 0:
+                all_freqs = freqs_profile
+                all_mtf_profiles = mtf_profile[np.newaxis, :]
+            else:
+                all_freqs = np.vstack((all_freqs, freqs_profile[np.newaxis, :]))
+                all_mtf_profiles = np.vstack((all_mtf_profiles, mtf_profile[np.newaxis, :]))
+        
+        if has_draw:
+            plt.figure()
+            for i, angle in enumerate(angles):
+                plt.plot(all_freqs[i, :], all_mtf_profiles[i, :], label=f'{angle/degrees:2.2f} $^o$')
+            if mtf_ideal is not None:
+                freqs_ideal, mtf_ideal_vals = mtf_ideal
+                plt.plot(freqs_ideal, mtf_ideal_vals, 'k--', label='MTF ideal')
+            plt.xlabel('Frequency (cycles/mm)')
+            plt.ylabel('MTF')
+            plt.title('1D MTF Profiles at Different Angles')
+            plt.xlim(0, all_freqs.max())
+            plt.ylim(-0.01, 1.01)
+            plt.grid()
+            plt.legend(title='angle')
+
+        return all_freqs, all_mtf_profiles
 
 
     @check_none('x', 'y', 'u', raise_exception=bool_raise_exception)
@@ -3140,3 +3341,48 @@ def quality_factor(range_x: float, range_y: float, num_x: int, num_y: int,
         print("Quality factor = {:2.2f}".format(quality))
 
     return quality
+
+
+
+def _bilinear_interpolate(image, x_coords, y_coords, x, y, fill_value=np.nan):
+    """
+    Bilinear interpolation of image at points (x_coords, y_coords).
+    image: 2D array with shape (ny, nx)
+    x: 1D array (len nx) sorted increasing
+    y: 1D array (len ny) sorted increasing
+    returns: array of same length as x_coords with interpolated values
+    """
+    nx = x.size
+    ny = y.size
+    xi = np.searchsorted(x, x_coords) - 1
+    yi = np.searchsorted(y, y_coords) - 1
+
+    vals = np.full_like(x_coords, fill_value, dtype=float)
+
+    # valid mask for points inside the interpolation range (need i and i+1 valid)
+    valid = (xi >= 0) & (xi < nx - 1) & (yi >= 0) & (yi < ny - 1)
+
+    if not np.any(valid):
+        return vals
+
+    xi_valid = xi[valid]
+    yi_valid = yi[valid]
+    x0 = x[xi_valid]
+    x1 = x[xi_valid + 1]
+    y0 = y[yi_valid]
+    y1 = y[yi_valid + 1]
+
+    # weights
+    wx = (x_coords[valid] - x0) / (x1 - x0)
+    wy = (y_coords[valid] - y0) / (y1 - y0)
+
+    # pixel values
+    I00 = image[yi_valid, xi_valid]
+    I10 = image[yi_valid, xi_valid + 1]
+    I01 = image[yi_valid + 1, xi_valid]
+    I11 = image[yi_valid + 1, xi_valid + 1]
+
+    vals_valid = (1 - wx) * (1 - wy) * I00 + wx * (1 - wy) * I10 + (1 - wx) * wy * I01 + wx * wy * I11
+    vals[valid] = vals_valid
+
+    return vals

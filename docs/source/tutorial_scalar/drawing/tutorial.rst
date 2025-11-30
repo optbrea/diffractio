@@ -7,6 +7,7 @@ Some info about drawing and videos
    :glob:
 
    logarithm.ipynb
+   profile.ipynb
    creating_video.ipynb
    use_interact_visualize_profiles.ipynb
    interactive_in_diffractio.ipynb

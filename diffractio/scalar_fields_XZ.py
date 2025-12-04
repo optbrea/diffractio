@@ -1910,6 +1910,7 @@ class Scalar_field_XZ():
                             z0: float = 0*um,
                             logarithm: float = 0.,
                             normalize: bool = False,
+                            new_field: bool = False,
                             has_draw: bool = True,
                             filename: str = ''):
         """Determine and draws transversal profile.
@@ -1952,16 +1953,24 @@ class Scalar_field_XZ():
                             bbox_inches='tight',
                             pad_inches=0.1)
 
-        if kind == 'intensity':
-            output = intensity
-        elif kind == 'amplitude':
-            output = amplitude
-        elif kind == 'phase':
-            output = phase
-        elif kind == 'refractive_index':
-            output = n_profile
+        if new_field is True:
+            u_x = Scalar_field_X(x=self.x,
+                                 wavelength=self.wavelength,
+                                 n_background=self.n_background,
+                                 info="transversal_profile_z={}".format(z0))
+            u_x.u = u
+            return u_x
         else:
-            output = None
+            if kind == 'intensity':
+                output = intensity
+            elif kind == 'amplitude':
+                output = amplitude
+            elif kind == 'phase':
+                output = phase
+            elif kind == 'refractive_index':
+                output = n_profile
+            else:
+                output = None
         return output
 
 

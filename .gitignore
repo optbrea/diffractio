@@ -19,6 +19,7 @@ __pycache__/
 *checkpoint.ipynb
 .ipynb_checkpoints/
 
+
 # Tests
 test_results/
 
@@ -74,6 +75,10 @@ coverage.xml
 # Django stuff:
 *.log
 
+
+# virtual environment
+.venv/
+
 # Sphinx documentation
 # docs/_build/
 
@@ -87,3 +92,5 @@ target/
 tests_results*/
 
 htmlcov/
+
+luismiguel/web/software/diffractio

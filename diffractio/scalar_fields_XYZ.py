@@ -889,21 +889,19 @@ class Scalar_field_XYZ():
         numy = len(self.y)
         numz = len(self.z)
 
-        deltax = self.x[-1] - self.x[0]
-        deltay = self.y[-1] - self.y[0]
+        deltax = self.x[1] - self.x[0]
+        deltay = self.y[1] - self.y[0]
         deltaz = self.z[1] - self.z[0]
         # pixelx = np.linspace(-int(numx/2), int(numx/2), numx)
         # pixely = np.linspace(-numy/2, numy/2, numy)
 
         modo = self.u0.u
 
-        kx1 = np.linspace(0, int(numx/2) + 1, int(numx/2))
-        kx2 = np.linspace(-int(numx/2), -1, int(numx/2))
-        kx = (2 * np.pi / deltax) * np.concatenate((kx1, kx2))
+        # Use fftfreq to guarantee kx has exactly numx samples.
+        kx = 2 * np.pi * np.fft.fftfreq(numx, d=deltax)
 
-        ky1 = np.linspace(0, numy/2 + 1, int(numy/2))
-        ky2 = np.linspace(-numy/2, -1, int(numy/2))
-        ky = (2 * np.pi / deltay) * np.concatenate((ky1, ky2))
+        # Use fftfreq to guarantee ky has exactly numy samples.
+        ky = 2 * np.pi * np.fft.fftfreq(numy, d=deltay)
 
         KX, KY = np.meshgrid(kx, ky)
 

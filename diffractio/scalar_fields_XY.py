@@ -3234,7 +3234,7 @@ def PWD_kernel(u: NDArrayComplex, n: float, k0: float, k_perp2: NDArrayComplex, 
     Ek = fftshift(fft2(u))
     H = np.exp(1j * dz * csqrt(n**2 * k0**2 - k_perp2) - absorption)
 
-    result = (ifft2(fftshift(H * Ek)))
+    result = ifft2(np.fft.ifftshift(H * Ek))
     return result
 
 

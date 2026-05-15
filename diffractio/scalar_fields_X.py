@@ -1813,7 +1813,7 @@ def PWD_kernel(u: NDArrayComplex, n: NDArrayComplex, k0: float, k_perp2: NDArray
     Ek = fftshift(fft(u))
     H = np.exp(1j * dz * csqrt(n**2 * k0**2 - k_perp2))
 
-    return ifft(fftshift(H * Ek))
+    return ifft(np.fft.ifftshift(H * Ek))
 
 
 def WPM_schmidt_kernel(u, n: NDArrayComplex, k0: float, k_perp2: NDArrayComplex, dz: float):

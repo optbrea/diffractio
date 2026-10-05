@@ -2,5 +2,12 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.analysis.typeCheckingMode": "basic",
-    "python.defaultInterpreterPath": "./.env/bin/python"
+    "python.defaultInterpreterPath": "./.env/bin/python",
+    "python-envs.pythonProjects": [
+        {
+            "path": ".",
+            "envManager": "ms-python.python:pipenv",
+            "packageManager": "ms-python.python:pip"
+        }
+    ]
 }

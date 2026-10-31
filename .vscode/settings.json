@@ -2,12 +2,14 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.analysis.typeCheckingMode": "basic",
-    "python.defaultInterpreterPath": "./.env/bin/python",
+    "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.analysis.autoImportCompletions": true,
     "python-envs.pythonProjects": [
         {
             "path": ".",
             "envManager": "ms-python.python:pipenv",
             "packageManager": "ms-python.python:pip"
         }
-    ]
+    ],
+    "python.REPL.enableREPLSmartSend": false
 }

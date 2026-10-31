@@ -19,6 +19,8 @@ Init module to control the rest of the modules.
 # flake8: noqa
 
 
+from typing import Literal, overload
+
 from .config import Options_Diffractio_kind, Options_Diffractio_frame
 
 from diffractio.scalar_fields_X import Scalar_field_X
@@ -66,6 +68,144 @@ class Diffractio():
         self.type (str): Class of the field.
         self.date (str): Date when performed.
     """
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['source'],
+        x: NDArrayFloat, y: None = ..., z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_source_X: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['mask'],
+        x: NDArrayFloat, y: None = ..., z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_mask_X: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['field'],
+        x: NDArrayFloat, y: None = ..., z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_field_X: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['source'],
+        x: NDArrayFloat, y: NDArrayFloat, z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_source_XY: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['mask'],
+        x: NDArrayFloat, y: NDArrayFloat, z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_mask_XY: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['field'],
+        x: NDArrayFloat, y: NDArrayFloat, z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_field_XY: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['mask'],
+        x: NDArrayFloat, y: None = ..., z: NDArrayFloat = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_mask_XZ: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['field'],
+        x: NDArrayFloat, y: None = ..., z: NDArrayFloat = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_field_XZ: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['mask'],
+        x: NDArrayFloat, y: NDArrayFloat, z: NDArrayFloat,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_mask_XYZ: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['field'],
+        x: NDArrayFloat, y: NDArrayFloat, z: NDArrayFloat,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_field_XYZ: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['scalar'], frame: Literal['field'],
+        x: None = ..., y: None = ..., z: NDArrayFloat = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Scalar_field_Z: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['field'],
+        x: NDArrayFloat, y: None = ..., z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_field_X: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['mask'],
+        x: NDArrayFloat, y: NDArrayFloat, z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_mask_XY: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['source'],
+        x: NDArrayFloat, y: NDArrayFloat, z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_source_XY: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['field'],
+        x: NDArrayFloat, y: NDArrayFloat, z: None = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_field_XY: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['field'],
+        x: NDArrayFloat, y: None = ..., z: NDArrayFloat = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_field_XZ: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['field'],
+        x: NDArrayFloat, y: NDArrayFloat, z: NDArrayFloat,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_field_XYZ: ...
+
+    @overload
+    def __new__(
+        cls, kind: Literal['vector'], frame: Literal['field'],
+        x: None = ..., y: None = ..., z: NDArrayFloat = ...,
+        wavelength: float = ..., n_background: float = ..., info: str = ...,
+    ) -> Vector_field_Z: ...
+
+    @overload
+    def __new__(
+        cls, kind: Options_Diffractio_kind, frame: Options_Diffractio_frame,
+        x: NDArrayFloat | None = ..., y: NDArrayFloat | None = ...,
+        z: NDArrayFloat | None = ..., wavelength: float = ...,
+        n_background: float = ..., info: str = ...,
+    ) -> "Diffractio": ...
+
+    def __new__(cls, *_args: object, **_kwargs: object) -> object:
+        del _args, _kwargs
+        return super().__new__(cls)
 
     def __init__(self, 
                  kind: Options_Diffractio_kind,

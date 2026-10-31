@@ -1183,7 +1183,8 @@ class Scalar_field_X():
 
 
 
-    def CZT_angular(self,  theta: NDArrayFloat | None, radius_obs: float, verbose: float = False, has_draw: bool | int = False):
+    def CZT_angular(self,  theta: NDArrayFloat | None, radius_obs: float, verbose: float = False, has_draw: bool | int = False,
+                    logarithm: bool = True):
         """Chirped z-transform for arrays of points R = f(theta)
         
         The code for this algoritm is based on "Hu, Yanlei, et al. "Efficient full-path optical calculation of scalar and 
@@ -1195,6 +1196,7 @@ class Scalar_field_X():
             theta (float or np.array): theta array with observation angles
             verbose (bool): If True it prints information.
             has_draw (bool or int): If True it draws the intensity in polar and cartesian coordinates. If 1, only cartesian. If 2, only polar.
+            logarithm (bool): If True, plots the intensity in logarithmic scale in the polar view.
         Returns:
             u_out: Complex amplitude of the outgoing light beam
         """
@@ -1219,32 +1221,41 @@ class Scalar_field_X():
             plt.tight_layout()
 
 
-            
         if has_draw in (2, 'all'):
 
-            
             # Enhanced polar plot
             fig, ax = plt.subplots( subplot_kw=dict(projection='polar'))
             
             # Plot the data
-            ax.plot(theta, np.log10(I_far), 'b-', linewidth=1, label=r'$\log_{10}(I/I_{max})$')
-            
-            # Grid settings
-            ax.grid(True, alpha=1)
-            ax.set_rgrids(np.arange(-6, 1, 2), 
+
+            if logarithm:
+                ax.plot(theta, np.log10(I_far), 'b-', linewidth=1, label=r'$\log_{10}(I/I_{max})$')
+
+                # Grid settings
+                ax.grid(True, alpha=1)
+                ax.set_rgrids(np.arange(-6, 1, 2), 
                         labels=[f'{i} dB' for i in range(-6, 1, 2)], 
                         angle=45, fontsize=10)
-            
+                
+                # Set limits
+                ax.set_ylim(-6, 0)
+                ax.set_xlim(-90*degrees, 90*degrees)
+            else:
+                ax.plot(theta, I_far, 'b-', linewidth=1, label=r'$\log_{10}(I/I_{max})$')
+
+                # Grid settings
+                ax.grid(True, alpha=1)
+
+                # Set limits
+                ax.set_xlim(-90*degrees, 90*degrees)
+                
+    
             # # Angular grid with degree labels
             # theta_deg_ticks = np.arange(theta[0]/degrees, theta[-1]/degrees+0.1, 15/degrees)
             # ax.set_thetagrids(theta_deg_ticks, 
             #                 labels=[f'{int(t)}°' for t in theta_deg_ticks], 
             #                 fontsize=10)
-            
-            # # Set limits
-            ax.set_ylim(-6, 0)
-            ax.set_xlim(-90*degrees, 90*degrees)
-            
+        
             # Title and labels
             # ax.set_title('Far field pattern - Polar View', fontsize=10)
                         

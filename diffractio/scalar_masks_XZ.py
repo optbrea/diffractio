@@ -1631,7 +1631,90 @@ class Scalar_mask_XZ(Scalar_field_XZ):
         ipasa = conditionZ * conditionX
         self.n[ipasa] = refractive_index
         return ipasa
+    
+    def blazed_grating(self, r0: tuple[float, float], period: float, blazed_order: int, refractive_index: float, thickness: float):
+    
+        """
+        Creates a blazed grating optimized for a given diffraction order.
 
+        Args:
+            r0 (tuple[float, float]): Position of the initial point of the blazed grating (x, z).
+            period (float): Period of the grating.
+            blazed_order (int): Diffraction order for which the blaze is optimized.
+                The sign of the order determines the direction of the blaze (example, +1 or −1).
+            refractive_index (float): Refractive index of the blazed grating material.
+            thickness (float): Thickness of the grating.
+   
+        TODO: 
+            Rotation not working due to mask_from_array implementation.
+            Update when mask_from_array handles rotation correctly.
+        """
+
+        x0 = r0[0]
+        z0 = r0[1]
+        x = self.x
+
+        h_max = blazed_order * self.wavelength / (refractive_index - 1)
+        height = ((x - x0) % period) / period * h_max
+
+        z2 = np.ones_like(height)
+        z2 *= thickness
+
+        profile_1 = np.array((x, -height))
+        profile_2 = np.array((x, z2))
+
+
+        self.mask_from_array(
+            r0=(x0, z0),
+            refractive_index=refractive_index,
+            array1=profile_1,
+            array2=profile_2,
+            x_sides=(x[0], x[-1]),
+            interp_kind="linear",
+        )
+
+    
+    def multilevel_grating(self, r0: tuple, period: float, num_levels: int, target_order: int, refractive_index: float, thickness: float):
+
+        """
+        Creates a multilevel grating optimized for a given diffraction order.
+
+        Args:
+            r0 (tuple[float, float]): Position of the initial point of the grating (x, z).
+            period (float): Period of the grating.
+            num_levels (int): Number of discrete height levels used to approximate the continuous blazed profile.
+            target_order (int): Diffraction order for which the blaze is optimized.
+                The sign of the order determines the direction of the blaze (example, +1 or −1).
+            refractive_index (float): Refractive index of the grating material.
+            thickness (float): Thickness of the grating.
+
+        TODO: 
+            Rotation not working due to mask_from_array implementation.
+            Update when mask_from_array handles rotation correctly.
+        """
+
+        x0, z0 = r0
+        x = self.x
+
+        h_max = target_order * self.wavelength / (refractive_index - 1)
+        height_continuous = ((x - x0) % period) / period * h_max
+
+        delta_h = h_max / num_levels
+        height_quantized = delta_h * np.floor(height_continuous / delta_h)
+
+        bottom = np.full_like(height_quantized, thickness)
+
+        profile_1 = np.array((x, -height_quantized))
+        profile_2 = np.array((x, bottom))
+
+        self.mask_from_array(
+            r0=(x0, z0),
+            refractive_index=refractive_index,
+            array1=profile_1,
+            array2=profile_2,
+            x_sides=(x[0], x[-1]),
+            interp_kind="linear",
+        )
 
     def probe(self, r0: tuple[float, float], base: float, length: float,
               refractive_index: complex | float | str, angle: float = 0*degrees):

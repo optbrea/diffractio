@@ -26,14 +26,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy as sp
 
+import os
+import sys
+
 __author__ = """Luis Miguel Sanchez Brea"""
 __email__ = 'optbrea@ucm.es'
 __version__ = '1.0.0'
 name = 'diffractio'
 
 um = 1.
-mm = 1000.*um
 nm = um / 1000.
+mm = 1000.*um
+m = 1000.*mm
+km = 1000.*m
+
 degrees = np.pi / 180.
 s = 1.
 seconds = 1.
@@ -49,3 +55,9 @@ date_test = now.strftime("%Y-%m-%d_%H")
 num_max_processors = multiprocessing.cpu_count()
 
 rcParams['figure.dpi'] = 75
+
+
+
+# Security/Stability configuration for Qt5 backend on Linux (prevents freezes/crashes in Jupyter/VS Code)
+os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "0"
+

@@ -4,10 +4,11 @@
     "python.analysis.typeCheckingMode": "basic",
     "python.defaultInterpreterPath": "./.venv/bin/python",
     "python.analysis.autoImportCompletions": true,
+    "python.analysis.extraPaths": ["../py_pol"],
     "python-envs.pythonProjects": [
         {
             "path": ".",
-            "envManager": "ms-python.python:venv",
+            "envManager": "ms-python.python:pipenv",
             "packageManager": "ms-python.python:pip"
         }
     ],

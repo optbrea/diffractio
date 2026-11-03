@@ -13,6 +13,6 @@ ipympl>=0.9.3
 ezdxf 
 pyvista
 python-ffmpeg
-pyqt5
+PySide6
 opencv-python
 psutil

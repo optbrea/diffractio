@@ -297,9 +297,13 @@ class Test_Scalar_fields_XY():
         h, z_profile, point1, point2 = field.profile(point1=p1,
                                                      point2=p2,
                                                      kind='intensity',
-                                                     order=1)
+                                                     order=1,
+                                                     has_draw=False)
 
-        field.draw_profile(point1=p1, point2=p2, kind='intensity', order=1)
+        plt.figure()
+        plt.plot(h, z_profile, 'k', linewidth=2)
+        plt.xlabel('h (profile)')
+        plt.ylabel('intensity')
         save_figure_test(newpath, func_name, add_name='_prof')
 
         field.draw()
@@ -353,7 +357,10 @@ class Test_Scalar_fields_XY():
         u.draw()
         save_figure_test(newpath, func_name, add_name='_field')
 
-        u.MTF(has_draw=True)
+        fx = np.linspace(-250,250,1000)
+        fy = np.linspace(-250,250,1000)
+
+        u.MTF(fx=fx, fy=fy, has_draw=True)        
         save_figure_test(newpath, func_name, add_name='_mtf')
 
     def test_average_intensity(self):

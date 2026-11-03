@@ -16,7 +16,7 @@ with open('requirements.txt', encoding='utf8') as req:
 # requirements = [
 #     'matplotlib', 'numpy', 'scipy', 'ezdxf',
 #     'screeninfo', 'Pillow', 'numexpr', 'pandas', 'py_pol',
-#     'ipywidgets', 'ipympl>=0.9.3', 'opencv-python', 'psutil', 'pyvista', 'python-ffmpeg', 'pyqt5',
+#     'ipywidgets', 'ipympl>=0.9.3', 'opencv-python', 'psutil', 'pyvista', 'python-ffmpeg', 'PySide6',
 # ]
 
 setup_requirements = [

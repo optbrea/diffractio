@@ -1971,4 +1971,3 @@ Total
  Total number of functions: 639
 
  Total number of lines across all files: 26026
-

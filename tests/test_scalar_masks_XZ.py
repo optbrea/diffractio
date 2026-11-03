@@ -224,7 +224,6 @@ class Test_Scalar_masks_XZ():
         filename = '{}{}'.format(newpath, func_name)
 
         x0 = np.linspace(-100*um, 100*um, 256)
-        print("Dx={}".format(x0[1] - x0[0]))
         z0 = np.linspace(0*um, 400*um, 256)
         wavelength = 50*um
 

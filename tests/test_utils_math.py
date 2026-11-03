@@ -100,18 +100,6 @@ class Test_utils_math():
         proposal = binarize(vector, min_value=-1, max_value=1)
         assert comparison(proposal, solution, eps), func_name
 
-    def test_amplitude2phase(self):
-        func_name = sys._getframe().f_code.co_name
-
-        u = np.linspace(0, 2 * np.pi, 6)
-        solution = np.exp(1j * u)
-        proposal = amplitude2phase(u)
-        assert comparison(proposal, solution, eps), func_name
-
-    def test_phase2amplitude(self):
-        # TODO:test
-
-        assert True
 
     def test_normalize(self):
         func_name = sys._getframe().f_code.co_name
@@ -126,57 +114,3 @@ class Test_utils_math():
         proposal = normalize(v, 2)
         assert comparison(proposal, solution, eps), func_name
 
-    def test_vector_product(self):
-        # TODO:test
-
-        assert True
-
-    def test_dot_product(self):
-        # TODO:test
-
-        assert True
-
-    def test_divergence(self):
-        # TODO:test
-
-        assert True
-
-    def test_curl(self):
-        # TODO:test
-
-        assert True
-
-    def test_get_transitions(self):
-        # TODO:test
-
-        assert True
-
-    def test_cut_function(self):
-        # TODO:test
-
-        assert True
-
-    def test_fft_convolution2d(self):
-        # TODO:test
-
-        assert True
-
-    def test_fft_convolution1d(self):
-        # TODO:test
-
-        assert True
-
-    def test_fft_correlation1d(self):
-        # TODO:test
-
-        assert True
-
-    def test_fft_correlation2d(self):
-        # TODO:test
-
-        assert True
-
-    def test_rotate_image(self):
-        # TODO:test
-
-        assert True

@@ -364,7 +364,7 @@ class Test_Scalar_masks_XY():
         wavelength = 0.6328*um
 
         t1 = Scalar_mask_XY(x, y, wavelength)
-        t1.super_gauss(r0=(0*um, 0*um),
+        t1.super_gauss_circular(r0=(0*um, 0*um),
                        radius=(length / 3, length / 3),
                        angle=45*degrees,
                        power=22)

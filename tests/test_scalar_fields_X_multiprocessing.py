@@ -77,6 +77,23 @@ def __function_polychromatic__(wavelength):
     return u1
 
 
+def __benchmark_RS_propagation__(parameters):
+    x = np.linspace(-100*um, 100*um, parameters['num_points'])
+    field = Scalar_source_X(x, parameters['wavelength'])
+    field.gauss_beam(
+        x0=parameters['x0'],
+        w0=parameters['w0'],
+        z0=0,
+        A=1,
+        theta=0,
+    )
+
+    for z in parameters['distances']:
+        field = field.RS(z=z, new_field=True, verbose=False)
+
+    return field.u
+
+
 def __experiment_grating_movement__(dict_params):
     delta_x = dict_params['delta_x']
     period = dict_params['period']
@@ -215,8 +232,6 @@ class Test_Scalar_fields_X():
         period = 50*um
         z_talbot = 2 * period**2 / wavelength
         z0 = z_talbot/2
-        delay = 0.001
-
         t1 = Scalar_mask_X(x0,
                            wavelength,
                            info="__experiment_grating_movement__")
@@ -268,8 +283,6 @@ class Test_Scalar_fields_X():
             h1.set_ydata(intensidad)
             h2.set_ydata(perfil)
             plt.draw()
-            plt.pause(delay)
-        plt.pause(0.25)
         save_figure_test(newpath, func_name)
 
         assert True
@@ -335,6 +348,42 @@ def __experiment_extended_polychromatic_source__(dict_params):
 
 
 class Test_Scalar_fields_X_multiprocessing():
+
+    def test_multiprocessing_propagation_benchmark(self):
+        parameters = [
+            {
+                'num_points': 131072,
+                'wavelength': (0.5 + index * 0.01) * um,
+                'x0': (index - 5.5) * um,
+                'w0': (25 + index) * um,
+                'distances': (10 * um, 20 * um, 30 * um, 40 * um),
+            }
+            for index in range(48)
+        ]
+        num_processors = num_max_processors-2
+
+        start = time.perf_counter()
+        sequential_results = [
+            __benchmark_RS_propagation__(item) for item in parameters
+        ]
+        sequential_time = time.perf_counter() - start
+
+        parallel_results, parallel_time = execute_multiprocessing(
+            __benchmark_RS_propagation__,
+            parameters,
+            num_processors,
+            verbose=False,
+        )
+
+        for sequential, parallel in zip(sequential_results, parallel_results):
+            np.testing.assert_allclose(parallel, sequential, rtol=1e-10, atol=1e-12)
+
+        speedup = sequential_time / parallel_time
+        print(
+            f"Propagation benchmark: sequential={sequential_time:.3f}s, "
+            f"{num_processors} processes={parallel_time:.3f}s, "
+            f"speedup={speedup:.2f}x"
+        )
 
     def test_multiprocessing_dictionary(self):
         func_name = sys._getframe().f_code.co_name

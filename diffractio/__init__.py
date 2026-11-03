@@ -58,6 +58,5 @@ rcParams['figure.dpi'] = 75
 
 
 
-# Security/Stability configuration for Qt5 backend on Linux (prevents freezes/crashes in Jupyter/VS Code)
+# Security/Stability configuration for Qt backend on Linux (prevents freezes/crashes in Jupyter/VS Code)
 os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "0"
-

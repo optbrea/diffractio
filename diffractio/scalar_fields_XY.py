@@ -104,10 +104,10 @@ except:
 try:
     import cv2
     if sys.platform.startswith("linux"):
-        from PyQt5.QtCore import QLibraryInfo
+        from PySide6.QtCore import QLibraryInfo
 
-        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.location(
-            QLibraryInfo.PluginsPath
+        os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = QLibraryInfo.path(
+            QLibraryInfo.LibraryPath.PluginsPath
         )
         os.environ.pop("QT_QPA_FONTDIR", None)
 except:

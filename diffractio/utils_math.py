@@ -208,7 +208,7 @@ def reduce_to_1(class_diffractio):
 
     return class_diffractio
 
-def distance(p1: NDArray | float,p2: NDArray | float, verbose: bool = False):
+def distance(p1: NDArray | float, p2: NDArray | float, verbose: bool = False):
     """Distance between to floats or numpy arrays.
 
     Args:
@@ -223,7 +223,13 @@ def distance(p1: NDArray | float,p2: NDArray | float, verbose: bool = False):
     if isinstance(p2, (int, float)):
         d = np.abs((p2-p1))
     else:
-        d = np.sqrt(np.sum((p2-p1)**2, axis=1))
+        try:
+            d = np.sqrt(np.sum(np.abs(p2-p1)**2, axis=1))
+        except:
+            d = np.sqrt(np.sum(np.abs(p2-p1)**2, axis=0))
+
+
+
 
     if verbose:
         print(f'distance between p1 and p2: {d}')
@@ -261,12 +267,17 @@ def nearest(vector: NDArray, number: float | int, verbose: bool=False):
     
     ds = distance(vector, number)
 
-    index = ds.argmin()
+    if ds.ndim == 1:
+        index = ds.argmin()
+    elif ds.ndim==2:
+        index = np.unravel_index(np.argmin(ds), ds.shape)
     value = vector[index]
     dist_min = ds[index]
 
+
     if verbose:
         print(f'index: {index}, value: {value}, dist_min: {dist_min}')
+
 
     return index, value, dist_min
 

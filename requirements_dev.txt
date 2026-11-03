@@ -6,6 +6,7 @@ Sphinx
 twine
 pytest-cov
 pytest
+pytest-qt
 
 # bumpversion==0.5.3
 # flake8==3.5.0

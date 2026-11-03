@@ -312,19 +312,19 @@ def add(self, other, kind: Options_add  = 'source'):
         f1 = np.angle(self.u)
         if isinstance(other, tuple):
 
-            t.u = self.u
+            t.u = self.u.astype(np.complex128)
             for o in other:
                 t2 = np.abs(o.u)
                 f2 = np.angle(o.u)
                 t.u += o.u
                 i_change = t1+t2>1
-                t.u[i_change]=(np.exp(1j*f1[i_change])+np.exp(1j*f2[i_change])).astype(np.complex128)
+                t.u[i_change]=np.exp(1j*f1[i_change])+np.exp(1j*f2[i_change])
                 t.u[i_change]= t.u[i_change]/np.abs( t.u[i_change])
         else:
             t2 = np.abs(other.u)
             f2 = np.angle(other.u)
 
-            t.u = self.u + other.u
+            t.u = (self.u + other.u).astype(np.complex128)
             i_change = t1+t2>1
             t.u[i_change]=np.exp(1j*f1[i_change])+np.exp(1j*f2[i_change])
             t.u[i_change]= t.u[i_change]/np.abs(t.u[i_change])

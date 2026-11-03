@@ -357,7 +357,10 @@ class Test_Scalar_fields_X():
         save_figure_test(newpath, func_name, add_name='_mask')
         u0.save_data(filename=filename + '_mask' + '.npz')
 
-        u0.MTF(kind='mm', has_draw=True)
+        frequencies=np.linspace(-50,50,1000)
+
+
+        u0.MTF(frequencies=frequencies, incoherent=False, has_draw=True)
         plt.xlim(-250, 250)
         save_figure_test(newpath, func_name, add_name='_mtf')
         assert True

@@ -252,7 +252,7 @@ class Scalar_source_X(Scalar_field_X):
 
         Args:
             lc (float, float) | float: correlation length in micrometers
-            s (float): standard deviation in microns, for example $\lambda$/2.
+            s (float): standard deviation in microns, for example $\\lambda$/2.
             has_draw (bool, optional): Whether to draw the result. Defaults to True.
             verbose (bool, optional): Prints statistics about the roughness. Defaults to True.
 

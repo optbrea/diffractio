@@ -779,17 +779,15 @@ class Scalar_field_XZ():
         numz = len(self.z)  # distance en z
         numx = len(self.x)  # distance en x
         deltaz = self.z[1] - self.z[0]  # Tamaño del sampling
-        rangox = self.x[-1] - self.x[0]
+        deltax = self.x[1] - self.x[0]
 
         pixelx = np.linspace(-int(numx/2), int(numx/2), numx)
         # initial field
         field_z = self.u0.u
         
         # Calculo de la phase 1 normalizada -------------------
-        kx1 = np.linspace(0, int(numx/2) + 1, int(numx/2))
-        kx2 = np.linspace(-int(numx/2), -1, int(numx/2))
-        # Número de ondas del material en una dimensión
-        kx = (2 * np.pi / rangox) * np.concatenate((kx1, kx2))
+        # Use fftfreq to guarantee kx has exactly numx samples (odd/even-safe).
+        kx = 2 * np.pi * np.fft.fftfreq(numx, d=deltax)
         # Función de transferencia para la propagación que es identica
         # a la respuesta de frecuencia espacial en óptica de Fourier
         # incorporando el termino (-j k0 z).
